@@ -32,6 +32,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:va
 select,input[type=text],input[type=number]{padding:7px 10px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:13px;font-family:inherit}
 .upload-zone{border:2px dashed var(--border2);border-radius:var(--rl);padding:48px 24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg)}
 .upload-zone:hover,.upload-zone.drag{border-color:#185FA5;background:var(--info-bg)}
+@keyframes spin{to{transform:rotate(360deg)}}
 .upload-zone i{font-size:44px;color:var(--text3);display:block;margin-bottom:14px}
 .suppliers-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:16px}
 .sup-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);padding:16px;cursor:pointer;transition:all .15s;position:relative}
@@ -217,57 +218,88 @@ input[type=range]{flex:2;accent-color:#185FA5}
     <button class="btn" onclick="document.getElementById('projectInput').click()"><i class="ti ti-folder-open"></i> <span>Load Project</span></button>
     <input type="file" id="projectInput" accept=".json" style="display:none" onchange="loadProject(this.files[0]);this.value=''">
   </div>
-  <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()"
-    ondragover="ev=event;ev.preventDefault();ev.currentTarget.classList.add('drag')"
-    ondragleave="event.currentTarget.classList.remove('drag')" ondrop="handleDrop(event)">
-    <i class="ti ti-cloud-upload"></i>
-    <div style="font-size:16px;font-weight:500;margin-bottom:6px">Drop Excel file here or click</div>
-    <div style="font-size:13px;color:var(--text2)">Unterstützt .xlsx - Mehrere Suppliers nacheinander - Audit-Blaetter automatisch erkannt</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+    <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()"
+      ondragover="ev=event;ev.preventDefault();ev.currentTarget.classList.add('drag')"
+      ondragleave="event.currentTarget.classList.remove('drag')" ondrop="handleDrop(event)"
+      style="margin:0">
+      <i class="ti ti-cloud-upload"></i>
+      <div style="font-size:14px;font-weight:600;margin-bottom:4px">Standard Import</div>
+      <div style="font-size:12px;color:var(--text2)">Drop .xlsx here or click · Requires standard column names (Checkpoint, Score, Notes)</div>
+    </div>
+    <div class="upload-zone" onclick="document.getElementById('aiFileInput').click()" style="margin:0;border-color:#185FA5;background:var(--bg2)">
+      <i class="ti ti-sparkles" style="color:#185FA5"></i>
+      <div style="font-size:14px;font-weight:600;margin-bottom:4px;color:#185FA5">AI Import <span style="font-size:10px;font-weight:700;background:#185FA5;color:#fff;padding:2px 6px;border-radius:4px;vertical-align:middle">NEW</span></div>
+      <div style="font-size:12px;color:var(--text2)">Any Excel structure · AI detects sheets, skips cover/index tabs, maps columns automatically</div>
+    </div>
   </div>
   <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none" onchange="handleFile(this.files[0]);this.value=''">
+  <input type="file" id="aiFileInput" accept=".xlsx,.xls" style="display:none" onchange="aiImportExcel(this.files[0]);this.value=''">
   <div id="importStatus" style="margin-top:12px;font-size:13px;color:var(--text2);min-height:20px"></div>
   <div id="suppliersList"></div>
 </div>
 
 <div class="page" id="page-new">
   <div class="section-title"><i class="ti ti-user-plus"></i> New Supplier</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:960px">
 
-    <!-- Left: Create supplier -->
-    <div class="card">
-      <div style="font-size:14px;font-weight:600;margin-bottom:14px">Create from Template</div>
-      <div style="margin-bottom:12px">
-        <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">Supplier Name</label>
-        <input id="newSupName" type="text" placeholder="e.g. Supplier GmbH" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text)">
+  <!-- Tabs -->
+  <div class="tabs-row">
+    <button class="etab active" id="ntab-create" onclick="switchNewTab('create',this)"><i class="ti ti-plus"></i> Create Supplier</button>
+    <button class="etab" id="ntab-builder" onclick="switchNewTab('builder',this)"><i class="ti ti-template"></i> Template Builder</button>
+  </div>
+
+  <!-- Tab: Create Supplier -->
+  <div class="etab-content active" id="ntab-create-content">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:760px">
+      <div class="card">
+        <div style="font-size:14px;font-weight:600;margin-bottom:14px">Create from Template</div>
+        <div style="margin-bottom:12px">
+          <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">Supplier Name *</label>
+          <input id="newSupName" type="text" placeholder="e.g. Supplier GmbH" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text)">
+        </div>
+        <div style="margin-bottom:16px">
+          <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">Template *</label>
+          <select id="newSupTemplate" onchange="renderTemplatePreview()" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text)">
+            <option value="">-- Select template --</option>
+          </select>
+        </div>
+        <div id="templatePreview" style="margin-bottom:16px;font-size:12px;color:var(--text2)"></div>
+        <button class="btn primary" onclick="createSupplierFromTemplate()" style="width:100%"><i class="ti ti-plus"></i> Create Supplier</button>
       </div>
-      <div style="margin-bottom:16px">
-        <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">Template</label>
-        <select id="newSupTemplate" onchange="renderTemplatePreview()" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text)">
-          <option value="">-- Select template --</option>
-        </select>
+      <div class="card">
+        <div style="font-size:14px;font-weight:600;margin-bottom:14px">Import from Supplier</div>
+        <div style="margin-bottom:12px;font-size:13px;color:var(--text2)">Copy the structure of an existing supplier as a new template.</div>
+        <div style="margin-bottom:10px">
+          <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">Template Name</label>
+          <input id="newTplName" type="text" placeholder="e.g. Standard Audit L2" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text)">
+        </div>
+        <div style="margin-bottom:12px">
+          <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">Based on Supplier</label>
+          <select id="newTplSource" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text)">
+            <option value="">-- Select supplier --</option>
+          </select>
+        </div>
+        <button class="btn success" onclick="saveTemplate()" style="width:100%"><i class="ti ti-device-floppy"></i> Save as Template</button>
       </div>
-      <div id="templatePreview" style="margin-bottom:16px;font-size:12px;color:var(--text2)"></div>
-      <button class="btn primary" onclick="createSupplierFromTemplate()" style="width:100%"><i class="ti ti-plus"></i> Create Supplier</button>
     </div>
+  </div>
 
-    <!-- Right: Manage templates -->
-    <div class="card">
-      <div style="font-size:14px;font-weight:600;margin-bottom:14px">Templates</div>
-      <div style="margin-bottom:12px;font-size:13px;color:var(--text2)">Save the structure of an existing supplier as a reusable template (scores and notes are not saved).</div>
-      <div style="margin-bottom:10px">
-        <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">Template Name</label>
-        <input id="newTplName" type="text" placeholder="e.g. Standard Audit L2" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text)">
+  <!-- Tab: Template Builder -->
+  <div class="etab-content" id="ntab-builder-content">
+    <div style="display:grid;grid-template-columns:280px 1fr;gap:16px;max-width:1100px">
+
+      <!-- Left: template list -->
+      <div>
+        <button class="btn primary" onclick="startNewTemplate()" style="width:100%;margin-bottom:12px"><i class="ti ti-plus"></i> New Template</button>
+        <div id="tplBuilderList"></div>
       </div>
-      <div style="margin-bottom:12px">
-        <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">Based on Supplier</label>
-        <select id="newTplSource" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text)">
-          <option value="">-- Select supplier --</option>
-        </select>
+
+      <!-- Right: editor -->
+      <div id="tplBuilderEditor">
+        <div class="empty" style="padding:40px"><i class="ti ti-template"></i>Select a template to edit or create a new one</div>
       </div>
-      <button class="btn success" onclick="saveTemplate()" style="width:100%;margin-bottom:16px"><i class="ti ti-device-floppy"></i> Save as Template</button>
-      <div id="templatesList"></div>
+
     </div>
-
   </div>
 </div>
 
@@ -309,7 +341,7 @@ input[type=range]{flex:2;accent-color:#185FA5}
     <select id="dataCatSelect" onchange="renderDataTable()"><option value="">All Categories</option></select>
     <button class="btn primary" onclick="saveDataEdits()"><i class="ti ti-device-floppy"></i> <span>Save</span></button>
   </div>
-  <div class="info-box"><i class="ti ti-info-circle"></i> Edit scores (1-5 or N.A.) and notes directly, then click Save. Use <i class="ti ti-camera"></i> to attach photos to a checkpoint.</div>
+  <div class="info-box"><i class="ti ti-info-circle"></i> Edit scores (0-5 or N.A.) and notes directly, then click Save. Use <i class="ti ti-camera"></i> to attach photos to a checkpoint. Use <i class="ti ti-book"></i> to view the scoring rubric for a checkpoint.</div>
   <input type="file" id="imgFileInput" accept="image/*" capture="environment" style="display:none" onchange="handleImageUpload(this)">
   <div id="dataTableContent"><div class="empty">Select supplier</div></div>
 </div>
@@ -317,7 +349,13 @@ input[type=range]{flex:2;accent-color:#185FA5}
 <div class="page" id="page-actions">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
     <div class="section-title" style="margin:0"><i class="ti ti-clipboard-check"></i> Actions</div>
-    <button class="btn primary" onclick="openActionModal()"><i class="ti ti-plus"></i> New Action</button>
+    <div style="display:flex;gap:8px">
+      <div style="display:flex;border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
+        <button id="actViewList" onclick="setActView('list')" style="padding:6px 12px;font-size:12px;border:none;cursor:pointer;background:var(--primary);color:#fff;display:flex;align-items:center;gap:4px"><i class="ti ti-list"></i> List</button>
+        <button id="actViewGantt" onclick="setActView('gantt')" style="padding:6px 12px;font-size:12px;border:none;cursor:pointer;background:var(--bg);color:var(--text);display:flex;align-items:center;gap:4px"><i class="ti ti-chart-gantt"></i> Gantt</button>
+      </div>
+      <button class="btn primary" onclick="openActionModal()"><i class="ti ti-plus"></i> New Action</button>
+    </div>
   </div>
 
   <!-- Filters -->
@@ -346,8 +384,9 @@ input[type=range]{flex:2;accent-color:#185FA5}
   <!-- KPI row -->
   <div id="actionsKpi" class="metric-row" style="margin-bottom:16px"></div>
 
-  <!-- Table -->
+  <!-- List / Gantt -->
   <div id="actionsContent"></div>
+  <div id="actionsGantt" style="display:none"></div>
 </div>
 
 <!-- Action Modal -->
@@ -389,6 +428,10 @@ input[type=range]{flex:2;accent-color:#185FA5}
       <div>
         <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">Responsible</label>
         <input id="actResponsible" type="text" placeholder="Name" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text)">
+      </div>
+      <div>
+        <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">Start Date</label>
+        <input id="actStart" type="date" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text)">
       </div>
       <div>
         <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">Due Date</label>
@@ -439,11 +482,28 @@ input[type=range]{flex:2;accent-color:#185FA5}
           <button class="btn" onclick="resetTiers()"><i class="ti ti-refresh"></i> Reset to Default</button>
         </div>
       </div></div>
-      <div class="section-title"><i class="ti ti-key"></i> API-Key (KI-Analysis)</div>
+      <div class="section-title"><i class="ti ti-key"></i> AI Settings</div>
       <div class="card">
-        <p style="font-size:13px;color:var(--text2);margin-bottom:10px">Anthropic API key. Create at anthropic.com/api</p>
-        <input type="text" id="apiKey" placeholder="sk-ant-..." style="width:100%;font-family:monospace;font-size:11px;margin-bottom:10px">
-        <button class="btn primary" onclick="runAI()"><i class="ti ti-sparkles"></i> AI Priority Analysis starten</button>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:10px">Anthropic API key — create at <b>console.anthropic.com</b></p>
+        <input type="text" id="apiKey" value="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" style="width:100%;font-family:monospace;font-size:11px;margin-bottom:12px">
+        <div style="margin-bottom:14px">
+          <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px">Model</label>
+          <div style="display:flex;flex-direction:column;gap:6px" id="modelPicker">
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r)">
+              <input type="radio" name="aiModel" value="claude-haiku-4-5-20251001" checked style="margin-top:2px">
+              <div><div style="font-size:13px;font-weight:600">Haiku 4.5 <span style="background:#E8F5E9;color:#1A8A5A;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:700">Recommended</span></div><div style="font-size:11px;color:var(--text2);margin-top:2px">Fastest · Cheapest · ~$0.001/request · Best for daily use</div></div>
+            </label>
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r)">
+              <input type="radio" name="aiModel" value="claude-sonnet-4-6" style="margin-top:2px">
+              <div><div style="font-size:13px;font-weight:600">Sonnet 4.6</div><div style="font-size:11px;color:var(--text2);margin-top:2px">Smarter · ~10× cost · Better for complex analysis</div></div>
+            </label>
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r)">
+              <input type="radio" name="aiModel" value="claude-opus-4-8" style="margin-top:2px">
+              <div><div style="font-size:13px;font-weight:600">Opus 4.8</div><div style="font-size:11px;color:var(--text2);margin-top:2px">Most capable · ~30× cost · For deep strategic analysis</div></div>
+            </label>
+          </div>
+        </div>
+        <button class="btn primary" onclick="runAI()"><i class="ti ti-sparkles"></i> Start AI Risk Analysis (All Suppliers)</button>
       </div>
     </div>
   </div>
@@ -467,6 +527,7 @@ input[type=range]{flex:2;accent-color:#185FA5}
         <label class="chk-label on" onclick="toggleChk(this,'ropt_summary')"><input type="checkbox" id="ropt_summary" checked style="display:none"><i class="ti ti-check" style="font-size:12px"></i> <span>Summary</span></label>
         <label class="chk-label on" onclick="toggleChk(this,'ropt_mgmt')"><input type="checkbox" id="ropt_mgmt" checked style="display:none"><i class="ti ti-check" style="font-size:12px"></i> <span>Management One-Pager</span></label>
 <label class="chk-label on" onclick="toggleChk(this,'ropt_detail')"><input type="checkbox" id="ropt_detail" checked style="display:none"><i class="ti ti-check" style="font-size:12px"></i> <span>Detail Tables</span></label>
+        <label class="chk-label on" onclick="toggleChk(this,'ropt_actions')"><input type="checkbox" id="ropt_actions" checked style="display:none"><i class="ti ti-check" style="font-size:12px"></i> <span>Action Plan + Gantt</span></label>
         <label class="chk-label" onclick="toggleChk(this,'ropt_notes')"><input type="checkbox" id="ropt_notes" style="display:none"> <span>Rows with notes only</span></label>
       </div>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;font-size:13px">
@@ -484,6 +545,14 @@ input[type=range]{flex:2;accent-color:#185FA5}
     </div>
 
     <div class="etab-content" id="etab-excel">
+      <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--text1)">Sheets to include</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+        <label class="chk-label on" onclick="toggleChk(this,'xopt_dashboard')"><input type="checkbox" id="xopt_dashboard" checked style="display:none"><i class="ti ti-check" style="font-size:12px"></i> <span>📊 Dashboard</span></label>
+        <label class="chk-label on" onclick="toggleChk(this,'xopt_ranking')"><input type="checkbox" id="xopt_ranking" checked style="display:none"><i class="ti ti-check" style="font-size:12px"></i> <span>🏆 Ranking</span></label>
+        <label class="chk-label on" onclick="toggleChk(this,'xopt_detail')"><input type="checkbox" id="xopt_detail" checked style="display:none"><i class="ti ti-check" style="font-size:12px"></i> <span>📋 Detail per Supplier</span></label>
+        <label class="chk-label on" onclick="toggleChk(this,'xopt_actions')"><input type="checkbox" id="xopt_actions" checked style="display:none"><i class="ti ti-check" style="font-size:12px"></i> <span>✅ Action Plan</span></label>
+      </div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--text1)">Suppliers</div>
       <div id="exportSupplierListExcel" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px"></div>
       <div style="display:flex;gap:8px;margin-bottom:16px">
         <button class="btn sm" onclick="selectAllExport('excel')">All</button>
@@ -519,6 +588,7 @@ input[type=range]{flex:2;accent-color:#185FA5}
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <script>// SupplierAuditTool v6.1 - 2026-06-13-fix
 
 var LOGOS = {
@@ -529,7 +599,7 @@ var LOGOS = {
   OnyxGrey: "image/png;base64,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",
 };
 // Logo position from template Basic layout
-var LOGO_X = 9.3048, LOGO_Y = 0.2215, LOGO_W = 0.3405, LOGO_H = 0.3311;
+var LOGO_X = 12.55, LOGO_Y = 0.22, LOGO_W = 0.50, LOGO_H = 0.40;
 
 var selectedTheme='ElectricBlue',lang='de';
 var suppliers=[],weights={},charts={},templates=[],actions=[];
@@ -538,7 +608,7 @@ var exportSelectedPptx=new Set(),exportSelectedExcel=new Set(),exportSelectedPdf
 var TIERS=[
   {min:85,color:'#1A8A5A',hex:'1A8A5A',label:'Very Good',risk:'Low risk'},
   {min:70,color:'#E07B00',hex:'E07B00',label:'Good',risk:'Targeted improvements suggested'},
-  {min:55,color:'#C8A000',hex:'C8A000',label:'Moderate',risk:'Corrective actions needed'},
+  {min:55,color:'#B8860B',hex:'B8860B',label:'Moderate',risk:'Corrective actions needed'},
   {min:0, color:'#C0392B',hex:'C0392B',label:'High Risk',risk:'Immediate action required'},
 ];
 var DEFAULT_TIERS=JSON.parse(JSON.stringify(TIERS));
@@ -555,7 +625,7 @@ var I18N={
     critical:'Kritisch',medium:'Mittel',good:'Gut',reset:'Reset',
     detTitle:'Analysis',supplier:'Supplier',allSuppliers:'All Suppliers',allCats:'All Categories',
     dataTitle:'Datenkontrolle',selectSup:'-- Select supplier --',saveBtn:'Speichern',
-    dataInfo:'Edit scores (1-5 or N.A.) and notes directly, then click Save.',
+    dataInfo:'Edit scores (0-5 or N.A.) and notes directly, then click Save.',
     settingsReport:'Berichtskopf',auditorLbl:'Auditor Name',companyLbl:'Unternehmen',projectLbl:'Projekt',dateAuto:'Datum wird automatisch auf heute gesetzt.',
     settingsLang:'Sprache',settingsThresh:'Ampelschwellen',greenFrom:'Gruen ab',yellowFrom:'Gelb ab',redAuto:'Rot unter Gelb (automatisch)',applyBtn:'Anwenden',
     settingsWeights:'Category Weighting',weightsInfo:'0 = deaktiviert - 1.0 = normal - 3.0 = dreifach',resetBtn:'Zuruecksetzen',afterImport:'Nach Import verfuegbar',
@@ -595,7 +665,7 @@ var I18N={
     filterBarAmpel:'Ampel:',filterBarCat:'Category:',filterBarSup:'Supplier:',
     filterNoCat:'No category matches the filter',filterNoSup:'No supplier matches the filter',
     catScoreTitle:'Score per Category',phAuditor:'Max Mustermann',phCompany:'P3 Group',phProject:'Supplier Audit 2025',
-    dataInfoText:'Edit scores (1-5 or N.A.) and notes directly, then click Save.',
+    dataInfoText:'Edit scores (0-5 or N.A.) and notes directly, then click Save.',
     berichtskopf:'Berichtskopf',spracheLbl:'Sprache',ampelLbl:'Ampelschwellen',
     gewichtLbl:'Category Weighting',gewichtInfo:'0 = deaktiviert - 1.0 = normal - 3.0 = dreifach',
     apiKeyLbl:'API-Key (KI-Analyse)',apiKeyInfo2:'Anthropic API-Key. Erstellen unter anthropic.com/api',
@@ -611,7 +681,7 @@ var I18N={
     critical:'Critical',medium:'Medium',good:'Good',reset:'Reset',
     detTitle:'Analysis',supplier:'Supplier',allSuppliers:'All Suppliers',allCats:'All Categories',
     dataTitle:'Data Control',selectSup:'-- Select supplier --',saveBtn:'Save',
-    dataInfo:'Edit scores (1-5 or N.A.) and notes directly, then click Save.',
+    dataInfo:'Edit scores (0-5 or N.A.) and notes directly, then click Save.',
     settingsReport:'Report Header',auditorLbl:'Auditor Name',companyLbl:'Company',projectLbl:'Project',dateAuto:'Date is set automatically.',
     settingsLang:'Language',settingsThresh:'Traffic Light Thresholds',greenFrom:'Green from',yellowFrom:'Yellow from',redAuto:'Red below yellow (automatic)',applyBtn:'Apply',
     settingsWeights:'Category Weighting',weightsInfo:'0 = disabled - 1.0 = normal - 3.0 = triple',resetBtn:'Reset',afterImport:'Available after import',
@@ -651,7 +721,7 @@ var I18N={
     filterBarAmpel:'Traffic light:',filterBarCat:'Category:',filterBarSup:'Supplier:',
     filterNoCat:'No category matches the filter',filterNoSup:'No supplier matches the filter',
     catScoreTitle:'Score per Category',phAuditor:'Max Mustermann',phCompany:'P3 Group',phProject:'Supplier Audit 2025',
-    dataInfoText:'Edit scores (1-5 or N.A.) and notes directly, then click Save.',
+    dataInfoText:'Edit scores (0-5 or N.A.) and notes directly, then click Save.',
     berichtskopf:'Report Header',spracheLbl:'Language',ampelLbl:'Traffic Light Thresholds',
     gewichtLbl:'Category Weighting',gewichtInfo:'0 = disabled - 1.0 = normal - 3.0 = triple',
     apiKeyLbl:'API Key (AI Analysis)',apiKeyInfo2:'Anthropic API key. Create at anthropic.com/api',
@@ -773,6 +843,167 @@ function parseSupplier(wb,filename,detected){
   });
   return{name,categories};
 }
+// ── AI Import ────────────────────────────────────────────────────────────────
+function aiImportExcel(file){
+  if(!file)return;
+  if(!getApiKey()){alert('Please enter your Anthropic API key in Settings first.');return;}
+  setStatus('<i class="ti ti-sparkles"></i> AI is analysing your Excel file...');
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var wb=XLSX.read(e.target.result,{type:'array'});
+      var previews=wb.SheetNames.map(function(name){
+        var rows=XLSX.utils.sheet_to_json(wb.Sheets[name],{header:1,defval:''});
+        return {name:name,rows:rows.slice(0,14)};
+      });
+      var prompt='I have an Excel workbook with '+previews.length+' sheet(s). For each sheet determine:\n'
+        +'1. Is this sheet audit/assessment data (checkpoints with scores)? Or is it a cover page, index, summary, chart, or non-audit tab?\n'
+        +'2. If it IS audit data: which 0-based column index contains: category, checkpoint number (no), checkpoint description, score/rating, notes/evidence? Set null if not present.\n'
+        +'3. Which row index (0-based) is the header row?\n'
+        +'4. What is the supplier name? (check sheet name and first rows)\n\n'
+        +'Sheet data:\n'+JSON.stringify(previews,null,1)+'\n\n'
+        +'Return ONLY a JSON array, no other text:\n'
+        +'[{"sheet":"SheetName","isAudit":true,"supplierName":"Name","headerRow":0,"columns":{"category":0,"no":1,"checkpoint":2,"score":3,"notes":4}},'
+        +'{"sheet":"Cover","isAudit":false,"reason":"Cover page / no checkpoint data"}]';
+      callClaude(prompt,
+        'You are a data import expert. Analyse Excel structures carefully. Return only valid JSON arrays. Column indices are 0-based integers or null.',
+        function(text){
+          var mapping;
+          try{var m=text.match(/\[[\s\S]*\]/);mapping=JSON.parse(m[0]);}
+          catch(ex){setStatus('AI could not parse the structure. Try Standard Import.');return;}
+          setStatus('');
+          showAiImportModal(wb,previews,mapping,file.name);
+        }
+      );
+    }catch(err){setStatus('Error reading file: '+err.message);}
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+var _aiImportState={wb:null,previews:[],mapping:[]};
+
+function showAiImportModal(wb,previews,mapping,filename){
+  _aiImportState={wb:wb,previews:previews,mapping:mapping};
+  var audit=mapping.filter(function(m){return m.isAudit;});
+  var skipped=mapping.filter(function(m){return !m.isAudit;});
+  var h='<div style="margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap">'
+    +'<span style="background:#E8F5E9;color:#1A8A5A;font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px"><i class="ti ti-check"></i> '+audit.length+' audit sheet'+(audit.length!==1?'s':'')+' detected</span>'
+    +(skipped.length?'<span style="background:var(--bg2);color:var(--text2);font-size:12px;padding:4px 10px;border-radius:20px"><i class="ti ti-ban"></i> '+skipped.length+' sheet'+(skipped.length!==1?'s':'')+' skipped ('+skipped.map(function(s){return s.sheet+(s.reason?' — '+s.reason:'');}).join(', ')+')</span>':'')
+    +'</div>';
+  if(!audit.length){
+    showAiModal('AI Import — '+esc(filename),'<div style="color:#C0392B;padding:16px">No audit data sheets detected in this file.<br>Try Standard Import or check that your Excel contains checkpoint and score columns.</div>');
+    return;
+  }
+  h+=audit.map(function(m,mi){
+    var preview=previews.find(function(p){return p.name===m.sheet;});
+    var cols=m.columns||{};
+    var colNames=preview&&preview.rows[0]?preview.rows[0].map(function(c,i){return {i:i,label:c||'Col '+i};}):[];
+    var dataRows=preview?preview.rows.slice((m.headerRow||0)+1,m.headerRow+4):[];
+    function colOpt(field){
+      return '<select onchange="_aiImportState.mapping['+mapping.indexOf(m)+'].columns.'+field+'=this.value===\'\'?null:parseInt(this.value)" style="border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:11px;border-radius:4px;padding:2px 4px">'
+        +'<option value="">— none —</option>'
+        +colNames.map(function(c){return '<option value="'+c.i+'"'+(cols[field]==c.i?' selected':'')+'>'+esc(String(c.label).slice(0,24))+'</option>';}).join('')
+        +'</select>';
+    }
+    var previewTable='<div style="overflow-x:auto;margin-top:8px"><table style="width:100%;border-collapse:collapse;font-size:11px">'
+      +'<thead><tr>'
+      +'<th style="padding:4px 6px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-weight:600">Category</th>'
+      +'<th style="padding:4px 6px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-weight:600">#</th>'
+      +'<th style="padding:4px 6px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-weight:600">Checkpoint</th>'
+      +'<th style="padding:4px 6px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-weight:600">Score</th>'
+      +'<th style="padding:4px 6px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-weight:600">Notes</th>'
+      +'</tr></thead><tbody>'
+      +dataRows.map(function(r){
+        function cell(idx){return idx!=null&&idx!==''?esc(String(r[idx]||'').slice(0,30)):'<span style="color:var(--text3)">—</span>';}
+        return '<tr>'
+          +'<td style="padding:3px 6px;border:1px solid var(--border)">'+cell(cols.category)+'</td>'
+          +'<td style="padding:3px 6px;border:1px solid var(--border)">'+cell(cols.no)+'</td>'
+          +'<td style="padding:3px 6px;border:1px solid var(--border)">'+cell(cols.checkpoint)+'</td>'
+          +'<td style="padding:3px 6px;border:1px solid var(--border)">'+cell(cols.score)+'</td>'
+          +'<td style="padding:3px 6px;border:1px solid var(--border)">'+cell(cols.notes)+'</td>'
+          +'</tr>';
+      }).join('')
+      +'</tbody></table></div>';
+    return '<div style="border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden">'
+      +'<div style="background:var(--bg2);padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
+        +'<input type="checkbox" id="ais_'+mi+'" checked style="width:16px;height:16px;cursor:pointer">'
+        +'<div style="flex:1;min-width:0">'
+          +'<div style="font-size:13px;font-weight:700">'+esc(m.sheet)+'</div>'
+          +'<div style="font-size:11px;color:var(--text2)">Supplier name: <input type="text" value="'+esc(m.supplierName||m.sheet)+'" onchange="_aiImportState.mapping['+mapping.indexOf(m)+'].supplierName=this.value" style="border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:11px;border-radius:4px;padding:2px 6px;width:180px"></div>'
+        +'</div>'
+      +'</div>'
+      +'<div style="padding:10px 14px">'
+        +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:8px">'
+          +'<div><div style="font-size:10px;color:var(--text2);margin-bottom:2px">CATEGORY COL</div>'+colOpt('category')+'</div>'
+          +'<div><div style="font-size:10px;color:var(--text2);margin-bottom:2px">NO. COL</div>'+colOpt('no')+'</div>'
+          +'<div><div style="font-size:10px;color:var(--text2);margin-bottom:2px">CHECKPOINT COL</div>'+colOpt('checkpoint')+'</div>'
+          +'<div><div style="font-size:10px;color:var(--text2);margin-bottom:2px">SCORE COL</div>'+colOpt('score')+'</div>'
+          +'<div><div style="font-size:10px;color:var(--text2);margin-bottom:2px">NOTES COL</div>'+colOpt('notes')+'</div>'
+        +'</div>'
+        +'<div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px">Preview (first 3 data rows):</div>'
+        +previewTable
+      +'</div>'
+      +'</div>';
+  }).join('');
+  h+='<button class="btn primary" onclick="confirmAiImport()" style="width:100%;margin-top:8px;font-size:14px"><i class="ti ti-check"></i> Confirm & Import</button>';
+  var ex=document.getElementById('aiModal');if(ex)ex.remove();
+  var mo=document.createElement('div');mo.id='aiModal';
+  mo.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:3000;display:flex;align-items:flex-end;justify-content:center;padding:16px';
+  mo.innerHTML='<div style="background:var(--bg);border-radius:16px 16px 12px 12px;width:100%;max-width:780px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.3)">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0">'
+      +'<div style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700"><i class="ti ti-sparkles" style="color:#185FA5"></i>AI Import — '+esc(filename)+'</div>'
+      +'<button onclick="document.getElementById(\'aiModal\').remove()" style="background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px"><i class="ti ti-x"></i></button>'
+    +'</div>'
+    +'<div style="padding:20px;overflow-y:auto">'+h+'</div>'
+  +'</div>';
+  mo.onclick=function(e){if(e.target===mo)mo.remove();};
+  document.body.appendChild(mo);
+}
+
+function confirmAiImport(){
+  var wb=_aiImportState.wb;
+  var mapping=_aiImportState.mapping;
+  var imported=0;
+  var auditSheets=mapping.filter(function(m){return m.isAudit;});
+  auditSheets.forEach(function(m,mi){
+    var cb=document.getElementById('ais_'+mi);
+    if(cb&&!cb.checked)return;
+    var cols=m.columns||{};
+    if(cols.checkpoint==null)return; // need at least checkpoint column
+    var allRows=XLSX.utils.sheet_to_json(wb.Sheets[m.sheet],{header:1,defval:null});
+    var hRow=m.headerRow||0;
+    var cats={};
+    var currentCat=m.sheet; // fallback category = sheet name
+    for(var i=hRow+1;i<allRows.length;i++){
+      var r=allRows[i];
+      var cp=r[cols.checkpoint];
+      if(!cp||!String(cp).trim())continue;
+      // Update current category if column exists and cell has value
+      if(cols.category!=null&&r[cols.category]!=null&&String(r[cols.category]).trim())
+        currentCat=String(r[cols.category]).trim();
+      var raw=cols.score!=null?r[cols.score]:null;
+      var score=null;
+      if(raw!=null){var sv=String(raw).trim().toUpperCase();if(['N.A.','NA','N/A'].includes(sv))score='N.A.';else if(!isNaN(Number(raw)))score=Number(raw);}
+      var no=cols.no!=null&&r[cols.no]!=null?r[cols.no]:(i-hRow);
+      var notes=cols.notes!=null&&r[cols.notes]!=null?String(r[cols.notes]):'';
+      if(!cats[currentCat])cats[currentCat]=[];
+      cats[currentCat].push({no:no,checkpoint:String(cp).trim(),score:score,notes:notes,rubric:null});
+    }
+    if(!Object.keys(cats).length)return;
+    var supName=m.supplierName||m.sheet;
+    var sup={name:supName,categories:cats};
+    var idx=suppliers.findIndex(function(s){return s.name===supName;});
+    if(idx>=0)suppliers[idx]=sup;else suppliers.push(sup);
+    initWeights(Object.keys(cats));
+    imported++;
+  });
+  var mo=document.getElementById('aiModal');if(mo)mo.remove();
+  renderSuppliersList();
+  setStatus('AI Import complete: <strong>'+imported+' supplier'+(imported!==1?'s':'')+' imported</strong>');
+  toast('Imported '+imported+' supplier'+(imported!==1?'s':''));
+}
+// ── End AI Import ────────────────────────────────────────────────────────────
+
 // ── Actions ───────────────────────────────────────────────────────────────────
 var ACT_PRIO_COLOR={High:'#C0392B',Medium:'#E07B00',Low:'#1A8A5A'};
 var ACT_STATUS_COLOR={Open:'#C0392B','In Progress':'#E07B00',Done:'#1A8A5A'};
@@ -894,6 +1125,7 @@ function openActionModal(id){
     document.getElementById('actTitle').value=a.title;
     document.getElementById('actDesc').value=a.desc||'';
     document.getElementById('actResponsible').value=a.responsible||'';
+    document.getElementById('actStart').value=a.startDate||'';
     document.getElementById('actDue').value=a.dueDate||'';
     document.getElementById('actPriority').value=a.priority;
     document.getElementById('actStatus').value=a.status;
@@ -905,6 +1137,7 @@ function openActionModal(id){
     document.getElementById('actTitle').value='';
     document.getElementById('actDesc').value='';
     document.getElementById('actResponsible').value='';
+    document.getElementById('actStart').value='';
     document.getElementById('actDue').value='';
     document.getElementById('actPriority').value='Medium';
     document.getElementById('actStatus').value='Open';
@@ -912,6 +1145,96 @@ function openActionModal(id){
     populateActCatSelect();
   }
   modal.style.display='flex';
+}
+
+var _actView='list';
+function setActView(v){
+  _actView=v;
+  var lb=document.getElementById('actViewList'),gb=document.getElementById('actViewGantt');
+  if(lb){lb.style.background=v==='list'?'var(--primary)':'var(--bg)';lb.style.color=v==='list'?'#fff':'var(--text)';}
+  if(gb){gb.style.background=v==='gantt'?'var(--primary)':'var(--bg)';gb.style.color=v==='gantt'?'#fff':'var(--text)';}
+  document.getElementById('actionsContent').style.display=v==='list'?'':'none';
+  document.getElementById('actionsGantt').style.display=v==='gantt'?'':'none';
+  if(v==='gantt')renderGantt();
+}
+
+function renderGantt(){
+  var el=document.getElementById('actionsGantt');if(!el)return;
+  var fSup=document.getElementById('actFilterSup')?document.getElementById('actFilterSup').value:'';
+  var fStatus=document.getElementById('actFilterStatus')?document.getElementById('actFilterStatus').value:'';
+  var list=actions.filter(function(a){
+    if(fSup&&a.supplier!==fSup)return false;
+    if(fStatus&&a.status!==fStatus)return false;
+    return true;
+  });
+  if(!list.length){el.innerHTML='<div class="empty">No actions to display in Gantt.</div>';return;}
+
+  // Determine date range
+  var today=new Date();today.setHours(0,0,0,0);
+  var dates=list.flatMap(function(a){return[a.startDate&&new Date(a.startDate),a.dueDate&&new Date(a.dueDate)];}).filter(Boolean);
+  var minD=dates.length?new Date(Math.min.apply(null,dates)):new Date(today.getFullYear(),today.getMonth(),1);
+  var maxD=dates.length?new Date(Math.max.apply(null,dates)):new Date(today.getFullYear(),today.getMonth()+3,0);
+  // Pad by one week on each side
+  minD=new Date(minD.getTime()-7*864e5);
+  maxD=new Date(maxD.getTime()+7*864e5);
+  var totalDays=(maxD-minD)/864e5;
+
+  // Build month headers
+  var months=[];var cur=new Date(minD.getFullYear(),minD.getMonth(),1);
+  while(cur<=maxD){months.push(new Date(cur));cur=new Date(cur.getFullYear(),cur.getMonth()+1,1);}
+
+  var LABEL_W=180,BAR_H=28,ROW_H=36,HDR_H=36,TODAY_COLOR='#C0392B';
+  var STATUS_COL={Open:'#C0392B','In Progress':'#E07B00',Done:'#1A8A5A'};
+
+  function pct(d){return Math.max(0,Math.min(100,((new Date(d)-minD)/864e5/totalDays)*100));}
+
+  var h='<div class="card" style="overflow-x:auto;padding:0">'
+    +'<div style="min-width:600px">'
+    // Header row
+    +'<div style="display:flex;height:'+HDR_H+'px;border-bottom:2px solid var(--border)">'
+      +'<div style="width:'+LABEL_W+'px;flex-shrink:0;padding:8px 12px;font-size:12px;font-weight:700;color:var(--text2);border-right:1px solid var(--border)">Action</div>'
+      +'<div style="flex:1;position:relative;overflow:hidden">'
+        +months.map(function(m){
+          var left=pct(m)+'%';
+          return '<div style="position:absolute;left:'+left+';top:0;height:100%;border-left:1px solid var(--border);padding:8px 4px;font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap">'
+            +m.toLocaleDateString('en-GB',{month:'short',year:'2-digit'})+'</div>';
+        }).join('')
+      +'</div>'
+    +'</div>'
+    // Today line marker + rows
+    +'<div style="position:relative">'
+      // Today vertical line
+      +'<div style="position:absolute;left:calc('+LABEL_W+'px + '+pct(today)+'%);top:0;bottom:0;width:2px;background:'+TODAY_COLOR+';z-index:2;pointer-events:none">'
+        +'<div style="position:absolute;top:0;left:-18px;background:'+TODAY_COLOR+';color:#fff;font-size:9px;padding:1px 4px;border-radius:3px;white-space:nowrap">Today</div>'
+      +'</div>'
+      +list.map(function(a,i){
+        var sD=a.startDate?new Date(a.startDate):today;
+        var eD=a.dueDate?new Date(a.dueDate):new Date(sD.getTime()+14*864e5);
+        var left=pct(sD),right=pct(eD);
+        var barW=Math.max(0.5,right-left);
+        var col=STATUS_COL[a.status]||'#888';
+        var isOD=a.dueDate&&a.status!=='Done'&&new Date(a.dueDate)<today;
+        var bg=i%2===0?'var(--bg)':'var(--bg2)';
+        return '<div style="display:flex;align-items:center;height:'+ROW_H+'px;background:'+bg+';border-bottom:1px solid var(--border)">'
+          +'<div style="width:'+LABEL_W+'px;flex-shrink:0;padding:4px 12px;border-right:1px solid var(--border);overflow:hidden">'
+            +'<div style="font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+esc(a.title)+'">'+esc(a.title)+'</div>'
+            +'<div style="font-size:10px;color:var(--text2)">'+esc(a.supplier||'')+(a.responsible?' · '+esc(a.responsible):'')+'</div>'
+          +'</div>'
+          +'<div style="flex:1;position:relative;height:100%">'
+            +'<div style="position:absolute;left:'+left+'%;width:'+barW+'%;top:50%;transform:translateY(-50%);height:'+BAR_H+'px;background:'+col+';border-radius:4px;display:flex;align-items:center;padding:0 6px;box-sizing:border-box;min-width:4px" title="'+esc(a.title)+'">'
+              +'<span style="font-size:10px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600">'+(isOD?'⚠ ':'')+esc(a.status)+'</span>'
+            +'</div>'
+          +'</div>'
+        +'</div>';
+      }).join('')
+    +'</div>'
+    // Legend
+    +'<div style="display:flex;gap:16px;padding:10px 12px;border-top:1px solid var(--border);flex-wrap:wrap">'
+      +Object.entries(STATUS_COL).map(function(e){return '<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)"><span style="width:14px;height:14px;border-radius:3px;background:'+e[1]+';display:inline-block"></span>'+e[0]+'</div>';}).join('')
+      +'<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)"><span style="width:3px;height:14px;background:'+TODAY_COLOR+';display:inline-block"></span>Today</div>'
+    +'</div>'
+    +'</div></div>';
+  el.innerHTML=h;
 }
 
 function closeActionModal(){
@@ -981,6 +1304,7 @@ function saveAction(){
     category:document.getElementById('actCategory').value,
     checkpoint:cpVal||'',
     responsible:document.getElementById('actResponsible').value.trim(),
+    startDate:document.getElementById('actStart').value,
     dueDate:document.getElementById('actDue').value,
     priority:document.getElementById('actPriority').value,
     status:document.getElementById('actStatus').value
@@ -1005,6 +1329,223 @@ function deleteAction(id){
   toast('Action deleted');
 }
 
+// ── Template Builder ──────────────────────────────────────────────────────────
+var tplDraft=null; // {name, categories:{catName:[{no,checkpoint}]}}
+var tplDraftIdx=-1; // -1 = new, >=0 = editing existing
+
+function switchNewTab(id,btn){
+  document.querySelectorAll('#page-new .etab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#page-new .etab-content').forEach(c=>c.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  var el=document.getElementById('ntab-'+id+'-content');
+  if(el)el.classList.add('active');
+  if(id==='builder')renderTplBuilderList();
+}
+
+function renderTplBuilderList(){
+  var el=document.getElementById('tplBuilderList');if(!el)return;
+  if(!templates.length){
+    el.innerHTML='<div style="font-size:12px;color:var(--text2);text-align:center;padding:16px">No templates yet</div>';
+    return;
+  }
+  el.innerHTML=templates.map(function(t,i){
+    var cats=Object.keys(t.categories);
+    var total=cats.reduce(function(s,c){return s+t.categories[c].length;},0);
+    var isActive=tplDraftIdx===i;
+    return '<div onclick="editTemplate('+i+')" style="padding:10px 12px;border-radius:var(--r);cursor:pointer;margin-bottom:6px;border:2px solid '+(isActive?'#185FA5':'var(--border)')+';background:'+(isActive?'var(--info-bg)':'var(--bg)')+'">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center">'
+        +'<div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(t.name)+'</div>'
+        +'<button onclick="event.stopPropagation();deleteTemplate('+i+')" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:2px"><i class="ti ti-trash" style="font-size:13px"></i></button>'
+      +'</div>'
+      +'<div style="font-size:11px;color:var(--text2);margin-top:3px">'+cats.length+' categories · '+total+' checkpoints</div>'
+      +'</div>';
+  }).join('');
+}
+
+function startNewTemplate(){
+  tplDraft={name:'',categories:{}};
+  tplDraftIdx=-1;
+  renderTplBuilderList();
+  renderTplEditor();
+}
+
+function editTemplate(i){
+  var t=templates[i];
+  // Deep copy
+  tplDraft={name:t.name,categories:{}};
+  Object.entries(t.categories).forEach(function([cat,items]){
+    tplDraft.categories[cat]=items.map(function(item){return {no:item.no,checkpoint:item.checkpoint,rubric:item.rubric||null};});
+  });
+  tplDraftIdx=i;
+  renderTplBuilderList();
+  renderTplEditor();
+}
+
+function renderTplEditor(){
+  var el=document.getElementById('tplBuilderEditor');if(!el||!tplDraft)return;
+  var cats=Object.keys(tplDraft.categories);
+  var h='<div class="card">'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'
+      +'<input id="tplDraftName" type="text" value="'+esc(tplDraft.name)+'" placeholder="Template name..." oninput="tplDraft.name=this.value" style="flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:var(--r);font-size:14px;font-weight:600;background:var(--bg);color:var(--text)">'
+      +'<button class="btn primary" onclick="commitTemplate()"><i class="ti ti-device-floppy"></i> Save</button>'
+      +(tplDraftIdx>=0?'<button class="btn" onclick="cancelTplEdit()"><i class="ti ti-x"></i> Cancel</button>':'')
+    +'</div>';
+
+  if(!cats.length){
+    h+='<div style="text-align:center;padding:24px;color:var(--text2);font-size:13px">No categories yet — add one below</div>';
+  } else {
+    cats.forEach(function(cat,ci){
+      var items=tplDraft.categories[cat]||[];
+      h+='<div style="border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden">'
+        // Category header
+        +'<div style="background:var(--bg2);padding:10px 12px;display:flex;align-items:center;gap:8px">'
+          +'<i class="ti ti-folder" style="color:#185FA5;font-size:15px"></i>'
+          +'<input type="text" value="'+esc(cat)+'" onchange="renameTplCat(\''+esc(cat)+'\',this.value)" style="flex:1;border:none;background:transparent;font-size:13px;font-weight:600;color:var(--text);outline:none;min-width:0" placeholder="Category name">'
+          +'<span style="font-size:11px;color:var(--text3);white-space:nowrap">'+items.length+' checkpoints</span>'
+          +'<button onclick="deleteTplCat(\''+esc(cat)+'\')" style="background:none;border:none;cursor:pointer;color:#C0392B;padding:2px" title="Delete category"><i class="ti ti-trash" style="font-size:13px"></i></button>'
+        +'</div>'
+        // Checkpoints
+        +'<div style="padding:8px 12px">'
+        +items.map(function(item,ii){
+          var rubricId='rubric_'+ci+'_'+ii;
+          var hasRubric=!!item.rubric;
+          var rubricContent=hasRubric
+            ?'<div style="padding:8px;background:var(--bg2);border-radius:6px;margin-top:4px;margin-bottom:4px">'
+              +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:6px">'
+                +'<span style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px">Scoring Rubric</span>'
+                +'<div style="display:flex;gap:6px">'
+                  +'<button id="rubric_gen_'+ci+'_'+ii+'" onclick="aiSuggestRubric(\''+esc(cat)+'\','+ii+')" style="background:#185FA5;color:#fff;border:none;cursor:pointer;font-size:11px;padding:3px 8px;border-radius:4px;display:flex;align-items:center;gap:4px"><i class="ti ti-sparkles"></i> Generate with AI</button>'
+                  +'<button onclick="removeTplRubric(\''+esc(cat)+'\','+ii+')" style="background:none;border:none;cursor:pointer;color:#C0392B;font-size:11px;padding:3px 6px;border-radius:4px">Remove</button>'
+                +'</div>'
+              +'</div>'
+              +[0,1,2,3,4,5].map(function(s){
+                return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">'
+                  +'<span style="font-size:11px;font-weight:700;color:var(--primary);min-width:14px;text-align:right">'+s+'</span>'
+                  +'<input type="text" value="'+esc((item.rubric[s])||'')+'" onchange="updateTplRubric(\''+esc(cat)+'\','+ii+','+s+',this.value)" placeholder="Description for score '+s+'..." style="flex:1;border:1px solid var(--border);background:var(--bg);font-size:11px;color:var(--text);padding:3px 7px;border-radius:4px">'
+                  +'</div>';
+              }).join('')
+              +'</div>'
+            :'<div style="padding:8px;background:var(--bg2);border-radius:6px;margin-top:4px;margin-bottom:4px;text-align:center">'
+              +'<button onclick="addTplRubric(\''+esc(cat)+'\','+ii+')" style="background:none;border:none;cursor:pointer;color:#185FA5;font-size:12px;display:inline-flex;align-items:center;gap:4px"><i class="ti ti-plus"></i> Add scoring rubric (0–5)</button>'
+              +'</div>';
+          return '<div style="border-bottom:1px solid var(--border)">'
+            +'<div style="display:flex;align-items:center;gap:8px;padding:5px 0">'
+              +'<span style="font-size:11px;color:var(--text3);min-width:20px;text-align:right">'+item.no+'</span>'
+              +'<input type="text" value="'+esc(item.checkpoint)+'" onchange="updateTplCheckpoint(\''+esc(cat)+'\','+ii+',this.value)" style="flex:1;border:1px solid transparent;background:transparent;font-size:12px;color:var(--text);padding:4px 6px;border-radius:4px;min-width:0" onfocus="this.style.border=\'1px solid var(--border2)\'" onblur="this.style.border=\'1px solid transparent\'" placeholder="Checkpoint description...">'
+              +'<button onclick="var p=document.getElementById(\''+rubricId+'\');p.style.display=p.style.display===\'none\'?\'block\':\'none\'" title="'+(hasRubric?'Edit rubric':'Add rubric')+'" style="background:none;border:none;cursor:pointer;color:'+(hasRubric?'#185FA5':'var(--text3)')+';padding:2px;flex-shrink:0"><i class="ti ti-list-check" style="font-size:13px"></i></button>'
+              +'<button onclick="deleteTplCheckpoint(\''+esc(cat)+'\','+ii+')" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:2px;flex-shrink:0"><i class="ti ti-x" style="font-size:12px"></i></button>'
+            +'</div>'
+            +'<div id="'+rubricId+'" style="display:'+(hasRubric?'block':'none')+'">'
+              +rubricContent
+            +'</div>'
+            +'</div>';
+        }).join('')
+        +'<button onclick="addTplCheckpoint(\''+esc(cat)+'\')" style="background:none;border:none;cursor:pointer;color:#185FA5;font-size:12px;padding:6px 0;display:flex;align-items:center;gap:4px;margin-top:4px"><i class="ti ti-plus"></i> Add checkpoint</button>'
+        +'</div>'
+        +'</div>';
+    });
+  }
+
+  h+='<button class="btn" onclick="addTplCategory()" style="width:100%;margin-top:4px"><i class="ti ti-folder-plus"></i> Add Category</button>'
+    +'</div>';
+  el.innerHTML=h;
+}
+
+function addTplCategory(){
+  if(!tplDraft)return;
+  var name='New Category '+(Object.keys(tplDraft.categories).length+1);
+  tplDraft.categories[name]=[];
+  renderTplEditor();
+  // Focus the new category name input
+  var inputs=document.querySelectorAll('#tplBuilderEditor input[placeholder="Category name"]');
+  if(inputs.length)inputs[inputs.length-1].focus();
+}
+
+function renameTplCat(oldName,newName){
+  if(!tplDraft||!newName.trim()||newName===oldName)return;
+  newName=newName.trim();
+  var cats=tplDraft.categories;
+  var rebuilt={};
+  Object.keys(cats).forEach(function(k){rebuilt[k===oldName?newName:k]=cats[k];});
+  tplDraft.categories=rebuilt;
+}
+
+function deleteTplCat(cat){
+  if(!tplDraft)return;
+  if(!confirm('Delete category "'+cat+'" and all its checkpoints?'))return;
+  delete tplDraft.categories[cat];
+  renderTplEditor();
+}
+
+function addTplCheckpoint(cat){
+  if(!tplDraft||!tplDraft.categories[cat])return;
+  var items=tplDraft.categories[cat];
+  items.push({no:items.length+1,checkpoint:'',rubric:null});
+  renderTplEditor();
+  // Focus last checkpoint input
+  var rows=document.querySelectorAll('#tplBuilderEditor input[placeholder="Checkpoint description..."]');
+  if(rows.length)rows[rows.length-1].focus();
+}
+
+function updateTplCheckpoint(cat,idx,val){
+  if(!tplDraft||!tplDraft.categories[cat])return;
+  tplDraft.categories[cat][idx].checkpoint=val.trim();
+}
+
+function addTplRubric(cat,idx){
+  if(!tplDraft||!tplDraft.categories[cat])return;
+  tplDraft.categories[cat][idx].rubric={0:'',1:'',2:'',3:'',4:'',5:''};
+  renderTplEditor();
+}
+
+function removeTplRubric(cat,idx){
+  if(!tplDraft||!tplDraft.categories[cat])return;
+  tplDraft.categories[cat][idx].rubric=null;
+  renderTplEditor();
+}
+
+function updateTplRubric(cat,idx,score,val){
+  if(!tplDraft||!tplDraft.categories[cat])return;
+  var item=tplDraft.categories[cat][idx];
+  if(!item.rubric)item.rubric={0:'',1:'',2:'',3:'',4:'',5:''};
+  item.rubric[score]=val;
+}
+
+function deleteTplCheckpoint(cat,idx){
+  if(!tplDraft||!tplDraft.categories[cat])return;
+  tplDraft.categories[cat].splice(idx,1);
+  // Renumber
+  tplDraft.categories[cat].forEach(function(item,i){item.no=i+1;});
+  renderTplEditor();
+}
+
+function commitTemplate(){
+  if(!tplDraft)return;
+  var name=document.getElementById('tplDraftName')?document.getElementById('tplDraftName').value.trim():tplDraft.name.trim();
+  if(!name){alert('Please enter a template name.');return;}
+  // Check for empty checkpoints
+  var hasEmpty=Object.values(tplDraft.categories).some(function(items){return items.some(function(i){return !i.checkpoint.trim();});});
+  if(hasEmpty&&!confirm('Some checkpoints are empty — save anyway?'))return;
+  tplDraft.name=name;
+  if(!Object.keys(tplDraft.categories).length){alert('Please add at least one category.');return;}
+  if(tplDraftIdx>=0){
+    templates[tplDraftIdx]=JSON.parse(JSON.stringify(tplDraft));
+    toast('Template "'+name+'" updated');
+  } else {
+    templates.push(JSON.parse(JSON.stringify(tplDraft)));
+    toast('Template "'+name+'" saved');
+  }
+  tplDraft=null;tplDraftIdx=-1;
+  renderTplBuilderList();
+  document.getElementById('tplBuilderEditor').innerHTML='<div class="empty" style="padding:40px"><i class="ti ti-template"></i>Select a template to edit or create a new one</div>';
+}
+
+function cancelTplEdit(){
+  tplDraft=null;tplDraftIdx=-1;
+  renderTplBuilderList();
+  document.getElementById('tplBuilderEditor').innerHTML='<div class="empty" style="padding:40px"><i class="ti ti-template"></i>Select a template to edit or create a new one</div>';
+}
+
 // ── Template & New Supplier ───────────────────────────────────────────────────
 function renderNewPage(){
   // Populate template dropdown
@@ -1020,7 +1561,7 @@ function renderNewPage(){
       +suppliers.map(function(s){return '<option>'+esc(s.name)+'</option>';}).join('');
   }
   renderTemplatePreview();
-  renderTemplatesList();
+  renderTplBuilderList();
 }
 
 function renderTemplatePreview(){
@@ -1070,7 +1611,7 @@ function saveTemplate(){
   var cats={};
   Object.entries(src.categories).forEach(function([cat,items]){
     cats[cat]=items.map(function(item){
-      return {no:item.no,checkpoint:item.checkpoint,score:null,notes:''};
+      return {no:item.no,checkpoint:item.checkpoint,score:null,notes:'',rubric:item.rubric||null};
     });
   });
   var existing=templates.findIndex(function(t){return t.name===name;});
@@ -1106,7 +1647,7 @@ function createSupplierFromTemplate(){
   var cats={};
   Object.entries(tpl.categories).forEach(function([cat,items]){
     cats[cat]=items.map(function(item){
-      return {no:item.no,checkpoint:item.checkpoint,score:null,notes:''};
+      return {no:item.no,checkpoint:item.checkpoint,score:null,notes:'',rubric:item.rubric||null};
     });
   });
   suppliers.push({name:name,categories:cats});
@@ -1265,6 +1806,10 @@ function renderDetail(){
       +'<div class="metric"><div class="metric-label">'+'Categories'+'</div><div class="metric-value">'+cns.length+'</div></div>'
       +'<div class="metric"><div class="metric-label">'+'Checkpoints'+'</div><div class="metric-value">'+Object.values(supCats).flat().length+'</div></div>'
       +'<div class="metric"><div class="metric-label">N.A.</div><div class="metric-value">'+naC+'</div></div>'
+      +'</div>';
+    h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">'
+      +'<button onclick="aiAnalyzeSupplier(\''+esc(sn)+'\')" class="btn primary" style="font-size:12px;padding:7px 14px"><i class="ti ti-sparkles"></i> AI Analysis</button>'
+      +'<button onclick="aiSuggestActions(\''+esc(sn)+'\')" class="btn" style="font-size:12px;padding:7px 14px"><i class="ti ti-robot"></i> Suggest Actions</button>'
       +'</div>';
     h+='<div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:12px">'+'Score per Category'+'</div>';
     cns.forEach(function(cat,i){var p2=csc[i];h+='<div class="cat-row"><div class="cat-name">'+cat+'</div><div class="cat-bar-wrap"><div class="cat-bar" style="width:'+(p2||0)+'%;background:'+sc(p2)+'"></div></div><div class="cat-pct" style="color:'+sc(p2)+'">'+(p2!==null?p2+'%':'--')+'</div></div>';});
@@ -1437,8 +1982,22 @@ function renderDataTable(){
       h+='<tr>'
         +'<td style="color:var(--text3)">'+item.no+'</td>'
         +'<td style="font-size:12px">'+esc(item.checkpoint)+'</td>'
-        +'<td><input class="score-input" data-sup="'+esc(sn)+'" data-cat="'+esc(cat)+'" data-idx="'+idx+'" value="'+(item.score===null?'':item.score)+'" placeholder="1-5/N.A."></td>'
-        +'<td><input class="notes-input" data-sup="'+esc(sn)+'" data-cat="'+esc(cat)+'" data-idx="'+idx+'" value="'+esc(item.notes||'')+'" placeholder="Notes..."></td>'
+        +'<td style="vertical-align:top">'
+        +'<div style="display:flex;align-items:center;gap:4px">'
+        +'<input class="score-input" data-sup="'+esc(sn)+'" data-cat="'+esc(cat)+'" data-idx="'+idx+'" value="'+(item.score===null?'':item.score)+'" placeholder="0-5/N.A." style="width:64px">'
+        +(item.rubric?'<button onclick="toggleRubricPanel(this)" title="Show scoring rubric" style="background:none;border:none;cursor:pointer;color:#185FA5;padding:2px;flex-shrink:0"><i class="ti ti-book" style="font-size:14px"></i></button>':'')
+        +'</div>'
+        +(item.rubric?'<div class="rubric-panel" style="display:none;margin-top:6px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px;min-width:180px">'
+          +'<div style="font-size:10px;font-weight:700;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Scoring Rubric</div>'
+          +[0,1,2,3,4,5].filter(function(s){return item.rubric[s]&&item.rubric[s].trim();}).map(function(s){
+            return '<div style="display:flex;gap:6px;margin-bottom:3px;font-size:11px">'
+              +'<span style="font-weight:700;color:var(--primary);min-width:12px">'+s+'</span>'
+              +'<span style="color:var(--text)">'+esc(item.rubric[s])+'</span>'
+              +'</div>';
+          }).join('')
+          +'</div>':'')
+        +'</td>'
+        +'<td><div style="display:flex;align-items:center;gap:4px"><input class="notes-input" data-sup="'+esc(sn)+'" data-cat="'+esc(cat)+'" data-idx="'+idx+'" value="'+esc(item.notes||'')+'" placeholder="Notes..." style="flex:1;min-width:0"><button id="ai_note_'+esc(sn).replace(/\W/g,"_")+'_'+esc(cat).replace(/\W/g,"_")+'_'+idx+'" onclick="aiImproveNote(\''+esc(sn)+'\',\''+esc(cat)+'\','+idx+')" title="Improve note with AI" style="background:none;border:none;cursor:pointer;color:#185FA5;padding:2px;flex-shrink:0"><i class="ti ti-sparkles" style="font-size:13px"></i></button></div></td>'
         +'<td style="white-space:nowrap"><div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">'+camBtn+thumbs+'</div></td>'
         +'</tr>';
     });
@@ -1446,6 +2005,11 @@ function renderDataTable(){
   });
   el.innerHTML=h||'<div class="empty">No data</div>';
 }
+function toggleRubricPanel(btn){
+  var panel=btn.parentElement.nextElementSibling;
+  if(panel&&panel.classList.contains('rubric-panel'))panel.style.display=panel.style.display==='none'?'block':'none';
+}
+
 function saveDataEdits(){
   document.querySelectorAll('.score-input').forEach(inp=>{const s=suppliers.find(x=>x.name===inp.dataset.sup);if(!s)return;const items=s.categories[inp.dataset.cat];if(!items)return;const v=inp.value.trim().toUpperCase();if(['N.A.','NA','N/A'].includes(v))items[inp.dataset.idx].score='N.A.';else if(v==='')items[inp.dataset.idx].score=null;else if(!isNaN(Number(v)))items[inp.dataset.idx].score=Number(v);});
   document.querySelectorAll('.notes-input').forEach(inp=>{const s=suppliers.find(x=>x.name===inp.dataset.sup);if(!s)return;const items=s.categories[inp.dataset.cat];if(!items)return;items[inp.dataset.idx].notes=inp.value;});
@@ -1468,6 +2032,7 @@ function saveProject(){
   var company=document.getElementById('companyName');
   var project=document.getElementById('projectName');
   var apiKeyEl=document.getElementById('apiKey');
+  var aiModelEl=document.querySelector('input[name="aiModel"]:checked');
   var data={
     v:'9',suppliers,weights,threshGreen,threshYellow,tiers:TIERS,
     templates,actions,actionIdCounter,
@@ -1475,7 +2040,8 @@ function saveProject(){
     auditor:auditor?auditor.value:'',
     company:company?company.value:'',
     project:project?project.value:'',
-    apiKey:apiKeyEl?apiKeyEl.value:''
+    apiKey:apiKeyEl?apiKeyEl.value:'',
+    aiModel:aiModelEl?aiModelEl.value:'claude-haiku-4-5-20251001'
   };
   var url=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));
   var a=document.createElement('a');a.href=url;a.download='supplier_audit.json';a.click();
@@ -1509,6 +2075,7 @@ function loadProject(file){
       safeSet('companyName', d.company);
       safeSet('projectName', d.project);
       safeSet('apiKey', d.apiKey);
+      if(d.aiModel){var rb=document.querySelector('input[name="aiModel"][value="'+d.aiModel+'"]');if(rb)rb.checked=true;}
       renderSuppliersList();
       renderTiersEditor();
       renderWeightControls();
@@ -1600,6 +2167,144 @@ function resetTiers(){
   toast('Thresholds reset to default');
 }
 
+// ── AI Features ───────────────────────────────────────────────────────────────
+function getApiKey(){var el=document.getElementById('apiKey');return el?el.value.trim():'';}
+
+function callClaude(userMsg,systemMsg,onResult,onLoading){
+  var key=getApiKey();
+  if(!key){alert('Please enter your Anthropic API key in Settings first.');return;}
+  if(onLoading)onLoading(true);
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:(document.querySelector('input[name="aiModel"]:checked')||{value:'claude-haiku-4-5-20251001'}).value,max_tokens:1500,system:systemMsg,messages:[{role:'user',content:userMsg}]})
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if(onLoading)onLoading(false);
+    if(data.error){alert('AI Error: '+data.error.message);return;}
+    var text=data.content&&data.content[0]?data.content[0].text:'';
+    onResult(text);
+  })
+  .catch(function(err){if(onLoading)onLoading(false);alert('AI request failed: '+err.message);});
+}
+
+function showAiModal(title,content){
+  var ex=document.getElementById('aiModal');if(ex)ex.remove();
+  var m=document.createElement('div');m.id='aiModal';
+  m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:3000;display:flex;align-items:flex-end;justify-content:center;padding:16px';
+  m.innerHTML='<div style="background:var(--bg);border-radius:16px 16px 12px 12px;width:100%;max-width:680px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.3)">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)">'
+      +'<div style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:var(--text)"><i class="ti ti-sparkles" style="color:#185FA5"></i>'+title+'</div>'
+      +'<button onclick="document.getElementById(\'aiModal\').remove()" style="background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px"><i class="ti ti-x"></i></button>'
+    +'</div>'
+    +'<div style="padding:20px;overflow-y:auto;white-space:pre-wrap;font-size:13px;line-height:1.6;color:var(--text)">'+content+'</div>'
+  +'</div>';
+  m.onclick=function(e){if(e.target===m)m.remove();};
+  document.body.appendChild(m);
+}
+
+function showAiLoading(title){showAiModal(title,'<div style="text-align:center;padding:32px;color:var(--text2)"><i class="ti ti-loader" style="font-size:32px;animation:spin 1s linear infinite"></i><div style="margin-top:12px">Analysing with AI...</div></div>');}
+
+function runAI(){
+  if(!suppliers.length){alert('No suppliers loaded.');return;}
+  var key=getApiKey();if(!key){alert('Please enter your Anthropic API key in Settings first.');return;}
+  showAiLoading('AI Risk Analysis — All Suppliers');
+  var lines=suppliers.map(function(s){
+    var pct=calcScore(s,null);
+    var notes=Object.values(s.categories).flat().filter(function(i){return i.notes&&i.notes.trim();}).map(function(i){return i.checkpoint+': '+i.notes;}).join('\n');
+    return '## '+s.name+' — Score: '+(pct!==null?pct+'%':'n/a')+'\n'+(notes||'No notes recorded.');
+  }).join('\n\n');
+  callClaude(
+    'Here is the supplier audit data:\n\n'+lines+'\n\nPlease:\n1. Rank suppliers from highest to lowest risk\n2. For each: one sentence on their main risk\n3. Overall recommendation at the end',
+    'You are a supplier quality expert. Give clear, actionable risk assessments. Use plain text, no markdown.',
+    function(text){showAiModal('AI Risk Analysis — All Suppliers',text);}
+  );
+}
+
+function aiSuggestRubric(cat,idx){
+  if(!tplDraft||!tplDraft.categories[cat])return;
+  var item=tplDraft.categories[cat][idx];
+  if(!item.rubric)item.rubric={0:'',1:'',2:'',3:'',4:'',5:''};
+  var btnId='rubric_gen_'+cat.replace(/\W/g,'_')+'_'+idx;
+  var btn=document.getElementById(btnId);
+  callClaude(
+    'Create a scoring rubric for this audit checkpoint:\nCategory: "'+cat+'"\nCheckpoint: "'+item.checkpoint+'"\n\nReturn exactly 6 lines. Each line must start with the score digit and a colon. Example:\n0: No evidence of...\n1: Minimal...\n2: Basic...\n3: Adequate...\n4: Good...\n5: Excellent...\n\nReturn ONLY the 6 lines, nothing else.',
+    'You are a supplier audit expert creating concise, professional evaluation rubrics.',
+    function(text){
+      var lines=text.trim().split('\n');
+      lines.forEach(function(line){
+        var m=line.match(/^([0-5])\s*[:.\-]\s*(.+)/);
+        if(m)item.rubric[parseInt(m[1])]=m[2].trim();
+      });
+      renderTplEditor();
+    },
+    function(loading){if(btn){btn.innerHTML=loading?'<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Generating...':'<i class="ti ti-sparkles"></i> Generate with AI';btn.disabled=loading;}}
+  );
+}
+
+function aiImproveNote(sn,cat,idx){
+  var s=suppliers.find(function(x){return x.name===sn;});
+  if(!s)return;
+  var item=s.categories[cat][idx];
+  var noteEl=document.querySelector('.notes-input[data-sup="'+sn+'"][data-cat="'+cat+'"][data-idx="'+idx+'"]');
+  var current=noteEl?noteEl.value.trim():item.notes||'';
+  if(!current){alert('Please enter a note first.');return;}
+  var btnId='ai_note_'+sn.replace(/\W/g,'_')+'_'+cat.replace(/\W/g,'_')+'_'+idx;
+  var btn=document.getElementById(btnId);
+  callClaude(
+    'Rewrite this audit note professionally and concisely (max 2 sentences). Preserve all factual content. Return ONLY the improved note, no intro text:\n\n'+current,
+    'You are a professional supplier audit report writer. Write clear, neutral, factual sentences.',
+    function(text){
+      var improved=text.trim();
+      if(noteEl)noteEl.value=improved;
+      item.notes=improved;
+      toast('Note improved');
+    },
+    function(loading){if(btn){btn.innerHTML=loading?'<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i>':'<i class="ti ti-sparkles" style="font-size:13px"></i>';btn.disabled=loading;btn.title=loading?'Generating...':'Improve note with AI';}}
+  );
+}
+
+function aiAnalyzeSupplier(sn){
+  var s=suppliers.find(function(x){return x.name===sn;});
+  if(!s){alert('Supplier not found.');return;}
+  var key=getApiKey();if(!key){alert('Please enter your Anthropic API key in Settings first.');return;}
+  showAiLoading('AI Analysis — '+sn);
+  var pct=calcScore(s,null);
+  var catLines=Object.entries(s.categories).map(function(e){
+    var cat=e[0],items=e[1];
+    var cs=calcScore(s,cat);
+    var notes=items.filter(function(i){return i.notes&&i.notes.trim();}).map(function(i){return '  - '+i.checkpoint+' ('+i.score+'): '+i.notes;}).join('\n');
+    return cat+' — Score: '+(cs!==null?cs+'%':'n/a')+(notes?'\n'+notes:'');
+  }).join('\n\n');
+  callClaude(
+    'Supplier: '+sn+'\nOverall Score: '+(pct!==null?pct+'%':'n/a')+'\n\n'+catLines+'\n\nPlease provide:\n1. Key strengths (1-2 bullet points)\n2. Critical risks (1-3 bullet points)\n3. Top 3 recommended actions',
+    'You are a supplier quality expert. Be concise, specific, and actionable. Use plain text with numbered/bulleted lists.',
+    function(text){showAiModal('AI Analysis — '+sn,text);}
+  );
+}
+
+function aiSuggestActions(sn){
+  var s=suppliers.find(function(x){return x.name===sn;});
+  if(!s){alert('Supplier not found.');return;}
+  var key=getApiKey();if(!key){alert('Please enter your Anthropic API key in Settings first.');return;}
+  showAiLoading('AI Action Suggestions — '+sn);
+  var weak=Object.entries(s.categories).map(function(e){
+    var cat=e[0],items=e[1];
+    var cs=calcScore(s,cat);
+    if(cs===null||cs>=70)return null;
+    var notes=items.filter(function(i){return i.notes&&i.notes.trim()&&(i.score===null||i.score<3);}).map(function(i){return '  - '+i.checkpoint+': '+i.notes;}).join('\n');
+    return cat+' ('+cs+'%)'+(notes?'\n'+notes:'');
+  }).filter(Boolean).join('\n\n');
+  if(!weak){showAiModal('AI Action Suggestions — '+sn,'All categories score above 70% — no critical weak areas detected.\n\nConsider continuous improvement actions for maintaining current performance.');return;}
+  callClaude(
+    'Supplier: '+sn+'\n\nWeak areas requiring improvement:\n'+weak+'\n\nSuggest 3-5 concrete, measurable corrective actions. For each action include:\n- What to do\n- Who is responsible (supplier or buyer)\n- Suggested timeline',
+    'You are a supplier development expert. Suggest practical, achievable improvement actions. Use plain text with numbered lists.',
+    function(text){showAiModal('AI Action Suggestions — '+sn,text);}
+  );
+}
+// ── End AI Features ───────────────────────────────────────────────────────────
+
 function renderThemeGrid(){
   const el=document.getElementById('themeGrid');if(!el)return;
   el.innerHTML=Object.entries(THEMES).map(([key,th])=>'<div class="theme-card'+(key===selectedTheme?' selected':'')+'" onclick="selectTheme(\''+key+'\')" id="thc_'+key+'" style="'+(key===selectedTheme?'border-color:#'+th.primary:'')+'"><div class="theme-swatch" style="background:#'+th.primary+'"></div><div class="theme-name">'+th.name+'</div></div>').join('');
@@ -1641,14 +2346,368 @@ function selectNoneExport(type){
   set.clear();renderExportList(type);
 }
 
-function exportExcel(){
+async function exportExcel(){
   if(!suppliers.length){alert('No data');return;}
-  const wb=XLSX.utils.book_new(),cats=allCats(),sel=suppliers.filter(s=>exportSelectedExcel.has(s.name));
-  const sum=[['Supplier',...cats,'Total (%)']];
-  sel.forEach(s=>sum.push([s.name,...cats.map(c=>{const p=calcScore(s,c);return p!==null?p:'--';}),calcScore(s)!==null?calcScore(s):'--']));
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(sum),'Summary');
-  sel.forEach(s=>{const rows=[['Category','Nr.','Checkpoint','Score','Evidence / Notes','Gewichtung']];Object.entries(s.categories).forEach(([cat,items])=>{items.forEach(item=>rows.push([cat,item.no,item.checkpoint,item.score===null?'':item.score,item.notes||'',(weights[cat]||1).toFixed(1)]));});XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rows),s.name.slice(0,31));});
-  XLSX.writeFile(wb,'Supplier_Audit_Export.xlsx');
+  if(typeof ExcelJS==='undefined'){alert('ExcelJS library not loaded. Please check your internet connection.');return;}
+  const sel=suppliers.filter(s=>exportSelectedExcel.has(s.name));
+  if(!sel.length){alert('No suppliers selected.');return;}
+  const cats=allCats();
+  const th=THEMES[selectedTheme];
+  const project=document.getElementById('projectName').value||'Supplier Audit';
+  const auditor=document.getElementById('auditorName').value||'';
+  const today=new Date().toLocaleDateString(lang==='de'?'de-DE':'en-GB');
+  const exOpts={
+    dashboard:document.getElementById('xopt_dashboard')?.checked!==false,
+    ranking:document.getElementById('xopt_ranking')?.checked!==false,
+    detail:document.getElementById('xopt_detail')?.checked!==false,
+    actions:document.getElementById('xopt_actions')?.checked!==false
+  };
+
+  const PRIMARY=th.primary;
+  const ACCENT=th.accent||'FFD000';
+  const LGRAY='F5F6F8';
+
+  function scoreHex(pct){
+    if(pct===null||pct===undefined)return null;
+    const t=TIERS.find(t=>pct>=t.min)||TIERS[TIERS.length-1];
+    return t.hex;
+  }
+  function tierLbl(pct){
+    if(pct===null||pct===undefined)return '—';
+    const t=TIERS.find(t=>pct>=t.min)||TIERS[TIERS.length-1];
+    return t.label;
+  }
+  function tierRisk(pct){
+    if(pct===null)return '—';
+    const t=TIERS.find(t=>pct>=t.min)||TIERS[TIERS.length-1];
+    return t.risk||t.label;
+  }
+  function bd(col='CCCCCC',style='thin'){const b={style,color:{argb:'FF'+col}};return{top:b,left:b,bottom:b,right:b};}
+  function fill(hex){return{type:'pattern',pattern:'solid',fgColor:{argb:'FF'+hex}};}
+  function hdrCell(cell,val,bgHex,opts){
+    cell.value=val;
+    cell.font=Object.assign({bold:true,size:10,color:{argb:'FFFFFFFF'}},opts&&opts.font||{});
+    cell.fill=fill(bgHex);
+    cell.alignment=Object.assign({vertical:'middle',horizontal:'center'},opts&&opts.align||{});
+    cell.border=bd();
+  }
+  function dataCell(cell,val,bgHex,opts){
+    cell.value=val;
+    cell.font=Object.assign({size:9},opts&&opts.font||{});
+    cell.fill=fill(bgHex||'FFFFFF');
+    cell.alignment=Object.assign({vertical:'middle',horizontal:'left'},opts&&opts.align||{});
+    cell.border=bd();
+  }
+  function titleBlock(ws,text,sub,cols){
+    ws.mergeCells(1,1,1,cols);
+    const c=ws.getCell('A1');
+    c.value=text;c.font={bold:true,size:16,color:{argb:'FFFFFFFF'}};
+    c.fill=fill(PRIMARY);c.alignment={vertical:'middle',horizontal:'left',indent:1};
+    ws.getRow(1).height=36;
+    if(sub){
+      ws.mergeCells(2,1,2,cols);
+      const s=ws.getCell('A2');
+      s.value=sub;s.font={size:9,color:{argb:'FFFFFFFF'}};
+      s.fill=fill(PRIMARY);s.alignment={vertical:'middle',horizontal:'left',indent:1};
+      ws.getRow(2).height=20;
+    }
+    ws.mergeCells(sub?3:2,1,sub?3:2,cols);
+    ws.getCell(sub?'A3':'A2').fill=fill(ACCENT);
+    ws.getRow(sub?3:2).height=4;
+  }
+
+  const wb=new ExcelJS.Workbook();
+  wb.creator='Supplier Audit Tool';
+  wb.created=new Date();
+
+  // ── SHEET 1: DASHBOARD ────────────────────────────────────────────────────
+  if(exOpts.dashboard){
+    const ws=wb.addWorksheet('Dashboard',{tabColor:{argb:'FF'+PRIMARY}});
+    ws.views=[{state:'frozen',ySplit:5}];
+    const cols=cats.length+3;
+    const sub=(auditor?'Auditor: '+auditor+'   |   ':'')+'Date: '+today+'   |   Suppliers: '+sel.length+'   |   Categories: '+cats.length;
+    titleBlock(ws,project,sub,cols);
+    ws.getRow(4).height=8;
+
+    // Header row
+    const hRow=ws.getRow(5);
+    ['Supplier',...cats,'Total Score','Tier'].forEach(function(h,i){
+      const c=hRow.getCell(i+1);
+      hdrCell(c,h,'222222',{align:{vertical:'middle',horizontal:i===0?'left':'center',indent:i===0?1:0,wrapText:true}});
+    });
+    hRow.height=38;
+
+    // Data
+    const sorted=[...sel].sort(function(a,b){return(calcScore(b)||0)-(calcScore(a)||0);});
+    sorted.forEach(function(s,ri){
+      const tot=calcScore(s);
+      const row=ws.getRow(6+ri);
+      const bg=ri%2===0?'FFFFFF':LGRAY;
+
+      dataCell(row.getCell(1),s.name,bg,{font:{bold:true,size:10},align:{vertical:'middle',horizontal:'left',indent:1}});
+
+      cats.forEach(function(cat,ci){
+        const p=calcScore(s,cat);
+        const hex=scoreHex(p);
+        const cell=row.getCell(ci+2);
+        if(p!==null&&hex){
+          cell.value=p/100;cell.numFmt='0%';
+          cell.font={bold:true,size:10,color:{argb:'FFFFFFFF'}};
+          cell.fill=fill(hex);
+        } else {
+          dataCell(cell,'—',bg,{font:{color:{argb:'FF999999'}},align:{horizontal:'center'}});
+        }
+        cell.alignment={vertical:'middle',horizontal:'center'};
+        cell.border=bd();
+      });
+
+      const totCell=row.getCell(cats.length+2);
+      const totHex=scoreHex(tot);
+      if(tot!==null&&totHex){
+        totCell.value=tot/100;totCell.numFmt='0%';
+        totCell.font={bold:true,size:12,color:{argb:'FFFFFFFF'}};
+        totCell.fill=fill(totHex);
+      } else {dataCell(totCell,'—',bg,{font:{color:{argb:'FF999999'}}});}
+      totCell.alignment={vertical:'middle',horizontal:'center'};totCell.border=bd();
+
+      const tierCell=row.getCell(cats.length+3);
+      dataCell(tierCell,tierLbl(tot),bg,{font:{size:9,color:{argb:'FF555555'}},align:{horizontal:'center'}});
+
+      row.height=24;
+    });
+
+    ws.getColumn(1).width=32;
+    cats.forEach(function(_,i){ws.getColumn(i+2).width=14;});
+    ws.getColumn(cats.length+2).width=14;
+    ws.getColumn(cats.length+3).width=14;
+  }
+
+  // ── SHEET 2: RANKING ─────────────────────────────────────────────────────
+  if(exOpts.ranking){
+    const ws=wb.addWorksheet('Ranking',{tabColor:{argb:'FF1A8A5A'}});
+    ws.views=[{state:'frozen',ySplit:4}];
+    titleBlock(ws,'Supplier Ranking — '+project,null,7);
+    ws.getRow(3).height=8;
+
+    const rHdrs=['Rank','Supplier','Overall Score','Tier','Risk Level','Score Bar','vs. Ø Average'];
+    ws.getRow(4).height=26;
+    rHdrs.forEach(function(h,i){
+      hdrCell(ws.getRow(4).getCell(i+1),h,'222222',{align:{vertical:'middle',horizontal:i<2?'left':'center',indent:i<2?1:0}});
+    });
+
+    const sorted=[...sel].sort(function(a,b){return(calcScore(b)||0)-(calcScore(a)||0);});
+    const avg=sorted.length?Math.round(sorted.reduce(function(acc,s){return acc+(calcScore(s)||0);},0)/sorted.length):0;
+
+    sorted.forEach(function(s,ri){
+      const tot=calcScore(s);
+      const hex=scoreHex(tot);
+      const bg=ri%2===0?'FFFFFF':LGRAY;
+      const row=ws.getRow(5+ri);
+
+      // Rank (medal styling)
+      const rCell=row.getCell(1);
+      rCell.value=ri+1;
+      rCell.fill=fill(bg);rCell.border=bd();rCell.alignment={vertical:'middle',horizontal:'center'};
+      if(ri===0)rCell.font={bold:true,size:14,color:{argb:'FFFFAA00'}};
+      else if(ri===1)rCell.font={bold:true,size:12,color:{argb:'FF888888'}};
+      else if(ri===2)rCell.font={bold:true,size:11,color:{argb:'FF8B4513'}};
+      else rCell.font={size:10,color:{argb:'FF666666'}};
+
+      dataCell(row.getCell(2),s.name,bg,{font:{bold:true,size:10},align:{vertical:'middle',horizontal:'left',indent:1}});
+
+      const sCell=row.getCell(3);
+      sCell.value=tot!==null?tot/100:null;sCell.numFmt='0%';
+      sCell.font={bold:true,size:12,color:{argb:'FFFFFFFF'}};
+      sCell.fill=fill(hex||'888888');sCell.border=bd();
+      sCell.alignment={vertical:'middle',horizontal:'center'};
+
+      dataCell(row.getCell(4),tierLbl(tot),bg,{font:{size:9,color:{argb:'FF555555'}},align:{horizontal:'center'}});
+      dataCell(row.getCell(5),tierRisk(tot),bg,{font:{size:9,color:{argb:'FF555555'}},align:{horizontal:'center'}});
+
+      // Score bar using block chars
+      const filled=Math.round((tot||0)/10);
+      const barCell=row.getCell(6);
+      barCell.value='█'.repeat(filled)+'░'.repeat(10-filled);
+      barCell.font={size:10,color:{argb:'FF'+(hex||'888888')},name:'Courier New'};
+      barCell.fill=fill(bg);barCell.border=bd();barCell.alignment={vertical:'middle'};
+
+      const diff=tot!==null?tot-avg:null;
+      const diffCell=row.getCell(7);
+      diffCell.value=diff!==null?(diff>=0?'+':'')+diff+'%':'—';
+      diffCell.font={size:10,bold:diff!==null&&diff!==0,color:{argb:diff===null?'FF999999':diff>=0?'FF1A8A5A':'FFC0392B'}};
+      diffCell.fill=fill(bg);diffCell.border=bd();diffCell.alignment={vertical:'middle',horizontal:'center'};
+
+      row.height=26;
+    });
+
+    // Average footer row
+    const fRow=ws.getRow(5+sorted.length+1);
+    ws.mergeCells(5+sorted.length+1,1,5+sorted.length+1,2);
+    fRow.getCell(1).value='Portfolio Average';
+    fRow.getCell(1).font={bold:true,size:9,color:{argb:'FF444444'}};
+    fRow.getCell(1).fill=fill('EEEEEE');fRow.getCell(1).border=bd();
+    fRow.getCell(1).alignment={vertical:'middle',indent:1};
+    const avgCell=fRow.getCell(3);
+    avgCell.value=avg/100;avgCell.numFmt='0%';
+    avgCell.font={bold:true,size:11,color:{argb:'FFFFFFFF'}};
+    avgCell.fill=fill(scoreHex(avg)||'888888');avgCell.border=bd();
+    avgCell.alignment={vertical:'middle',horizontal:'center'};
+    fRow.height=24;
+
+    ws.getColumn(1).width=7;ws.getColumn(2).width=32;ws.getColumn(3).width=15;
+    ws.getColumn(4).width=14;ws.getColumn(5).width=18;ws.getColumn(6).width=18;ws.getColumn(7).width=14;
+  }
+
+  // ── SHEETS: PER SUPPLIER ──────────────────────────────────────────────────
+  if(exOpts.detail){
+    sel.forEach(function(s){
+      const tot=calcScore(s);
+      const hex=scoreHex(tot);
+      const ws=wb.addWorksheet(s.name.slice(0,31),{tabColor:{argb:'FF'+(hex||PRIMARY)}});
+      ws.views=[{state:'frozen',ySplit:8}];
+      const COLS=6;
+
+      // Title block
+      ws.mergeCells(1,1,1,COLS);
+      const nc=ws.getCell('A1');nc.value=s.name;
+      nc.font={bold:true,size:15,color:{argb:'FFFFFFFF'}};nc.fill=fill(PRIMARY);
+      nc.alignment={vertical:'middle',horizontal:'left',indent:1};ws.getRow(1).height=32;
+
+      ws.mergeCells(2,1,2,3);ws.getCell('A2').value='Overall Score';
+      ws.getCell('A2').font={size:9,color:{argb:'FFFFFFFF'}};ws.getCell('A2').fill=fill(PRIMARY);
+      ws.getCell('A2').alignment={vertical:'middle',horizontal:'left',indent:1};
+      ws.mergeCells(2,4,2,COLS);
+      const tc=ws.getCell(2,4);tc.value=(tot!==null?tot+'%':'—')+' — '+tierLbl(tot);
+      tc.font={bold:true,size:12,color:{argb:'FFFFFFFF'}};tc.fill=fill(hex||'888888');
+      tc.alignment={vertical:'middle',horizontal:'center'};ws.getRow(2).height=26;
+
+      ws.mergeCells(3,1,3,COLS);ws.getCell('A3').fill=fill(ACCENT);ws.getRow(3).height=4;
+      ws.getRow(4).height=10;
+
+      // Category summary
+      ws.mergeCells(5,1,5,COLS);
+      const catHdrTitle=ws.getCell('A5');catHdrTitle.value='Category Summary';
+      catHdrTitle.font={bold:true,size:10,color:{argb:'FFFFFFFF'}};catHdrTitle.fill=fill('333333');
+      catHdrTitle.alignment={vertical:'middle',horizontal:'left',indent:1};ws.getRow(5).height=22;
+
+      const catHdrs=['Category','Score','Tier','','',''];
+      catHdrs.forEach(function(h,i){
+        const c=ws.getRow(6).getCell(i+1);
+        hdrCell(c,h,'555555',{align:{vertical:'middle',horizontal:i===0?'left':'center',indent:i===0?1:0}});
+      });
+      ws.getRow(6).height=20;
+
+      const catKeys=Object.keys(s.categories);
+      catKeys.forEach(function(cat,ci){
+        const p=calcScore(s,cat);const cHex=scoreHex(p);
+        const row=ws.getRow(7+ci);const bg=ci%2===0?'FFFFFF':LGRAY;
+        dataCell(row.getCell(1),cat,bg,{font:{bold:true,size:9},align:{vertical:'middle',indent:1}});
+        const sc2=row.getCell(2);
+        if(p!==null&&cHex){sc2.value=p/100;sc2.numFmt='0%';sc2.font={bold:true,size:10,color:{argb:'FFFFFFFF'}};sc2.fill=fill(cHex);}
+        else{dataCell(sc2,'—',bg,{font:{color:{argb:'FF999999'}},align:{horizontal:'center'}});}
+        sc2.alignment={vertical:'middle',horizontal:'center'};sc2.border=bd();
+        dataCell(row.getCell(3),tierLbl(p),bg,{font:{size:9,color:{argb:'FF666666'}},align:{horizontal:'center'}});
+        ws.mergeCells(7+ci,4,7+ci,COLS);row.getCell(4).fill=fill(bg);row.getCell(4).border=bd();
+        row.height=20;
+      });
+      ws.getRow(7+catKeys.length).height=12;
+
+      // Checkpoint detail header
+      const detStart=8+catKeys.length;
+      ws.mergeCells(detStart,1,detStart,COLS);
+      const dh=ws.getCell(detStart,1);dh.value='Checkpoint Detail';
+      dh.font={bold:true,size:11,color:{argb:'FFFFFFFF'}};dh.fill=fill(PRIMARY);
+      dh.alignment={vertical:'middle',horizontal:'left',indent:1};ws.getRow(detStart).height=26;
+
+      ['Category','#','Checkpoint','Score','Tier','Evidence / Notes'].forEach(function(h,i){
+        hdrCell(ws.getRow(detStart+1).getCell(i+1),h,'444444',{align:{vertical:'middle',horizontal:i<2?'left':'center',indent:i<2?1:0}});
+      });
+      ws.getRow(detStart+1).height=22;
+
+      let dri=0;
+      Object.entries(s.categories).forEach(function([cat,items]){
+        items.forEach(function(item,ii){
+          const row=ws.getRow(detStart+2+dri);const bg=dri%2===0?'FFFFFF':LGRAY;
+          const sc3=item.score;
+          const scPct=typeof sc3==='number'?Math.round((sc3/5)*100):null;
+          const scHex2=scoreHex(scPct);
+
+          dataCell(row.getCell(1),ii===0?cat:'',bg,{font:{size:8,color:{argb:'FF666666'}},align:{vertical:'middle',indent:1}});
+          dataCell(row.getCell(2),item.no,bg,{font:{size:8,color:{argb:'FF888888'}},align:{horizontal:'center'}});
+          const chkCell=row.getCell(3);
+          dataCell(chkCell,item.checkpoint,bg,{font:{size:9},align:{vertical:'middle',wrapText:true,indent:1}});
+
+          const sCell2=row.getCell(4);
+          if(sc3===null){dataCell(sCell2,'—',bg,{font:{color:{argb:'FF999999'}},align:{horizontal:'center'}});}
+          else if(sc3==='N.A.'){dataCell(sCell2,'N.A.',bg,{font:{color:{argb:'FF888888'}},align:{horizontal:'center'}});}
+          else{sCell2.value=sc3;sCell2.font={bold:true,size:10,color:{argb:'FFFFFFFF'}};sCell2.fill=fill(scHex2||'888888');sCell2.alignment={vertical:'middle',horizontal:'center'};sCell2.border=bd();}
+
+          dataCell(row.getCell(5),tierLbl(scPct),bg,{font:{size:8,color:{argb:'FF666666'}},align:{horizontal:'center'}});
+          dataCell(row.getCell(6),item.notes||'',bg,{font:{size:9,color:{argb:'FF444444'}},align:{vertical:'middle',wrapText:true,indent:1}});
+          row.height=20;dri++;
+        });
+      });
+
+      ws.getColumn(1).width=22;ws.getColumn(2).width=5;ws.getColumn(3).width=46;
+      ws.getColumn(4).width=9;ws.getColumn(5).width=14;ws.getColumn(6).width=42;
+    });
+  }
+
+  // ── SHEET: ACTION PLAN ────────────────────────────────────────────────────
+  if(exOpts.actions&&actions&&actions.length>0){
+    const SCOL={'Open':'C0392B','In Progress':'E07B00','Done':'1A8A5A'};
+    const PCOL={'High':'C0392B','Medium':'E07B00','Low':'1A8A5A'};
+    const ws=wb.addWorksheet('Action Plan',{tabColor:{argb:'FFE07B00'}});
+    ws.views=[{state:'frozen',ySplit:4}];
+    titleBlock(ws,'Action Plan — '+project,null,9);
+    ws.getRow(3).height=8;
+
+    ['#','Title','Supplier','Category','Responsible','Start','Due Date','Priority','Status'].forEach(function(h,i){
+      hdrCell(ws.getRow(4).getCell(i+1),h,'222222',{align:{vertical:'middle',horizontal:i<4?'left':'center',indent:i<4?1:0}});
+    });
+    ws.getRow(4).height=26;
+
+    actions.forEach(function(a,i){
+      const row=ws.getRow(5+i);const bg=i%2===0?'FFFFFF':LGRAY;
+      const sc4=SCOL[a.status]||'888888';const pc=PCOL[a.priority]||'888888';
+      [i+1,a.title,a.supplier,a.category,a.responsible,a.startDate||'—',a.dueDate||'—',a.priority,a.status].forEach(function(v,ci){
+        const cell=row.getCell(ci+1);
+        if(ci===8){// Status — colored bg
+          cell.value=v;cell.font={bold:true,size:9,color:{argb:'FFFFFFFF'}};
+          cell.fill=fill(sc4);cell.border=bd();cell.alignment={vertical:'middle',horizontal:'center'};
+        } else if(ci===7){// Priority — colored text
+          dataCell(cell,v,bg,{font:{bold:true,size:9,color:{argb:'FF'+pc}},align:{horizontal:'center'}});
+        } else {
+          dataCell(cell,v,bg,{font:{size:9},align:{vertical:'middle',horizontal:ci<4?'left':'center',indent:ci<4?1:0,wrapText:ci===1}});
+        }
+      });
+      row.height=22;
+    });
+
+    // Summary footer
+    const fr=5+actions.length+1;ws.getRow(fr).height=10;
+    ws.mergeCells(fr+1,1,fr+1,5);
+    const sf=ws.getCell(fr+1,1);
+    const open=actions.filter(function(a){return a.status==='Open';}).length;
+    const inp=actions.filter(function(a){return a.status==='In Progress';}).length;
+    const done=actions.filter(function(a){return a.status==='Done';}).length;
+    sf.value='Open: '+open+'   |   In Progress: '+inp+'   |   Done: '+done+'   |   Total: '+actions.length;
+    sf.font={size:9,italic:true,color:{argb:'FF555555'}};
+    sf.fill=fill('F0F0F0');sf.border=bd();sf.alignment={vertical:'middle',indent:1};
+    ws.getRow(fr+1).height=20;
+
+    ws.getColumn(1).width=5;ws.getColumn(2).width=36;ws.getColumn(3).width=24;ws.getColumn(4).width=20;
+    ws.getColumn(5).width=22;ws.getColumn(6).width=12;ws.getColumn(7).width=12;ws.getColumn(8).width=12;ws.getColumn(9).width=14;
+  }
+
+  // ── DOWNLOAD ──────────────────────────────────────────────────────────────
+  const buffer=await wb.xlsx.writeBuffer();
+  const blob=new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='Supplier_Audit_'+project.replace(/[^a-zA-Z0-9]/g,'_')+'_'+new Date().toISOString().slice(0,10)+'.xlsx';
+  a.click();URL.revokeObjectURL(url);
+  toast('Excel exported — '+wb.worksheets.length+' sheets');
 }
 
 function exportPDF(){
@@ -1777,117 +2836,194 @@ async function exportPPTX(){
   var showSummary=document.getElementById('ropt_summary').checked;
   var showMgmt=document.getElementById('ropt_mgmt').checked;
   var showDetail=document.getElementById('ropt_detail').checked;
+  var showActions=document.getElementById('ropt_actions')&&document.getElementById('ropt_actions').checked;
   var onlyNotes=document.getElementById('ropt_notes').checked;
   var topN=Math.max(3,Math.min(15,parseInt(document.getElementById('topN').value)||5));
 
   toast('Creating PPTX...','#185FA5');
 
   var pres=new PptxGenJS();
-  pres.layout='LAYOUT_16x9';
+  pres.layout='LAYOUT_WIDE'; // 13.33" × 7.5"
 
-  var CY=0.75;
+  var SW=13.33;   // slide width
+  var MX=0.60;    // left margin — matches MS slide
+  var MW=12.21;   // content width (right edge = MX+MW = 12.81)
+  var CY=1.05;    // content Y start (below header separator)
 
   function addLogo(slide){
     if(logo)slide.addImage({data:logo,x:LOGO_X,y:LOGO_Y,w:LOGO_W,h:LOGO_H});
   }
 
   function addHeader(slide,chapter,heading,sub){
-    slide.addText(chapter||'',{x:0.354,y:0.22,w:8.558,h:0.151,fontSize:9,color:th.chapterColor,fontFace:'Calibri',valign:'middle'});
-    slide.addText(heading||'',{x:0.354,y:0.411,w:8.558,h:0.263,fontSize:16,color:'333333',fontFace:'Calibri',bold:true,valign:'middle'});
+    // Chapter label (same position as MS "supplier name" line)
+    slide.addText(chapter||'',{x:MX,y:0.20,w:11.75,h:0.28,fontSize:9,color:th.chapterColor,fontFace:'Calibri',valign:'middle'});
+    // Main heading
+    slide.addText(heading||'',{x:MX,y:0.48,w:11.75,h:0.40,fontSize:20,color:'111111',fontFace:'Calibri',bold:true,valign:'middle'});
+    // Separator line — same left edge and width as MS content area
+    slide.addShape('line',{x:MX,y:0.93,w:MW,h:0,line:{color:'DDDDDD',width:0.75}});
     addLogo(slide);
-    slide.addText(today,{x:0.354,y:5.344,w:1.55,h:0.283,fontSize:8,color:'888888',fontFace:'Calibri',valign:'middle'});
-    slide.addText(company+' | '+project,{x:3.312,y:5.342,w:3.375,h:0.283,fontSize:8,color:'888888',fontFace:'Calibri',align:'center',valign:'middle'});
-    if(sub)slide.addText(sub,{x:8.371,y:5.342,w:1.275,h:0.283,fontSize:8,color:'888888',fontFace:'Calibri',align:'right',valign:'middle'});
+    // Footer — same y baseline, consistent x positions
+    slide.addText(today,{x:MX,y:7.15,w:2.0,h:0.22,fontSize:7,color:'AAAAAA',fontFace:'Calibri',valign:'middle'});
+    slide.addText(company+(company&&project?' | ':'')+project,{x:MX+2.2,y:7.15,w:MW-4.4,h:0.22,fontSize:7,color:'AAAAAA',fontFace:'Calibri',align:'center',valign:'middle'});
+    if(sub)slide.addText(sub,{x:MX+MW-2.0,y:7.15,w:2.0,h:0.22,fontSize:7,color:'AAAAAA',fontFace:'Calibri',align:'right',valign:'middle'});
   }
 
   if(showCover){
     var slide=pres.addSlide();
     slide.background={color:th.primary};
-    slide.addShape('rect',{x:0,y:3.9,w:10,h:1.725,fill:{color:th.accent},line:{color:th.accent,width:0}});
+    slide.addShape('rect',{x:0,y:3.9,w:SW,h:1.8,fill:{color:th.accent},line:{color:th.accent,width:0}});
     addLogo(slide);
-    slide.addText('Supplier Audit',{x:0.354,y:0.35,w:8,h:0.25,fontSize:10,color:th.accent,fontFace:'Calibri'});
-    slide.addText(project,{x:0.354,y:0.7,w:9,h:1.6,fontSize:32,bold:true,color:'FFFFFF',fontFace:'Calibri'});
-    slide.addText('Supplier Audit Report',{x:0.5,y:4.0,w:7,h:0.5,fontSize:14,color:th.primary,fontFace:'Calibri',bold:true});
-    var meta=[auditor&&'Auditor'+': '+auditor,company,'Date'+': '+today].filter(Boolean).join('   -   ');
-    slide.addText(meta,{x:0.5,y:4.6,w:9,h:0.4,fontSize:10,color:th.primary,fontFace:'Calibri'});
+    slide.addText('Supplier Audit',{x:MX,y:0.35,w:MW,h:0.30,fontSize:11,color:th.accent,fontFace:'Calibri'});
+    slide.addText(project,{x:MX,y:0.75,w:MW,h:1.8,fontSize:36,bold:true,color:'FFFFFF',fontFace:'Calibri'});
+    slide.addText('Supplier Audit Report',{x:MX,y:4.05,w:MW,h:0.5,fontSize:15,color:th.primary,fontFace:'Calibri',bold:true});
+    var meta=[auditor&&'Auditor: '+auditor,company,'Date: '+today].filter(Boolean).join('   ·   ');
+    slide.addText(meta,{x:MX,y:4.65,w:MW,h:0.4,fontSize:11,color:th.primary,fontFace:'Calibri'});
   }
 
   if(showSummary&&sel.length){
     var slide=pres.addSlide();
     slide.background={color:'FFFFFF'};
-    addHeader(slide,'Supplier Audit'+' - '+today,'Summary - All Suppliers');
+    addHeader(slide,'Supplier Audit — '+today,'Summary — All Suppliers');
     var sorted=[...sel].sort(function(a,b){return (calcScore(b)||0)-(calcScore(a)||0);});
-    var catW=Math.max(0.55,(7.0-2.2-0.85)/Math.max(cats.length,1));
-    var colW=[2.2,...cats.map(function(){return catW;}),0.85];
-    var hdrOpts=function(txt,small){return {text:txt,options:{bold:true,fill:{color:th.primary},color:'FFFFFF',fontSize:small?7:8,align:'center'}};};
-    var rows=[[{text:'Supplier',options:{bold:true,fill:{color:th.primary},color:'FFFFFF',fontSize:8}},...cats.map(function(c){return hdrOpts(c.length>14?c.slice(0,13)+'...':c,true);}),hdrOpts('Total',false)]];
+    var tableW=MW;
+    var catW=Math.max(0.50,(tableW-2.5-1.0)/Math.max(cats.length,1));
+    var colW=[2.5,...cats.map(function(){return catW;}),1.0];
+    var hdrOpts=function(txt,small){return{text:txt,options:{bold:true,fill:{color:th.primary},color:'FFFFFF',fontSize:small?7:8,align:'center'}};};
+    var rows=[[{text:'Supplier',options:{bold:true,fill:{color:th.primary},color:'FFFFFF',fontSize:8}},...cats.map(function(c){return hdrOpts(c.length>14?c.slice(0,13)+'…':c,true);}),hdrOpts('Total',false)]];
     sorted.forEach(function(s){
       var tot=calcScore(s);
       rows.push([{text:s.name,options:{fontSize:8,bold:true}},...cats.map(function(c){var p=calcScore(s,c);return{text:p!==null?p+'%':'--',options:{fontSize:8,color:scHex(p),bold:true,align:'center'}};}),{text:tot!==null?tot+'%':'--',options:{fontSize:9,bold:true,color:scHex(tot),align:'center'}}]);
     });
-    slide.addTable(rows,{x:0.25,y:CY,w:9.5,colW:colW,border:{pt:0.5,color:'DDDDDD'},autoPage:false});
+    slide.addTable(rows,{x:MX,y:CY,w:tableW,colW:colW,border:{pt:0.5,color:'DDDDDD'},autoPage:false});
   }
 
   for(var si=0;si<sel.length;si++){
     var s=sel[si];
     var tot=calcScore(s);
 
-    if(showMgmt&&cats.length>=3){
-      // Average scores of all OTHER suppliers as benchmark
+    if(showMgmt&&Object.keys(s.categories).length>=3){
+      var supCatKeys=Object.keys(s.categories);
       var others=suppliers.filter(function(o){return o.name!==s.name;});
       var avgVals=null;
       if(others.length>0){
-        avgVals=cats.map(function(c){
+        avgVals=supCatKeys.map(function(c){
           var scores=others.map(function(o){return calcScore(o,c);}).filter(function(v){return v!==null;});
           return scores.length>0?Math.round(scores.reduce(function(a,b){return a+b;},0)/scores.length):0;
         });
       }
-      var radarPng=await renderRadarToPng(cats,cats.map(function(c){return calcScore(s,c)||0;}),th.chapterColor,avgVals,s.name);
+      var radarPng=await renderRadarToPng(supCatKeys,supCatKeys.map(function(c){return calcScore(s,c)||0;}),th.chapterColor,avgVals,s.name);
       var critical=getTopCritical(s,topN);
       var slide=pres.addSlide();
       slide.background={color:'FFFFFF'};
-      addHeader(slide,s.name,'Management Summary',tot!==null?tot+'%':'--');
+      var scoreVal=tot||0;
       var scoreColor=scHex(tot);
 
-      // LEFT: Radar chart (smaller to leave room for category score list)
-      slide.addImage({data:radarPng,x:0.25,y:CY,w:3.1,h:3.25});
+      // ── TITLE (matches template placeholder positions) ──────────────────
+      slide.addText(s.name,{x:0.60,y:0.20,w:11.5,h:0.28,fontSize:10,color:'888888',fontFace:'Calibri',valign:'middle'});
+      slide.addText('Management Summary',{x:0.60,y:0.48,w:11.5,h:0.70,fontSize:28,bold:true,color:'111111',fontFace:'Calibri',valign:'middle'});
+      addLogo(slide);
 
-      // Category score list (right of radar)
-      var catListX=3.45;var catListW=1.5;
-      var catH=Math.min(0.36,3.25/Math.max(cats.length,1));
-      cats.forEach(function(cat,i){
-        var cp=calcScore(s,cat);var cc=scHex(cp);var cy2=CY+i*catH;
-        slide.addShape('rect',{x:catListX,y:cy2+0.03,w:0.44,h:catH-0.05,fill:{color:cc},line:{color:cc,width:0}});
-        slide.addText(cp!==null?cp+'%':'--',{x:catListX,y:cy2+0.03,w:0.44,h:catH-0.05,fontSize:7,bold:true,color:'FFFFFF',fontFace:'Calibri',align:'center',valign:'middle'});
-        var catLabel=cat.length>18?cat.slice(0,17)+'…':cat;
-        slide.addText(catLabel,{x:catListX+0.48,y:cy2+0.03,w:catListW-0.48,h:catH-0.05,fontSize:8,color:'333333',fontFace:'Calibri',valign:'middle'});
+      // ── EXACT MEASUREMENTS FROM TEMPLATE EMUs ──────────────────────────
+      var lX=0.60,lW=2.46;                   // left column
+      var cX=3.46,cW=5.88;                   // center column
+      var rX=9.74,rW=3.07;                   // right column
+      var colY=1.86,colH=3.97;              // columns vertical span
+      var fY=6.05,fW=12.21,fH=0.60;         // footer comment box
+
+      // ── VERTICAL DIVIDERS ──────────────────────────────────────────────
+      slide.addShape('line',{x:3.26,y:colY,w:0,h:colH,line:{color:'BBBBBB',width:0.75}});
+      slide.addShape('line',{x:9.55,y:colY,w:0,h:colH,line:{color:'BBBBBB',width:0.75}});
+
+      // ──────────────────────────────────────────────────────────────────
+      // LEFT COL — Overall score box + Traffic-light vertical bar chart
+      // ──────────────────────────────────────────────────────────────────
+
+      // Score box (white bg, black border)
+      slide.addShape('roundRect',{x:lX,y:colY,w:lW,h:0.92,fill:{color:'FFFFFF'},line:{color:'222222',width:1.0},rectRadius:0.06});
+      slide.addText('Overall score:',{x:lX,y:colY+0.04,w:lW,h:0.34,fontSize:11,bold:true,color:'111111',fontFace:'Calibri',align:'center',valign:'middle'});
+      slide.addText((tot!==null?tot:' --')+' %',{x:lX,y:colY+0.36,w:lW,h:0.50,fontSize:22,bold:true,color:'111111',fontFace:'Calibri',align:'center',valign:'middle'});
+
+      // Traffic-light bar chart box
+      var bcX=lX,bcY=colY+0.97+0.06,bcW=lW,bcH=colH-0.97-0.06;
+      slide.addShape('roundRect',{x:bcX,y:bcY,w:bcW,h:bcH,fill:{color:'FFFFFF'},line:{color:'222222',width:0.75},rectRadius:0.06});
+
+      // Inner chart geometry
+      var axX=bcX+0.90;           // x of vertical axis line
+      var ctTop=bcY+0.18;         // chart top
+      var ctBot=bcY+bcH-0.18;     // chart bottom
+      var ctH=ctBot-ctTop;        // chart height
+      var bW=0.46;                // bar width
+
+      slide.addShape('line',{x:axX,y:ctTop,w:0,h:ctH,line:{color:'444444',width:0.75}});
+
+      // Score bar (filled black from bottom up to scoreVal%)
+      var barH3=ctH*(scoreVal/100);
+      if(barH3>0){
+        slide.addShape('rect',{x:axX,y:ctBot-barH3,w:bW,h:barH3,fill:{color:'333333'},line:{color:'333333',width:0}});
+      }
+
+      // Threshold lines + labels
+      var thList=[{pct:100,line1:'100 %',line2:null}];
+      TIERS.forEach(function(t){thList.push({pct:t.min,line1:t.label,line2:t.min+' %'});});
+      thList.push({pct:0,line1:'0 %',line2:null});
+      thList.forEach(function(t){
+        var ty=ctTop+ctH*(1-t.pct/100);
+        slide.addShape('line',{x:axX,y:ty,w:bW,h:0,line:{color:'AAAAAA',width:0.5}});
+        if(t.line2){
+          slide.addText(t.line1,{x:bcX+0.04,y:ty-0.16,w:axX-bcX-0.07,h:0.15,fontSize:6,color:'666666',fontFace:'Calibri',align:'right',valign:'middle'});
+          slide.addText(t.line2,{x:bcX+0.04,y:ty+0.01,w:axX-bcX-0.07,h:0.15,fontSize:6,color:'444444',fontFace:'Calibri',align:'right',valign:'middle'});
+        } else {
+          slide.addText(t.line1,{x:bcX+0.04,y:ty-0.11,w:axX-bcX-0.07,h:0.22,fontSize:7,color:'333333',fontFace:'Calibri',align:'right',valign:'middle'});
+        }
       });
 
-      // Total score row below category list
-      var totRowY=CY+cats.length*catH+0.06;
-      slide.addShape('rect',{x:catListX,y:totRowY,w:catListW,h:0.32,fill:{color:scoreColor},line:{color:scoreColor,width:0}});
-      slide.addText('Total: '+(tot!==null?tot+'%':'--'),{x:catListX,y:totRowY,w:catListW,h:0.32,fontSize:9,bold:true,color:'FFFFFF',fontFace:'Calibri',align:'center',valign:'middle'});
+      // ──────────────────────────────────────────────────────────────────
+      // CENTER COL — Radar chart (large, fills column)
+      // ──────────────────────────────────────────────────────────────────
+      slide.addShape('roundRect',{x:cX,y:colY,w:cW,h:colH,fill:{color:'FFFFFF'},line:{color:'CCCCCC',width:0.75},rectRadius:0.06});
+      if(radarPng){slide.addImage({data:radarPng,x:cX+0.10,y:colY+0.10,w:cW-0.20,h:colH-0.20});}
 
-      // RIGHT: Overall score badge
-      slide.addShape('rect',{x:5.1,y:CY,w:4.6,h:0.5,fill:{color:scoreColor},line:{color:scoreColor,width:0}});
-      slide.addText('Total Score: '+(tot!==null?tot+'%':'--'),{x:5.1,y:CY,w:4.6,h:0.5,fontSize:14,bold:true,color:'FFFFFF',fontFace:'Calibri',align:'center',valign:'middle'});
+      // ──────────────────────────────────────────────────────────────────
+      // RIGHT COL TOP — Supplier metadata (h=1.89 from template)
+      // ──────────────────────────────────────────────────────────────────
+      var rtH=1.89;
+      slide.addShape('roundRect',{x:rX,y:colY,w:rW,h:rtH,fill:{color:'FFFFFF'},line:{color:'222222',width:0.75},rectRadius:0.06});
+      var mRows=[{l:'Supplier',v:s.name},{l:'Location',v:'—'},{l:'Auditor',v:auditor||'—'},{l:'Date',v:today}];
+      var mRH=rtH/mRows.length;
+      mRows.forEach(function(m,i){
+        var my=colY+i*mRH;
+        if(i>0)slide.addShape('line',{x:rX+0.08,y:my,w:rW-0.16,h:0,line:{color:'DDDDDD',width:0.5}});
+        slide.addText(m.l,{x:rX+0.10,y:my+0.04,w:0.78,h:mRH-0.08,fontSize:8,color:'888888',fontFace:'Calibri',valign:'middle'});
+        slide.addText(String(m.v).slice(0,26),{x:rX+0.92,y:my+0.04,w:rW-1.02,h:mRH-0.08,fontSize:8,color:'111111',fontFace:'Calibri',valign:'middle'});
+      });
 
-      // RIGHT: Comments only (no criteria names, no scores)
-      var commentsY=CY+0.62;var commentsH=4.3-0.62;
+      // ──────────────────────────────────────────────────────────────────
+      // RIGHT COL BOTTOM — Category scores (fills remaining height)
+      // ──────────────────────────────────────────────────────────────────
+      var rbY=colY+rtH+0.04,rbH=colH-rtH-0.04;
+      slide.addShape('roundRect',{x:rX,y:rbY,w:rW,h:rbH,fill:{color:'FFFFFF'},line:{color:'222222',width:0.75},rectRadius:0.06});
+      var cKeys=supCatKeys.slice(0,9);
+      var cRH=rbH/Math.max(cKeys.length,1);
+      cKeys.forEach(function(cat,i){
+        var cp=calcScore(s,cat);
+        var ry2=rbY+i*cRH;
+        if(i>0)slide.addShape('line',{x:rX+0.08,y:ry2,w:rW-0.16,h:0,line:{color:'DDDDDD',width:0.5}});
+        var cLabel=cat.length>22?cat.slice(0,21)+'…':cat;
+        slide.addText(cLabel,{x:rX+0.10,y:ry2+0.04,w:rW-1.00,h:cRH-0.08,fontSize:8,color:'111111',fontFace:'Calibri',valign:'middle'});
+        slide.addText(cp!==null?cp+' %':'--',{x:rX+rW-0.80,y:ry2+0.04,w:0.70,h:cRH-0.08,fontSize:8,bold:true,color:'111111',fontFace:'Calibri',align:'right',valign:'middle'});
+      });
+
+      // ──────────────────────────────────────────────────────────────────
+      // FOOTER — Full-width comments box with double-chevron icon
+      // ──────────────────────────────────────────────────────────────────
+      slide.addShape('roundRect',{x:lX,y:fY,w:fW,h:fH,fill:{color:'F7F7F7'},line:{color:'333333',width:1.0},rectRadius:0.08});
+      slide.addShape('notchedRightArrow',{x:lX+0.08,y:fY+0.08,w:0.34,h:fH-0.16,fill:{color:'111111'},line:{color:'111111',width:0}});
+      slide.addShape('notchedRightArrow',{x:lX+0.34,y:fY+0.08,w:0.34,h:fH-0.16,fill:{color:'111111'},line:{color:'111111',width:0}});
       var itemsWithNotes=critical.filter(function(item){return item.notes&&item.notes.trim().length>0;});
-      if(itemsWithNotes.length>0){
-        slide.addText('Comments',{x:5.1,y:commentsY-0.27,w:4.6,h:0.24,fontSize:9,color:th.chapterColor,fontFace:'Calibri',bold:true});
-        var totalChars=itemsWithNotes.reduce(function(sum,item){return sum+item.notes.trim().length;},0);
-        var fSize=totalChars>700?8:totalChars>450?9:10;
-        var bulletItems=itemsWithNotes.map(function(item){
-          return {text:'•  '+item.notes.trim(),options:{fontSize:fSize,color:'222222',breakLine:true,paraSpaceAfter:4}};
-        });
-        slide.addText(bulletItems,{x:5.1,y:commentsY,w:4.6,h:commentsH,fontFace:'Calibri',valign:'top',shrinkText:true});
-      } else if(critical.length>0){
-        slide.addText('No comments recorded for critical criteria.',{x:5.1,y:commentsY,w:4.6,h:1,fontSize:10,color:'888888',fontFace:'Calibri',valign:'middle'});
-      } else {
-        slide.addText('No critical criteria found.',{x:5.1,y:commentsY,w:4.6,h:1,fontSize:11,color:'1D9E75',fontFace:'Calibri',valign:'middle'});
-      }
+      var commentText=itemsWithNotes.length>0
+        ?itemsWithNotes.map(function(item){return item.notes.trim();}).join(' · ')
+        :(critical.length>0?'No comments recorded for critical findings.':'No critical findings recorded.');
+      slide.addText(commentText,{x:lX+0.80,y:fY+0.05,w:fW-0.88,h:fH-0.10,fontSize:9,bold:true,color:'111111',fontFace:'Calibri',valign:'middle',shrinkText:true});
     }
 
 
@@ -1916,8 +3052,103 @@ async function exportPPTX(){
             {text:item.notes||'',options:{fontSize:8,color:'555555'}}
           ]);
         });
-        slide.addTable(rows,{x:0.25,y:CY,w:9.5,colW:[0.4,4.0,0.7,4.4],border:{pt:0.5,color:'DDDDDD'},autoPage:true,autoPageRepeatHeader:true,newSlideStartY:CY});
+        slide.addTable(rows,{x:MX,y:CY,w:MW,colW:[0.40,6.18,0.70,4.93],border:{pt:0.5,color:'DDDDDD'},autoPage:true,autoPageRepeatHeader:true,newSlideStartY:CY});
       }
+    }
+  }
+
+  // ── ACTION PLAN SLIDES ──────────────────────────────────────────────────
+  if(showActions&&actions&&actions.length>0){
+    var STATUS_COL2={'Open':'C0392B','In Progress':'E07B00','Done':'1A8A5A'};
+    var PRIO_COL={'High':'C0392B','Medium':'E07B00','Low':'1A8A5A'};
+
+    // Actions list slide
+    var aSlide=pres.addSlide();
+    aSlide.background={color:'FFFFFF'};
+    addHeader(aSlide,'Action Plan','All Actions','');
+    var aRows=[[
+      {text:'Title',options:{bold:true,fill:{color:th.primary},color:'FFFFFF',fontSize:8}},
+      {text:'Supplier',options:{bold:true,fill:{color:th.primary},color:'FFFFFF',fontSize:8}},
+      {text:'Category',options:{bold:true,fill:{color:th.primary},color:'FFFFFF',fontSize:8}},
+      {text:'Responsible',options:{bold:true,fill:{color:th.primary},color:'FFFFFF',fontSize:8}},
+      {text:'Start',options:{bold:true,fill:{color:th.primary},color:'FFFFFF',fontSize:8,align:'center'}},
+      {text:'Due',options:{bold:true,fill:{color:th.primary},color:'FFFFFF',fontSize:8,align:'center'}},
+      {text:'Priority',options:{bold:true,fill:{color:th.primary},color:'FFFFFF',fontSize:8,align:'center'}},
+      {text:'Status',options:{bold:true,fill:{color:th.primary},color:'FFFFFF',fontSize:8,align:'center'}}
+    ]];
+    actions.forEach(function(a){
+      var sc=STATUS_COL2[a.status]||'555555';
+      var pc=PRIO_COL[a.priority]||'555555';
+      aRows.push([
+        {text:a.title||'',options:{fontSize:8}},
+        {text:a.supplier||'',options:{fontSize:8,color:'555555'}},
+        {text:a.category||'',options:{fontSize:8,color:'555555'}},
+        {text:a.responsible||'',options:{fontSize:8}},
+        {text:a.startDate||'—',options:{fontSize:8,align:'center',color:'555555'}},
+        {text:a.dueDate||'—',options:{fontSize:8,align:'center',color:'555555'}},
+        {text:a.priority||'',options:{fontSize:8,bold:true,color:pc,align:'center'}},
+        {text:a.status||'',options:{fontSize:8,bold:true,color:sc,align:'center'}}
+      ]);
+    });
+    aSlide.addTable(aRows,{x:MX,y:CY,w:MW,colW:[3.20,1.70,2.05,1.70,0.85,0.85,0.93,0.93],border:{pt:0.5,color:'DDDDDD'},autoPage:true,autoPageRepeatHeader:true,newSlideStartY:CY});
+
+    // Gantt slide
+    var actionsWithDates=actions.filter(function(a){return a.startDate&&a.dueDate;});
+    if(actionsWithDates.length>0){
+      var gSlide=pres.addSlide();
+      gSlide.background={color:'FFFFFF'};
+      addHeader(gSlide,'Action Plan','Gantt Timeline','');
+
+      var allDates=[];
+      actionsWithDates.forEach(function(a){allDates.push(new Date(a.startDate),new Date(a.dueDate));});
+      var minD=new Date(Math.min.apply(null,allDates));
+      var maxD=new Date(Math.max.apply(null,allDates));
+      minD.setDate(1);
+      maxD.setMonth(maxD.getMonth()+1);maxD.setDate(1);
+      var totalMs=maxD-minD;
+
+      var gY=CY;
+      var labelW=2.8;
+      var tlX=MX+labelW+0.10;   // timeline start x
+      var tlW=MW-labelW-0.10;   // timeline width
+      var rowH2=0.28;
+
+      // Month header row
+      var cur=new Date(minD);
+      while(cur<maxD){
+        var nx=new Date(cur);nx.setMonth(nx.getMonth()+1);
+        var mX=tlX+tlW*((cur-minD)/totalMs);
+        var mW=tlW*((Math.min(nx,maxD)-cur)/totalMs);
+        var mLabel=cur.toLocaleString('default',{month:'short',year:'2-digit'});
+        gSlide.addShape('rect',{x:mX,y:gY,w:mW,h:rowH2,fill:{color:'E8ECF0'},line:{color:'BBBBBB',width:0.5}});
+        gSlide.addText(mLabel,{x:mX,y:gY,w:mW,h:rowH2,fontSize:7,color:'333333',fontFace:'Calibri',align:'center',valign:'middle'});
+        cur=nx;
+      }
+      gY+=rowH2+0.04;
+
+      // Today line
+      var todayD=new Date();
+      if(todayD>=minD&&todayD<=maxD){
+        var todayX=tlX+tlW*((todayD-minD)/totalMs);
+        gSlide.addShape('line',{x:todayX,y:gY,w:0,h:actionsWithDates.length*rowH2+(actionsWithDates.length-1)*0.06,line:{color:'CC0000',width:1.0}});
+      }
+
+      // Action rows
+      actionsWithDates.forEach(function(a,i){
+        var rowY=gY+i*(rowH2+0.06);
+        var sc2=STATUS_COL2[a.status]||'555555';
+        // Label
+        var lbl=(a.title||'').slice(0,34);
+        gSlide.addText(lbl,{x:MX,y:rowY,w:labelW,h:rowH2,fontSize:7,color:'222222',fontFace:'Calibri',valign:'middle'});
+        // Row background
+        gSlide.addShape('rect',{x:tlX,y:rowY,w:tlW,h:rowH2,fill:{color:i%2===0?'F9F9F9':'FFFFFF'},line:{color:'EEEEEE',width:0.25}});
+        // Bar
+        var s2=new Date(a.startDate),e2=new Date(a.dueDate);
+        var bx=tlX+tlW*((s2-minD)/totalMs);
+        var bw=tlW*((e2-s2)/totalMs);
+        if(bw<0.06)bw=0.06;
+        gSlide.addShape('roundRect',{x:bx,y:rowY+0.04,w:bw,h:rowH2-0.08,fill:{color:sc2},line:{color:sc2,width:0},rectRadius:0.03});
+      });
     }
   }
 
