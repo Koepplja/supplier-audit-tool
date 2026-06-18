@@ -3133,11 +3133,12 @@ async function exportExcel(){
       catHdrTitle.font={bold:true,size:10,color:{argb:'FFFFFFFF'}};catHdrTitle.fill=fill('333333');
       catHdrTitle.alignment={vertical:'middle',horizontal:'left',indent:1};ws.getRow(5).height=22;
 
-      const catHdrs=['Category','Score','Tier','','',''];
-      catHdrs.forEach(function(h,i){
-        const c=ws.getRow(6).getCell(i+1);
-        hdrCell(c,h,'555555',{align:{vertical:'middle',horizontal:i===0?'left':'center',indent:i===0?1:0}});
+      const catHdrRow=ws.getRow(6);
+      ['Category','Score','Tier'].forEach(function(h,i){
+        hdrCell(catHdrRow.getCell(i+1),h,'555555',{align:{vertical:'middle',horizontal:i===0?'left':'center',indent:i===0?1:0}});
       });
+      ws.mergeCells(6,4,6,COLS);
+      catHdrRow.getCell(4).fill=fill('555555');catHdrRow.getCell(4).border=bd();
       ws.getRow(6).height=20;
 
       const catKeys=Object.keys(s.categories);
@@ -3433,13 +3434,13 @@ async function exportPPTX(){
     var tableW=MW;
     var catW=Math.max(0.50,(tableW-2.5-1.0)/Math.max(cats.length,1));
     var colW=[2.5,...cats.map(function(){return catW;}),1.0];
-    var hdrOpts=function(txt,small){return{text:txt,options:{bold:true,fill:{color:th.primary},color:'FFFFFF',fontSize:small?7:8,align:'center'}};};
-    var rows=[[{text:'Supplier',options:{bold:true,fill:{color:th.primary},color:'FFFFFF',fontSize:8}},...cats.map(function(c){return hdrOpts(c.length>14?c.slice(0,13)+'…':c,true);}),hdrOpts('Total',false)]];
+    var hdrOpts=function(txt,small){return{text:txt,options:{bold:true,fill:{color:th.primary},color:'FFFFFF',fontSize:small?7:8,align:'center',valign:'middle',wrap:true}};};
+    var rows=[[{text:'Supplier',options:{bold:true,fill:{color:th.primary},color:'FFFFFF',fontSize:8,valign:'middle'}},...cats.map(function(c){return hdrOpts(c,true);}),hdrOpts('Total',false)]];
     sorted.forEach(function(s){
       var tot=calcScore(s);
       rows.push([{text:s.name,options:{fontSize:8,bold:true}},...cats.map(function(c){var p=calcScore(s,c);return{text:p!==null?p+'%':'--',options:{fontSize:8,color:scHex(p),bold:true,align:'center'}};}),{text:tot!==null?tot+'%':'--',options:{fontSize:9,bold:true,color:scHex(tot),align:'center'}}]);
     });
-    slide.addTable(rows,{x:MX,y:CY,w:tableW,colW:colW,border:{pt:0.5,color:'DDDDDD'},autoPage:false});
+    slide.addTable(rows,{x:MX,y:CY,w:tableW,colW:colW,border:{pt:0.5,color:'DDDDDD'},autoPage:false,rowH:[0.45]});
   }
 
   for(var si=0;si<sel.length;si++){
