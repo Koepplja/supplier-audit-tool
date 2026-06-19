@@ -61,6 +61,18 @@ select,input[type=text],input[type=number]{padding:7px 10px;border:1px solid var
 .cat-name{width:220px;min-width:220px;max-width:220px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cat-bar-wrap{flex:1;background:var(--border);border-radius:3px;height:8px;overflow:hidden}
 .cat-bar{height:100%;border-radius:3px;transition:width .5s}.cat-pct{min-width:50px;text-align:right;font-weight:600;font-size:13px}
+/* Dashboard */
+.db-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.db-kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;display:flex;align-items:center;gap:14px;transition:border-color .15s}
+.db-kpi:hover{border-color:var(--primary)44}
+.db-kpi-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:19px}
+.db-kpi-val{font-size:24px;font-weight:800;line-height:1.1}
+.db-kpi-lbl{font-size:11px;color:var(--text2);margin-top:3px;line-height:1.3}
+.db-grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.db-grid3{display:grid;grid-template-columns:3fr 2fr;gap:14px;margin-bottom:14px}
+.db-row-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .15s}
+.db-row-card:hover{border-color:var(--primary)55;background:var(--bg2)}
+@media(max-width:900px){.db-kpi-row{grid-template-columns:repeat(2,1fr)}.db-grid2,.db-grid3{grid-template-columns:1fr}}
 .data-table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
 .data-table col.col-no{width:38px}.data-table col.col-cp{width:auto}.data-table col.col-score{width:90px}.data-table col.col-weight{width:72px}.data-table col.col-notes{width:32%}.data-table col.col-photos{width:88px}
 .data-table th{text-align:left;padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text2);font-weight:500;font-size:12px;background:var(--bg2)}
@@ -77,6 +89,45 @@ input[type=range]{flex:2;accent-color:#185FA5}
 .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--text2);margin-bottom:12px}
 .legend-item{display:flex;align-items:center;gap:6px}.legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
 .empty{text-align:center;padding:48px;color:var(--text2);font-size:14px}.empty i{font-size:36px;display:block;margin-bottom:10px;color:var(--text3)}
+/* Workflow stepper */
+.workflow-stepper{display:flex;align-items:flex-start;overflow-x:auto;padding-bottom:4px}
+.wf-step{display:flex;flex-direction:column;align-items:center;position:relative;flex:1;min-width:72px;cursor:pointer;padding:0 4px}
+.wf-step:not(:last-child)::after{content:'';position:absolute;top:15px;left:calc(50% + 18px);right:calc(-50% + 18px);height:2px;background:var(--border);z-index:0}
+.wf-step.wf-done:not(:last-child)::after,.wf-step.wf-active:not(:last-child)::after{background:#1A8A5A}
+.wf-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;z-index:1;border:2px solid var(--border);background:var(--bg);color:var(--text2);transition:all .2s}
+.wf-step.wf-done .wf-dot{background:#1A8A5A;border-color:#1A8A5A;color:#fff}
+.wf-step.wf-active .wf-dot{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 0 0 3px var(--primary)22}
+.wf-step.wf-partial .wf-dot{background:#E07B00;border-color:#E07B00;color:#fff}
+.wf-label{font-size:10px;margin-top:5px;text-align:center;color:var(--text3);font-weight:500;line-height:1.2}
+.wf-step.wf-done .wf-label{color:#1A8A5A;font-weight:600}
+.wf-step.wf-active .wf-label{color:var(--primary);font-weight:700}
+.wf-step.wf-partial .wf-label{color:#E07B00}
+/* Supplier progress */
+.sup-progress-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:5px}
+.sup-progress-fill{height:100%;border-radius:2px}
+.sup-audit-btn{margin-top:8px;width:100%;padding:6px;border:1px solid var(--primary);border-radius:6px;background:transparent;color:var(--primary);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .15s}
+.sup-audit-btn:hover{background:var(--primary);color:#fff}
+/* Audit wizard */
+.audit-wizard{position:fixed;inset:0;background:var(--bg);z-index:2000;display:flex;flex-direction:column;overflow:hidden}
+.aw-header{padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0}
+.aw-prog-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:8px}
+.aw-prog-fill{height:100%;background:var(--primary);border-radius:2px;transition:width .3s}
+.aw-body{flex:1;overflow-y:auto;padding:14px 16px}
+.aw-footer{padding:10px 16px;border-top:1px solid var(--border);display:flex;gap:8px;background:var(--bg);flex-shrink:0}
+.aw-checkpoint{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px}
+.aw-cp-num{font-size:11px;color:var(--text3);font-weight:700;min-width:20px}
+.aw-cp-title{font-size:13px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:10px}
+.score-btn-row{display:flex;gap:5px;margin-bottom:8px}
+.score-btn{flex:1;height:46px;border:2px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:15px;font-weight:700;cursor:pointer;transition:all .12s;-webkit-tap-highlight-color:transparent}
+.score-btn:hover{border-color:var(--primary)}
+.score-btn.sb-1{background:#C0392B;border-color:#C0392B;color:#fff}
+.score-btn.sb-2{background:#E07B00;border-color:#E07B00;color:#fff}
+.score-btn.sb-3{background:#B8860B;border-color:#B8860B;color:#fff}
+.score-btn.sb-4{background:#2E86AB;border-color:#2E86AB;color:#fff}
+.score-btn.sb-5{background:#1A8A5A;border-color:#1A8A5A;color:#fff}
+.score-btn.sb-0{background:#8B0000;border-color:#8B0000;color:#fff}
+.score-btn.sb-na{background:var(--text3);border-color:var(--text3);color:#fff;font-size:11px}
+.aw-note{width:100%;border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:12px;background:var(--bg);color:var(--text);resize:none;box-sizing:border-box;font-family:inherit;margin-top:2px}
 .filter-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
 .filter-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer;transition:all .15s;background:var(--bg)}
 .filter-chip:hover{background:var(--bg2)}.filter-chip.active{background:#185FA5;color:#fff;border-color:#185FA5}
@@ -209,10 +260,9 @@ input[type=range]{flex:2;accent-color:#185FA5}
 <div class="topbar">
   <div class="logo"><i class="ti ti-building-factory-2"></i> Supplier Audit Tool</div>
   <nav class="nav">
-    <button class="nav-btn active" onclick="showPage('import',this)"><i class="ti ti-upload"></i> <span>Import</span></button>
+    <button class="nav-btn active" onclick="showPage('import',this)"><i class="ti ti-device-floppy"></i> <span>Project</span></button>
     <button class="nav-btn" onclick="showPage('new',this)"><i class="ti ti-user-plus"></i> <span>New Supplier</span></button>
-    <button class="nav-btn" onclick="showPage('overview',this)"><i class="ti ti-layout-dashboard"></i> Overview</button>
-    <button class="nav-btn" onclick="showPage('detail',this)"><i class="ti ti-user-search"></i> <span>Analysis</span></button>
+    <button class="nav-btn" onclick="showPage('dashboard',this)"><i class="ti ti-layout-dashboard"></i> <span>Dashboard</span></button>
     <button class="nav-btn" onclick="showPage('data',this)"><i class="ti ti-table"></i> <span>Data</span></button>
     <button class="nav-btn" onclick="showPage('actions',this)"><i class="ti ti-clipboard-check"></i> <span>Actions</span></button>
     <button class="nav-btn" onclick="showPage('calendar',this)"><i class="ti ti-calendar"></i> <span>Calendar</span></button>
@@ -223,30 +273,12 @@ input[type=range]{flex:2;accent-color:#185FA5}
 <div class="main">
 
 <div class="page active" id="page-import">
-  <div class="section-title"><i class="ti ti-file-spreadsheet"></i> <span>Import</span></div>
-  <div class="filter-row" style="margin-bottom:12px">
+  <div class="section-title"><i class="ti ti-device-floppy"></i> <span>Project</span></div>
+  <div class="filter-row" style="margin-bottom:16px">
     <button class="btn success" onclick="saveProject()"><i class="ti ti-device-floppy"></i> <span>Save Project</span></button>
     <button class="btn" onclick="document.getElementById('projectInput').click()"><i class="ti ti-folder-open"></i> <span>Load Project</span></button>
     <input type="file" id="projectInput" accept=".json" style="display:none" onchange="loadProject(this.files[0]);this.value=''">
   </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-    <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()"
-      ondragover="ev=event;ev.preventDefault();ev.currentTarget.classList.add('drag')"
-      ondragleave="event.currentTarget.classList.remove('drag')" ondrop="handleDrop(event)"
-      style="margin:0">
-      <i class="ti ti-cloud-upload"></i>
-      <div style="font-size:14px;font-weight:600;margin-bottom:4px">Standard Import</div>
-      <div style="font-size:12px;color:var(--text2)">Drop .xlsx here or click · Requires standard column names (Checkpoint, Score, Notes)</div>
-    </div>
-    <div class="upload-zone" onclick="document.getElementById('aiFileInput').click()" style="margin:0;border-color:#185FA5;background:var(--bg2)">
-      <i class="ti ti-sparkles" style="color:#185FA5"></i>
-      <div style="font-size:14px;font-weight:600;margin-bottom:4px;color:#185FA5">AI Import <span style="font-size:10px;font-weight:700;background:#185FA5;color:#fff;padding:2px 6px;border-radius:4px;vertical-align:middle">NEW</span></div>
-      <div style="font-size:12px;color:var(--text2)">Any Excel structure · AI detects sheets, skips cover/index tabs, maps columns automatically</div>
-    </div>
-  </div>
-  <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none" onchange="handleFile(this.files[0]);this.value=''">
-  <input type="file" id="aiFileInput" accept=".xlsx,.xls" style="display:none" onchange="aiImportExcel(this.files[0]);this.value=''">
-  <div id="importStatus" style="margin-top:12px;font-size:13px;color:var(--text2);min-height:20px"></div>
   <div id="suppliersList"></div>
 </div>
 
@@ -257,6 +289,7 @@ input[type=range]{flex:2;accent-color:#185FA5}
   <div class="tabs-row">
     <button class="etab active" id="ntab-create" onclick="switchNewTab('create',this)"><i class="ti ti-plus"></i> Create Supplier</button>
     <button class="etab" id="ntab-builder" onclick="switchNewTab('builder',this)"><i class="ti ti-template"></i> Template Builder</button>
+    <button class="etab" id="ntab-import" onclick="switchNewTab('import',this)"><i class="ti ti-file-spreadsheet"></i> Excel Import</button>
   </div>
 
   <!-- Tab: Create Supplier -->
@@ -301,7 +334,8 @@ input[type=range]{flex:2;accent-color:#185FA5}
 
       <!-- Left: template list -->
       <div>
-        <button class="btn primary" onclick="startNewTemplate()" style="width:100%;margin-bottom:12px"><i class="ti ti-plus"></i> New Template</button>
+        <button class="btn primary" onclick="startNewTemplate()" style="width:100%;margin-bottom:8px"><i class="ti ti-plus"></i> New Template</button>
+        <button class="btn" onclick="aiGenerateTemplate()" style="width:100%;margin-bottom:12px;background:linear-gradient(135deg,#185FA5,#7B2FBE);color:#fff;border:none"><i class="ti ti-sparkles"></i> AI Generate Checklist</button>
         <div id="tplBuilderList"></div>
       </div>
 
@@ -312,6 +346,39 @@ input[type=range]{flex:2;accent-color:#185FA5}
 
     </div>
   </div>
+
+  <!-- Tab: Excel Import -->
+  <div class="etab-content" id="ntab-import-content">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;max-width:900px">
+      <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()"
+        ondragover="ev=event;ev.preventDefault();ev.currentTarget.classList.add('drag')"
+        ondragleave="event.currentTarget.classList.remove('drag')" ondrop="handleDrop(event)"
+        style="margin:0">
+        <i class="ti ti-cloud-upload"></i>
+        <div style="font-size:14px;font-weight:600;margin-bottom:4px">Standard Import</div>
+        <div style="font-size:12px;color:var(--text2)">Drop .xlsx here or click · Requires standard column names (Checkpoint, Score, Notes)</div>
+      </div>
+      <div class="upload-zone" onclick="document.getElementById('aiFileInput').click()" style="margin:0;border-color:#185FA5;background:var(--bg2)">
+        <i class="ti ti-sparkles" style="color:#185FA5"></i>
+        <div style="font-size:14px;font-weight:600;margin-bottom:4px;color:#185FA5">AI Import <span style="font-size:10px;font-weight:700;background:#185FA5;color:#fff;padding:2px 6px;border-radius:4px;vertical-align:middle">NEW</span></div>
+        <div style="font-size:12px;color:var(--text2)">Any Excel structure · AI detects sheets, skips cover/index tabs, maps columns automatically</div>
+      </div>
+    </div>
+    <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none" onchange="handleFile(this.files[0]);this.value=''">
+    <input type="file" id="aiFileInput" accept=".xlsx,.xls" style="display:none" onchange="aiImportExcel(this.files[0]);this.value=''">
+    <div id="importStatus" style="margin-bottom:12px;font-size:13px;color:var(--text2);min-height:20px"></div>
+    <div id="workflowStepperContainer"></div>
+  </div>
+</div>
+
+<div class="page" id="page-dashboard">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+    <div class="section-title" style="margin:0"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" onclick="renderDashboard()" style="font-size:12px;padding:6px 12px"><i class="ti ti-refresh"></i> Refresh</button>
+    </div>
+  </div>
+  <div id="dashboardContent"><div class="empty"><i class="ti ti-upload"></i> No data — import suppliers to see your dashboard</div></div>
 </div>
 
 <div class="page" id="page-overview">
@@ -328,6 +395,9 @@ input[type=range]{flex:2;accent-color:#185FA5}
 </div>
 
 <div class="page" id="page-detail">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+    <button id="detBackBtn" onclick="showPage('dashboard',document.querySelector('[onclick*=dashboard]'))" style="display:none;align-items:center;gap:5px;background:none;border:none;cursor:pointer;color:var(--primary);font-size:12px;font-weight:600;padding:4px 0"><i class="ti ti-arrow-left"></i> Dashboard</button>
+  </div>
   <div class="section-title"><i class="ti ti-user-search"></i> <span>Analysis</span></div>
   <div class="ai-panel" id="aiPanel" style="display:none">
     <div class="ai-panel-title"><i class="ti ti-robot"></i> AI Priority Analysis</div>
@@ -396,9 +466,29 @@ input[type=range]{flex:2;accent-color:#185FA5}
   <!-- KPI row -->
   <div id="actionsKpi" class="metric-row" style="margin-bottom:16px"></div>
 
+  <!-- Bulk action toolbar -->
+  <div id="actBulkBar" style="display:none;align-items:center;gap:10px;padding:8px 12px;background:var(--card);border:1px solid var(--primary);border-radius:var(--r);margin-bottom:10px"></div>
+
   <!-- List / Gantt -->
   <div id="actionsContent"></div>
   <div id="actionsGantt" style="display:none"></div>
+</div>
+
+<!-- Notes Expand Modal -->
+<div id="notesExpandModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1500;align-items:center;justify-content:center">
+  <div style="background:var(--bg);border-radius:12px;padding:24px;width:600px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.3)">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <i class="ti ti-notes" style="font-size:18px;color:var(--primary)"></i>
+      <div style="font-weight:700;font-size:15px;flex:1" id="notesExpandTitle">Evidence / Notes</div>
+      <button onclick="closeNotesExpand()" style="background:none;border:none;cursor:pointer;color:var(--text2);padding:4px"><i class="ti ti-x" style="font-size:18px"></i></button>
+    </div>
+    <div style="font-size:11px;color:var(--text2);margin-bottom:8px" id="notesExpandCheckpoint"></div>
+    <textarea id="notesExpandArea" rows="10" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg2);color:var(--text);font-size:13px;font-family:inherit;resize:vertical;flex:1;line-height:1.5" placeholder="Enter evidence, observations, and notes here..."></textarea>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px">
+      <button onclick="closeNotesExpand()" class="btn" style="font-size:13px">Cancel</button>
+      <button onclick="saveNotesExpand()" class="btn primary" style="font-size:13px"><i class="ti ti-device-floppy"></i> Save</button>
+    </div>
+  </div>
 </div>
 
 <!-- Action Modal -->
@@ -429,9 +519,13 @@ input[type=range]{flex:2;accent-color:#185FA5}
       </div>
       <div style="grid-column:1/-1">
         <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">Linked Checkpoint</label>
-        <select id="actCheckpoint" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text)">
+        <select id="actCheckpoint" onchange="renderActCheckpointPhotos()" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text)">
           <option value="">-- None --</option>
         </select>
+      </div>
+      <div style="grid-column:1/-1;display:none" id="actCheckpointPhotosRow">
+        <label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;margin-bottom:8px"><i class="ti ti-camera"></i> Checkpoint photos — select to carry over to this task</label>
+        <div id="actCheckpointPhotos" style="display:flex;gap:8px;flex-wrap:wrap"></div>
       </div>
       <div style="grid-column:1/-1">
         <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">Description</label>
@@ -622,10 +716,9 @@ input[type=range]{flex:2;accent-color:#185FA5}
 
 </div>
 <nav class="mobile-nav" id="mobileNav">
-  <button class="nav-btn active" onclick="showPage('import',this)"><i class="ti ti-upload"></i><span>Import</span></button>
+  <button class="nav-btn active" onclick="showPage('import',this)"><i class="ti ti-device-floppy"></i><span>Project</span></button>
   <button class="nav-btn" onclick="showPage('new',this)"><i class="ti ti-user-plus"></i><span>New</span></button>
-  <button class="nav-btn" onclick="showPage('overview',this)"><i class="ti ti-layout-dashboard"></i><span>Overview</span></button>
-  <button class="nav-btn" onclick="showPage('detail',this)"><i class="ti ti-user-search"></i><span>Analysis</span></button>
+  <button class="nav-btn" onclick="showPage('dashboard',this)"><i class="ti ti-layout-dashboard"></i><span>Dashboard</span></button>
   <button class="nav-btn" onclick="showPage('data',this)"><i class="ti ti-table"></i><span>Data</span></button>
   <button class="nav-btn" onclick="showPage('actions',this)"><i class="ti ti-clipboard-check"></i><span>Actions</span></button>
   <button class="nav-btn" onclick="showPage('calendar',this)"><i class="ti ti-calendar"></i><span>Calendar</span></button>
@@ -827,6 +920,7 @@ function calcScore(s,cat){
 
 
 function showPage(id,btn){
+  if(id!=='detail')_detailFromDashboard=false;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   // sync mobile nav
@@ -835,7 +929,9 @@ function showPage(id,btn){
   if(pg)pg.classList.add('active');
   if(btn)btn.classList.add('active');
   var renders={
+    import:function(){renderSuppliersList();},
     new:function(){renderNewPage();},
+    dashboard:function(){renderDashboard();},
     actions:function(){renderActionsPage();},
     overview:function(){buildTlChips('ov_tl_chips','toggleOvFilter',ovFilterColor);buildOvCatChips();renderOverview();},
     detail:function(){buildTlChips('det_tl_chips','toggleDetFilter',detFilterColor);populateSelects('detailSupSelect','detailCatFilter');renderDetail();},
@@ -1104,11 +1200,16 @@ function renderActions(){
       &&(!fStat||a.status===fStat)
       &&(!fPrio||a.priority===fPrio);
   });
+
+  // Keep _selActions in sync with what is visible
+  var filteredIds=new Set(filtered.map(function(a){return a.id;}));
+  _selActions.forEach(function(id){if(!filteredIds.has(id))_selActions.delete(id);});
+  _renderBulkToolbar(filtered);
+
   if(!filtered.length){
     el.innerHTML='<div class="empty"><i class="ti ti-clipboard-check"></i> '+(actions.length?'No actions match the filter':'No actions yet — create one with + New Action')+'</div>';
     return;
   }
-  // Sort: Open first, then In Progress, then Done; within group by due date
   var order={Open:0,'In Progress':1,Done:2};
   filtered.sort(function(a,b){
     var sd=order[a.status]-order[b.status];
@@ -1117,7 +1218,9 @@ function renderActions(){
     return a.dueDate?-1:1;
   });
   var today=new Date();today.setHours(0,0,0,0);
+  var allChecked=filtered.length>0&&filtered.every(function(a){return _selActions.has(a.id);});
   el.innerHTML='<div style="overflow-x:auto"><table class="data-table"><thead><tr>'
+    +'<th style="width:36px;padding-left:10px"><input type="checkbox" id="actSelAll" '+(allChecked?'checked':'')+' onchange="selectAllActions(this.checked)" title="Select all" style="width:15px;height:15px;cursor:pointer"></th>'
     +'<th>Priority</th><th>Title</th><th>Supplier</th><th>Category</th><th>Responsible</th><th>Due Date</th><th>Status</th><th style="width:70px"></th>'
     +'</tr></thead><tbody>'
     +filtered.map(function(a){
@@ -1125,25 +1228,85 @@ function renderActions(){
       var sc2=ACT_STATUS_COLOR[a.status]||'#888';
       var due=a.dueDate?new Date(a.dueDate):null;
       var isOverdue=due&&a.status!=='Done'&&due<today;
-      var dueStr=due?due.toLocaleDateString('en-GB'):'—';
+      var dueStr=due?due.toLocaleDateString('de-DE'):'—';
       if(isOverdue)dueStr='<span style="color:#C0392B;font-weight:600">'+dueStr+' ⚠</span>';
-      return '<tr style="'+(a.status==='Done'?'opacity:.6':'')+'">'
+      var chk=_selActions.has(a.id);
+      return '<tr style="'+(a.status==='Done'?'opacity:.6':'')+(chk?';background:var(--primary)0D':'')+'" onclick="toggleActionSelect('+a.id+',event)">'
+        +'<td style="padding-left:10px" onclick="event.stopPropagation()"><input type="checkbox" '+(chk?'checked':'')+' onchange="toggleActionSelect('+a.id+',event)" style="width:15px;height:15px;cursor:pointer"></td>'
         +'<td><span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:'+pc+'22;color:'+pc+'">'+a.priority+'</span></td>'
-        +'<td style="font-weight:500;max-width:220px"><div title="'+esc(a.title)+'">'+esc(a.title)+'</div>'+(a.checkpoint?'<div style="font-size:11px;color:var(--text2);margin-top:2px">↳ '+esc(a.checkpoint.slice(0,60))+(a.checkpoint.length>60?'…':'')+'</div>':'')+'</td>'
+        +'<td style="font-weight:500;max-width:220px">'
+          +'<div style="display:flex;align-items:center;gap:6px">'
+            +'<span title="'+esc(a.title)+'">'+esc(a.title)+'</span>'
+            +(a.images&&a.images.length?'<span onclick="event.stopPropagation();openActionImgViewer('+a.id+',0)" title="View photos" style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;background:#185FA518;color:#185FA5;cursor:pointer;flex-shrink:0"><i class="ti ti-camera" style="font-size:11px"></i>'+a.images.length+'</span>':'')
+          +'</div>'
+          +(a.checkpoint?'<div style="font-size:11px;color:var(--text2);margin-top:2px">↳ '+esc(a.checkpoint.slice(0,60))+(a.checkpoint.length>60?'…':'')+'</div>':'')
+        +'</td>'
         +'<td style="font-size:12px">'+esc(a.supplier||'—')+'</td>'
         +'<td style="font-size:12px">'+esc(a.category||'—')+'</td>'
         +'<td style="font-size:12px">'+esc(a.responsible||'—')+'</td>'
         +'<td style="font-size:12px;white-space:nowrap">'+dueStr+'</td>'
-        +'<td><select onchange="quickStatusChange('+a.id+',this.value)" style="font-size:11px;padding:2px 6px;border:1px solid var(--border);border-radius:var(--r);background:'+sc2+'22;color:'+sc2+';font-weight:600">'
+        +'<td onclick="event.stopPropagation()"><select onchange="quickStatusChange('+a.id+',this.value)" style="font-size:11px;padding:2px 6px;border:1px solid var(--border);border-radius:var(--r);background:'+sc2+'22;color:'+sc2+';font-weight:600">'
           +['Open','In Progress','Done'].map(function(s){return '<option'+(s===a.status?' selected':'')+'>'+s+'</option>';}).join('')
         +'</select></td>'
-        +'<td style="white-space:nowrap">'
+        +'<td style="white-space:nowrap" onclick="event.stopPropagation()">'
           +'<button onclick="openActionModal('+a.id+')" style="background:none;border:none;cursor:pointer;color:var(--text2);padding:3px" title="Edit"><i class="ti ti-pencil" style="font-size:14px"></i></button>'
           +'<button onclick="deleteAction('+a.id+')" style="background:none;border:none;cursor:pointer;color:#C0392B;padding:3px" title="Delete"><i class="ti ti-trash" style="font-size:14px"></i></button>'
         +'</td>'
         +'</tr>';
     }).join('')
     +'</tbody></table></div>';
+}
+
+function _renderBulkToolbar(filtered){
+  var bar=document.getElementById('actBulkBar');if(!bar)return;
+  var n=_selActions.size;
+  if(n===0){bar.style.display='none';return;}
+  bar.style.display='flex';
+  bar.innerHTML='<span style="font-size:13px;font-weight:600;color:var(--primary)">'+n+' selected</span>'
+    +'<div style="display:flex;gap:6px;margin-left:auto">'
+    +'<button class="btn" onclick="markSelectedDone()" style="font-size:12px;padding:5px 12px"><i class="ti ti-check"></i> Mark as done</button>'
+    +'<button class="btn" onclick="deleteSelectedActions()" style="font-size:12px;padding:5px 12px;background:#C0392B;color:#fff;border:none"><i class="ti ti-trash"></i> Delete ('+n+')</button>'
+    +'<button class="btn" onclick="_selActions.clear();renderActions()" style="font-size:12px;padding:5px 12px">Deselect all</button>'
+    +'</div>';
+}
+
+function toggleActionSelect(id,evt){
+  if(evt&&(evt.target.tagName==='BUTTON'||evt.target.tagName==='SELECT'||evt.target.tagName==='I'))return;
+  if(_selActions.has(id))_selActions.delete(id);else _selActions.add(id);
+  renderActions();
+}
+
+function selectAllActions(checked){
+  var fSup=document.getElementById('actFilterSup').value;
+  var fCat=document.getElementById('actFilterCat').value;
+  var fStat=document.getElementById('actFilterStatus').value;
+  var fPrio=document.getElementById('actFilterPrio').value;
+  var filtered=actions.filter(function(a){
+    return (!fSup||a.supplier===fSup)&&(!fCat||a.category===fCat)
+      &&(!fStat||a.status===fStat)&&(!fPrio||a.priority===fPrio);
+  });
+  if(checked){filtered.forEach(function(a){_selActions.add(a.id);});}
+  else{_selActions.clear();}
+  renderActions();
+}
+
+function deleteSelectedActions(){
+  var n=_selActions.size;if(!n)return;
+  if(!confirm('Delete '+n+' action'+(n===1?'':'s')+'?'))return;
+  actions=actions.filter(function(a){return !_selActions.has(a.id);});
+  _selActions.clear();
+  renderActionsKpi();
+  renderActions();
+  toast(n+' action'+(n===1?'':'s')+' deleted');
+}
+
+function markSelectedDone(){
+  var n=_selActions.size;if(!n)return;
+  actions.forEach(function(a){if(_selActions.has(a.id))a.status='Done';});
+  _selActions.clear();
+  renderActionsKpi();
+  renderActions();
+  toast(n+' action'+(n===1?'':'s')+' marked as done');
 }
 
 function quickStatusChange(id,status){
@@ -1165,15 +1328,17 @@ function clearActionFilters(){
   renderActions();
 }
 
+var _actExistingImages=[];
+
 function openActionModal(id){
   var modal=document.getElementById('actionModal');
-  // Populate supplier dropdown in modal
   var supSel=document.getElementById('actSupplier');
   supSel.innerHTML='<option value="">-- Select --</option>'+suppliers.map(function(s){return '<option>'+esc(s.name)+'</option>';}).join('');
 
   if(id!=null){
     var a=actions.find(function(x){return x.id===id;});
     if(!a)return;
+    _actExistingImages=a.images||[];
     document.getElementById('actionModalTitle').textContent='Edit Action';
     document.getElementById('actionEditId').value=id;
     document.getElementById('actTitle').value=a.title;
@@ -1186,6 +1351,7 @@ function openActionModal(id){
     supSel.value=a.supplier||'';
     populateActCatSelect(a.category, a.checkpoint);
   } else {
+    _actExistingImages=[];
     document.getElementById('actionModalTitle').textContent='New Action';
     document.getElementById('actionEditId').value='';
     document.getElementById('actTitle').value='';
@@ -1202,11 +1368,13 @@ function openActionModal(id){
 }
 
 var _actView='list';
+var _selActions=new Set();
 var GANTT_STATUS_COL={Open:'#C0392B','In Progress':'#E07B00',Done:'#1A8A5A'};
 var GANTT_TODAY_COLOR='#E74C3C';
 
 function setActView(v){
   _actView=v;
+  if(v==='gantt'){_selActions.clear();var bb=document.getElementById('actBulkBar');if(bb)bb.style.display='none';}
   var lb=document.getElementById('actViewList'),gb=document.getElementById('actViewGantt');
   if(lb){lb.style.background=v==='list'?'var(--primary)':'var(--bg)';lb.style.color=v==='list'?'#fff':'var(--text)';}
   if(gb){gb.style.background=v==='gantt'?'var(--primary)':'var(--bg)';gb.style.color=v==='gantt'?'#fff':'var(--text)';}
@@ -1372,7 +1540,8 @@ function populateActCheckpointSelect(selectedCp){
       sup.categories[catName].forEach(function(item){
         var label=item.no+'. '+item.checkpoint;
         var scoreStr=item.score!==null&&item.score!=='N.A.'?' ['+item.score+'/5]':'';
-        cpSel.innerHTML+='<option value="'+esc(item.checkpoint)+'"'+(item.checkpoint===selectedCp?' selected':'')+'>'+esc(label+scoreStr)+'</option>';
+        var hasPhotos=item.images&&item.images.length?'  📷':'';
+        cpSel.innerHTML+='<option value="'+esc(item.checkpoint)+'"'+(item.checkpoint===selectedCp?' selected':'')+'>'+esc(label+scoreStr)+hasPhotos+'</option>';
       });
     }
   }
@@ -1385,6 +1554,32 @@ function populateActCheckpointSelect(selectedCp){
       if(item)document.getElementById('actPriority').value=priorityFromScore(item.score);
     }
   }
+  renderActCheckpointPhotos();
+}
+
+function renderActCheckpointPhotos(){
+  var row=document.getElementById('actCheckpointPhotosRow');
+  var container=document.getElementById('actCheckpointPhotos');
+  if(!row||!container)return;
+  var supName=document.getElementById('actSupplier').value;
+  var catName=document.getElementById('actCategory').value;
+  var cpText=document.getElementById('actCheckpoint').value;
+  if(!supName||!catName||!cpText){row.style.display='none';return;}
+  var sup=suppliers.find(function(s){return s.name===supName;});
+  if(!sup){row.style.display='none';return;}
+  var items=sup.categories[catName]||[];
+  var item=items.find(function(i){return i.checkpoint===cpText;});
+  if(!item||!item.images||!item.images.length){row.style.display='none';return;}
+  row.style.display='';
+  var existingData=new Set((_actExistingImages||[]).map(function(im){return im.data;}));
+  container.innerHTML=item.images.map(function(img,i){
+    var sel=existingData.has(img.data);
+    return '<label style="position:relative;cursor:pointer;display:inline-block" title="'+(img.name||'photo')+'">'
+      +'<input type="checkbox" data-img-idx="'+i+'" class="act-photo-cb" '+(sel?'checked':'')+' style="position:absolute;top:4px;left:4px;z-index:2;width:16px;height:16px;accent-color:#185FA5;cursor:pointer" onchange="this.nextElementSibling.style.borderColor=this.checked?\'#185FA5\':\'var(--border)\'">'
+      +'<img src="'+img.data+'" style="width:68px;height:68px;object-fit:cover;border-radius:6px;border:2.5px solid '+(sel?'#185FA5':'var(--border)')+';display:block;pointer-events:none">'
+      +(sel?'<span style="position:absolute;bottom:4px;right:4px;background:#185FA5;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center"><i class="ti ti-check" style="font-size:9px;color:#fff"></i></span>':'')
+    +'</label>';
+  }).join('');
 }
 
 function saveAction(){
@@ -1392,6 +1587,25 @@ function saveAction(){
   if(!title){alert('Please enter a title.');return;}
   var editId=document.getElementById('actionEditId').value;
   var cpVal=document.getElementById('actCheckpoint').value;
+  // Collect selected checkpoint photos
+  var selectedPhotos=[];
+  var row=document.getElementById('actCheckpointPhotosRow');
+  if(row&&row.style.display!=='none'){
+    var supN=document.getElementById('actSupplier').value;
+    var catN=document.getElementById('actCategory').value;
+    var supX=suppliers.find(function(s){return s.name===supN;});
+    if(supX&&catN&&supX.categories[catN]){
+      var cpItem=supX.categories[catN].find(function(i){return i.checkpoint===cpVal;});
+      if(cpItem&&cpItem.images){
+        document.querySelectorAll('.act-photo-cb:checked').forEach(function(cb){
+          var idx=parseInt(cb.dataset.imgIdx);
+          if(cpItem.images[idx])selectedPhotos.push(cpItem.images[idx]);
+        });
+      }
+    }
+  } else {
+    selectedPhotos=_actExistingImages.slice();
+  }
   var obj={
     id:editId?parseInt(editId):actionIdCounter++,
     title:title,
@@ -1403,7 +1617,8 @@ function saveAction(){
     startDate:document.getElementById('actStart').value,
     dueDate:document.getElementById('actDue').value,
     priority:document.getElementById('actPriority').value,
-    status:document.getElementById('actStatus').value
+    status:document.getElementById('actStatus').value,
+    images:selectedPhotos
   };
   if(editId){
     var idx=actions.findIndex(function(a){return a.id===obj.id;});
@@ -1436,6 +1651,7 @@ function switchNewTab(id,btn){
   var el=document.getElementById('ntab-'+id+'-content');
   if(el)el.classList.add('active');
   if(id==='builder')renderTplBuilderList();
+  if(id==='import'){var sc=document.getElementById('workflowStepperContainer');if(sc)sc.innerHTML=renderWorkflowStepper();}
 }
 
 function renderTplBuilderList(){
@@ -1498,6 +1714,10 @@ function renderTplEditor(){
           +'<i class="ti ti-folder" style="color:#185FA5;font-size:15px"></i>'
           +'<input type="text" value="'+esc(cat)+'" onchange="renameTplCat(\''+esc(cat)+'\',this.value)" style="flex:1;border:none;background:transparent;font-size:13px;font-weight:600;color:var(--text);outline:none;min-width:0" placeholder="Category name">'
           +'<span style="font-size:11px;color:var(--text3);white-space:nowrap">'+items.length+' checkpoints</span>'
+          +'<label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text3);white-space:nowrap" title="Category weight in overall score (0 = excluded)">'
+            +'<i class="ti ti-scale" style="font-size:11px"></i> Weight'
+            +'<input type="number" value="'+(weights[cat]!==undefined?weights[cat]:1)+'" min="0" max="3" step="0.1" onchange="weights[\''+esc(cat)+'\']=parseFloat(this.value)||0;renderSuppliersList()" style="width:44px;font-size:11px;text-align:center;border:1px solid var(--border);border-radius:4px;padding:2px 4px;background:var(--bg);color:var(--text)">'
+          +'</label>'
           +'<button onclick="deleteTplCat(\''+esc(cat)+'\')" style="background:none;border:none;cursor:pointer;color:#C0392B;padding:2px" title="Delete category"><i class="ti ti-trash" style="font-size:13px"></i></button>'
         +'</div>'
         // Checkpoints
@@ -1565,6 +1785,7 @@ function renameTplCat(oldName,newName){
   var rebuilt={};
   Object.keys(cats).forEach(function(k){rebuilt[k===oldName?newName:k]=cats[k];});
   tplDraft.categories=rebuilt;
+  if(weights[oldName]!==undefined&&weights[newName]===undefined){weights[newName]=weights[oldName];delete weights[oldName];}
 }
 
 function deleteTplCat(cat){
@@ -1729,6 +1950,475 @@ function deleteTemplate(i){
   renderNewPage();
 }
 
+// ── Guided Workflow ───────────────────────────────────────────────────────────
+function getAuditProgress(s){
+  var items=Object.values(s.categories).flat();
+  var filled=items.filter(function(i){return i.score!==null&&i.score!==''&&i.score!==undefined;}).length;
+  return {filled:filled,total:items.length,pct:items.length?Math.round((filled/items.length)*100):0};
+}
+
+function renderWorkflowStepper(){
+  if(!suppliers.length)return '';
+  var total=suppliers.length;
+  var done=suppliers.filter(function(s){return getAuditProgress(s).pct===100;}).length;
+  var inProgress=suppliers.filter(function(s){var p=getAuditProgress(s).pct;return p>0&&p<100;}).length;
+  var notStarted=total-done-inProgress;
+
+  // Header summary bar
+  var h='<div class="card" style="padding:14px 18px;margin-bottom:14px">'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'
+      +'<i class="ti ti-clipboard-list" style="color:var(--primary);font-size:16px"></i>'
+      +'<span style="font-size:12px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.5px">Audit Coverage</span>'
+      +'<div style="margin-left:auto;display:flex;gap:10px;font-size:11px">'
+        +(done?'<span style="background:#1A8A5A22;color:#1A8A5A;padding:2px 8px;border-radius:10px;font-weight:600"><i class="ti ti-check" style="font-size:10px"></i> '+done+' Complete</span>':'')
+        +(inProgress?'<span style="background:#E07B0022;color:#E07B00;padding:2px 8px;border-radius:10px;font-weight:600"><i class="ti ti-dots" style="font-size:10px"></i> '+inProgress+' In Progress</span>':'')
+        +(notStarted?'<span style="background:var(--bg2);color:var(--text2);padding:2px 8px;border-radius:10px;font-weight:600">'+notStarted+' Not started</span>':'')
+      +'</div>'
+    +'</div>'
+    +'<div style="display:flex;flex-direction:column;gap:6px">';
+
+  suppliers.forEach(function(s){
+    var prog=getAuditProgress(s);
+    var col=prog.pct===100?'#1A8A5A':prog.pct>0?'#E07B00':'var(--border2)';
+    var statusIcon=prog.pct===100?'ti-check':'ti-clipboard-list';
+    var statusLabel=prog.pct===100?'Complete':prog.pct>0?'In progress':'Not started';
+    h+='<div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2)">'
+      +'<div style="width:24px;height:24px;border-radius:50%;background:'+col+'22;display:flex;align-items:center;justify-content:center;flex-shrink:0">'
+        +'<i class="ti '+statusIcon+'" style="font-size:11px;color:'+col+'"></i>'
+      +'</div>'
+      +'<div style="font-size:13px;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(s.name)+'</div>'
+      +'<div style="flex:2;min-width:80px;max-width:180px">'
+        +'<div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden">'
+          +'<div style="height:100%;width:'+prog.pct+'%;background:'+col+';border-radius:3px;transition:width .4s"></div>'
+        +'</div>'
+      +'</div>'
+      +'<div style="font-size:12px;font-weight:700;color:'+col+';min-width:34px;text-align:right">'+prog.pct+'%</div>'
+      +'<div style="font-size:11px;color:var(--text2);min-width:75px;text-align:right">'+prog.filled+'/'+prog.total+' filled</div>'
+      +'<button onclick="openAuditWizard(\''+esc(s.name)+'\')" style="flex-shrink:0;font-size:11px;font-weight:600;padding:4px 10px;border:1px solid '+col+';border-radius:6px;background:transparent;color:'+col+';cursor:pointer;white-space:nowrap">'
+        +(prog.pct===100?'Review':'Audit')
+      +'</button>'
+    +'</div>';
+  });
+
+  h+='</div></div>';
+  return h;
+}
+
+function showFirstRunModal(){
+  if(suppliers.length||templates.length)return;
+  if(localStorage.getItem('saw_welcome_v93'))return;
+  var m=document.createElement('div');m.id='firstRunModal';
+  m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:4000;display:flex;align-items:center;justify-content:center;padding:20px';
+  m.innerHTML='<div style="background:var(--bg);border-radius:20px;width:100%;max-width:480px;overflow:hidden;box-shadow:0 12px 60px rgba(0,0,0,.4)">'
+    +'<div style="background:linear-gradient(135deg,var(--primary),#7B2FBE);padding:28px 28px 24px;text-align:center">'
+      +'<div style="font-size:36px;margin-bottom:10px">📋</div>'
+      +'<div style="font-size:20px;font-weight:800;color:#fff;margin-bottom:6px">Supplier Audit Tool</div>'
+      +'<div style="font-size:13px;color:rgba(255,255,255,.8)">Professionelle Lieferantenaudits — strukturiert, messbar, exportierbar</div>'
+    +'</div>'
+    +'<div style="padding:24px 28px 20px;display:flex;flex-direction:column;gap:10px">'
+      +'<div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">How would you like to start?</div>'
+
+      +'<button onclick="frDismiss();showPage(\'settings\',document.querySelectorAll(\'.nav-btn\')[document.querySelectorAll(\'.nav-btn\').length-2])" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:2px solid var(--border);border-radius:12px;background:var(--bg2);cursor:pointer;text-align:left;width:100%">'
+        +'<div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#185FA5,#0D3B6E);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-rocket" style="color:#fff;font-size:18px"></i></div>'
+        +'<div><div style="font-size:13px;font-weight:700;color:var(--text)">Von vorne starten</div><div style="font-size:11px;color:var(--text2)">API-Key eingeben, Template erstellen, Lieferanten anlegen</div></div>'
+      +'</button>'
+
+      +'<button onclick="frDismiss();showPage(\'new\',document.querySelectorAll(\'.nav-btn\')[1])" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:2px solid var(--border);border-radius:12px;background:var(--bg2);cursor:pointer;text-align:left;width:100%">'
+        +'<div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#1A8A5A,#0D5C3A);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-upload" style="color:#fff;font-size:18px"></i></div>'
+        +'<div><div style="font-size:13px;font-weight:700;color:var(--text)">Daten importieren</div><div style="font-size:11px;color:var(--text2)">Excel-Datei oder gespeichertes Projekt laden</div></div>'
+      +'</button>'
+
+      +'<button onclick="frLoadDemo()" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:2px solid var(--border);border-radius:12px;background:var(--bg2);cursor:pointer;text-align:left;width:100%">'
+        +'<div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#E07B00,#8B4A00);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-eye" style="color:#fff;font-size:18px"></i></div>'
+        +'<div><div style="font-size:13px;font-weight:700;color:var(--text)">Demo laden</div><div style="font-size:11px;color:var(--text2)">Beispieldaten anzeigen — ideal zum Ausprobieren</div></div>'
+      +'</button>'
+
+      +'<button onclick="frDismiss()" style="font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;padding:6px;margin-top:2px">Close</button>'
+    +'</div>'
+  +'</div>';
+  document.body.appendChild(m);
+}
+
+function frDismiss(){
+  localStorage.setItem('saw_welcome_v93','1');
+  var m=document.getElementById('firstRunModal');if(m)m.remove();
+}
+
+function frLoadDemo(){
+  frDismiss();
+  var demoInput=document.getElementById('projectInput');
+  if(demoInput){demoInput.click();}
+  else{toast('Please load a project file via Import.');}
+}
+
+// ── Step-by-Step Audit Wizard ─────────────────────────────────────────────────
+var _awState={sn:'',catIdx:0,cats:[]};
+
+function openAuditWizard(sn){
+  var s=suppliers.find(function(x){return x.name===sn;});
+  if(!s){return;}
+  _awState={sn:sn,catIdx:0,cats:Object.keys(s.categories)};
+  renderAuditWizard();
+}
+
+function renderAuditWizard(){
+  var ex=document.getElementById('auditWizard');if(ex)ex.remove();
+  var sn=_awState.sn;
+  var s=suppliers.find(function(x){return x.name===sn;});
+  if(!s)return;
+  var cats=_awState.cats;
+  var catIdx=_awState.catIdx;
+  var cat=cats[catIdx];
+  var items=s.categories[cat]||[];
+  var total=cats.length;
+  var progPct=Math.round((catIdx/total)*100);
+  var auditProg=getAuditProgress(s);
+
+  var checkpointsHtml=items.map(function(item,ii){
+    var sc=item.score;
+    var btnRow=[0,1,2,3,4,5].map(function(v){
+      var cls='score-btn'+(sc===v?' sb-'+v:'');
+      return '<button class="'+cls+'" onclick="awSetScore(\''+esc(cat)+'\','+ii+','+v+')">'+v+'</button>';
+    }).join('');
+    btnRow+='<button class="score-btn'+(sc==='N.A.'?' sb-na':'')+'" onclick="awSetScore(\''+esc(cat)+'\','+ii+',\'N.A.\')" style="font-size:10px;flex:0.8">N.A.</button>';
+    var imgs=item.images||[];
+    var thumbs=imgs.map(function(im,imgI){
+      return '<img src="'+im.data+'" onclick="openImgViewer(\''+esc(sn)+'\',\''+esc(cat)+'\','+ii+','+imgI+')" style="width:36px;height:36px;object-fit:cover;border-radius:4px;cursor:pointer;border:1px solid var(--border)" title="'+esc(im.name||'')+'">';
+    }).join('');
+
+    return '<div class="aw-checkpoint" id="awcp_'+ii+'">'
+      +'<div style="display:flex;gap:8px;align-items:flex-start">'
+        +'<span class="aw-cp-num">'+(ii+1)+'.</span>'
+        +'<div style="flex:1">'
+          +'<div class="aw-cp-title">'+esc(item.checkpoint)+'</div>'
+          +'<div class="score-btn-row">'+btnRow+'</div>'
+          +'<textarea class="aw-note" rows="2" placeholder="Evidence / Notes (optional)" oninput="awSetNote(\''+esc(cat)+'\','+ii+',this.value)">'+esc(item.notes||'')+'</textarea>'
+          +'<div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap">'
+            +thumbs
+            +'<button onclick="awTriggerImg(\''+esc(cat)+'\','+ii+')" title="Add photo" style="background:none;border:1px dashed var(--border);border-radius:4px;cursor:pointer;color:'+(imgs.length?'var(--primary)':'var(--text3)')+';padding:4px 8px;display:flex;align-items:center;gap:4px;font-size:11px">'
+              +'<i class="ti ti-camera" style="font-size:13px"></i>'+(imgs.length?' '+imgs.length+' photo'+(imgs.length>1?'s':''):'')
+            +'</button>'
+          +'</div>'
+        +'</div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+
+  // Category mini-nav dots
+  var catDots=cats.map(function(c,i){
+    var cp=s.categories[c]||[];
+    var done=cp.every(function(it){return it.score!==null&&it.score!=='';});
+    var partial=!done&&cp.some(function(it){return it.score!==null&&it.score!=='';});
+    var col=done?'#1A8A5A':partial?'#E07B00':'var(--border)';
+    var active=i===catIdx?'border:2px solid var(--primary);':'';
+    return '<div onclick="_awState.catIdx='+i+';renderAuditWizard()" title="'+esc(c)+'" style="width:10px;height:10px;border-radius:50%;background:'+col+';cursor:pointer;flex-shrink:0;'+active+'"></div>';
+  }).join('');
+
+  var div=document.createElement('div');
+  div.id='auditWizard';div.className='audit-wizard';
+  div.innerHTML=
+    '<div class="aw-header">'
+      +'<div style="display:flex;align-items:center;gap:10px">'
+        +'<button onclick="closeAuditWizard()" style="background:none;border:none;cursor:pointer;color:var(--text2);padding:4px;flex-shrink:0"><i class="ti ti-arrow-left" style="font-size:20px"></i></button>'
+        +'<div style="flex:1;min-width:0">'
+          +'<div style="font-size:14px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(sn)+'</div>'
+          +'<div style="font-size:11px;color:var(--text2);margin-top:1px">'+esc(cat)+' · Category '+(catIdx+1)+' of '+total+' · '+auditProg.filled+'/'+auditProg.total+' filled</div>'
+        +'</div>'
+        +'<button onclick="closeAuditWizard()" style="padding:6px 12px;background:none;border:1px solid var(--border);border-radius:var(--r);font-size:12px;cursor:pointer;color:var(--text2);white-space:nowrap;flex-shrink:0">Save & Close</button>'
+      +'</div>'
+      +'<div class="aw-prog-bar"><div class="aw-prog-fill" style="width:'+progPct+'%"></div></div>'
+      +'<div style="display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap">'+catDots+'<span style="font-size:10px;color:var(--text3);margin-left:4px">Categories</span></div>'
+    +'</div>'
+    +'<div class="aw-body">'+checkpointsHtml+'</div>'
+    +'<div class="aw-footer">'
+      +'<button onclick="awNavigate(-1)" '+(catIdx===0?'disabled style="opacity:.4"':'')+' class="btn" style="flex:1"><i class="ti ti-arrow-left"></i> Back</button>'
+      +(catIdx<total-1
+        ?'<button onclick="awNavigate(1)" class="btn primary" style="flex:2">Next <i class="ti ti-arrow-right"></i></button>'
+        :'<button onclick="closeAuditWizard()" class="btn primary" style="flex:2;background:#1A8A5A;border-color:#1A8A5A"><i class="ti ti-check"></i> Complete audit</button>')
+    +'</div>'
+    +'<input type="file" id="awImgInput" accept="image/*" capture="environment" style="display:none" onchange="handleAwImageUpload(this)">';
+  document.body.appendChild(div);
+}
+
+function awSetScore(cat,idx,val){
+  var s=suppliers.find(function(x){return x.name===_awState.sn;});
+  if(!s||!s.categories[cat])return;
+  s.categories[cat][idx].score=val;
+  // Update just the score buttons without full re-render
+  var cpEl=document.getElementById('awcp_'+idx);
+  if(cpEl){
+    cpEl.querySelectorAll('.score-btn').forEach(function(btn){
+      btn.className='score-btn';
+    });
+    var btns=cpEl.querySelectorAll('.score-btn');
+    [0,1,2,3,4,5,'N.A.'].forEach(function(v,vi){
+      var btn=btns[vi];if(!btn)return;
+      if(v===val){btn.className='score-btn '+(v==='N.A.'?'sb-na':'sb-'+v);}
+    });
+  }
+}
+
+function awSetNote(cat,idx,val){
+  var s=suppliers.find(function(x){return x.name===_awState.sn;});
+  if(!s||!s.categories[cat])return;
+  s.categories[cat][idx].notes=val;
+}
+
+function awTriggerImg(cat,idx){
+  _imgTarget={sup:_awState.sn,cat:cat,idx:idx};
+  var inp=document.getElementById('awImgInput');
+  if(inp){inp.value='';inp.click();}
+}
+
+function handleAwImageUpload(input){
+  if(!input.files||!input.files[0]||!_imgTarget)return;
+  var file=input.files[0];
+  var reader=new FileReader();
+  reader.onload=function(e){
+    compressImage(e.target.result,1200,0.75,function(compressed){
+      var s=suppliers.find(function(x){return x.name===_imgTarget.sup;});
+      if(!s)return;
+      var item=s.categories[_imgTarget.cat]&&s.categories[_imgTarget.cat][_imgTarget.idx];
+      if(!item)return;
+      if(!item.images)item.images=[];
+      item.images.push({data:compressed,name:file.name});
+      var body=document.querySelector('.aw-body');
+      var scrollTop=body?body.scrollTop:0;
+      renderAuditWizard();
+      var newBody=document.querySelector('.aw-body');
+      if(newBody)newBody.scrollTop=scrollTop;
+      toast('Photo added');
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+function awNavigate(dir){
+  var newIdx=_awState.catIdx+dir;
+  if(newIdx<0||newIdx>=_awState.cats.length)return;
+  _awState.catIdx=newIdx;
+  renderAuditWizard();
+}
+
+function closeAuditWizard(){
+  var el=document.getElementById('auditWizard');if(el)el.remove();
+  refreshDashboardIfVisible();
+  renderSuppliersList();
+  toast('Audit progress saved');
+}
+
+// ── AI Checklist Generator ────────────────────────────────────────────────────
+var AI_ALL_FOCUS=[
+  'Quality Management System','Incoming Inspection & Control','Non-Conformance Management','Supplier Development & Qualification',
+  'Production Planning & Capacity','Inventory & Demand Planning','Supply Chain Risk Management','Logistics & Transportation',
+  'Warehouse & Material Handling','Procurement & Sourcing','Cost & Pricing Transparency','Cost Reduction & Efficiency',
+  'Sustainability & ESG','Regulatory & Compliance','Innovation & R&D','Digital Transformation & Traceability',
+  'Health & Safety','Business Continuity & Resilience','Financial Stability','IT Security & Cybersecurity'
+];
+var AI_PRESETS={
+  'Operations & Supply Chain':['Supply Chain Risk Management','Inventory & Demand Planning','Production Planning & Capacity','Logistics & Transportation','Warehouse & Material Handling','Procurement & Sourcing','Business Continuity & Resilience','Digital Transformation & Traceability'],
+  'Quality & Compliance':['Quality Management System','Incoming Inspection & Control','Non-Conformance Management','Supplier Development & Qualification','Regulatory & Compliance','Health & Safety'],
+  'Automotive (IATF)':['Quality Management System','Non-Conformance Management','Production Planning & Capacity','Logistics & Transportation','Cost & Pricing Transparency','Sustainability & ESG','Innovation & R&D'],
+  'General Manufacturing':['Quality Management System','Logistics & Transportation','Cost & Pricing Transparency','Sustainability & ESG','Innovation & R&D','Financial Stability'],
+  'Finance & Risk':['Financial Stability','Cost & Pricing Transparency','Cost Reduction & Efficiency','Regulatory & Compliance','IT Security & Cybersecurity','Business Continuity & Resilience']
+};
+
+function aiGenerateTemplate(){
+  var key=getApiKey();
+  if(!key){alert('Please enter your Anthropic API key in Settings first.');return;}
+  var ex=document.getElementById('aiTplModal');if(ex)ex.remove();
+  var m=document.createElement('div');m.id='aiTplModal';
+  m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:3000;display:flex;align-items:center;justify-content:center;padding:16px';
+
+  var focusCheckboxes=AI_ALL_FOCUS.map(function(f,i){
+    return '<label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 9px;border:1px solid var(--border);border-radius:7px;background:var(--bg2)">'
+      +'<input type="checkbox" class="aiTplFocusCb" value="'+f+'" style="width:13px;height:13px;accent-color:#185FA5">'+f+'</label>';
+  }).join('');
+
+  var presetBtns=Object.keys(AI_PRESETS).map(function(p){
+    return '<button type="button" onclick="setAiTplPreset(\''+p+'\')" style="padding:5px 10px;border:1px solid var(--border);border-radius:20px;background:var(--bg);color:var(--text);font-size:11px;cursor:pointer;white-space:nowrap">'+p+'</button>';
+  }).join('');
+
+  m.innerHTML='<div style="background:var(--bg);border-radius:16px;width:100%;max-width:600px;max-height:92vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.35)">'
+    +'<div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;position:sticky;top:0;background:var(--bg);z-index:1">'
+      +'<div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#185FA5,#7B2FBE);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-sparkles" style="color:#fff;font-size:17px"></i></div>'
+      +'<div><div style="font-size:15px;font-weight:700;color:var(--text)">AI Checklist Generator</div>'
+        +'<div style="font-size:11px;color:var(--text2)">Define criteria — AI creates a complete audit template</div></div>'
+      +'<button onclick="document.getElementById(\'aiTplModal\').remove()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px"><i class="ti ti-x"></i></button>'
+    +'</div>'
+    +'<div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">'
+
+      +'<div><label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">Template Name</label>'
+      +'<input id="aiTpl_name" type="text" placeholder="e.g. Automotive Tier-1 Supplier 2026" style="width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text);box-sizing:border-box"></div>'
+
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">'
+        +'<div><label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">Industry / Sector</label>'
+        +'<input id="aiTpl_industry" type="text" placeholder="e.g. Automotive, Electronics" style="width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text);box-sizing:border-box"></div>'
+        +'<div><label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">Supplier Type</label>'
+        +'<input id="aiTpl_suptype" type="text" placeholder="e.g. Component manufacturer" style="width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text);box-sizing:border-box"></div>'
+      +'</div>'
+
+      // Focus areas with presets
+      +'<div>'
+        +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">'
+          +'<label style="font-size:12px;font-weight:600;color:var(--text2)">Focus Areas</label>'
+          +'<button type="button" onclick="document.querySelectorAll(\'.aiTplFocusCb\').forEach(function(c){c.checked=false;})" style="font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer">Clear all</button>'
+        +'</div>'
+        +'<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px">'+presetBtns+'</div>'
+        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;max-height:200px;overflow-y:auto;padding-right:4px">'+focusCheckboxes+'</div>'
+        // Custom area input
+        +'<div style="display:flex;gap:7px;margin-top:8px">'
+          +'<input id="aiTpl_customArea" type="text" placeholder="Add custom focus area…" style="flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:var(--r);font-size:12px;background:var(--bg);color:var(--text)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();addAiTplCustomArea();}">'
+          +'<button type="button" onclick="addAiTplCustomArea()" style="padding:7px 12px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:12px;cursor:pointer;white-space:nowrap"><i class="ti ti-plus"></i> Add</button>'
+        +'</div>'
+        +'<div id="aiTpl_customList" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>'
+      +'</div>'
+
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">'
+        +'<div><label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">Checkpoints per Category</label>'
+        +'<select id="aiTpl_cpcount" style="width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text)">'
+        +'<option value="4">4 checkpoints</option><option value="5" selected>5 checkpoints</option><option value="6">6 checkpoints</option><option value="7">7 checkpoints</option></select></div>'
+        +'<div><label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">Language</label>'
+        +'<select id="aiTpl_lang" style="width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text)">'
+        +'<option value="English">English</option><option value="German">German</option></select></div>'
+      +'</div>'
+
+      +'<label style="display:flex;align-items:center;gap:9px;font-size:13px;cursor:pointer;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2)">'
+        +'<input type="checkbox" id="aiTpl_rubric" checked style="width:15px;height:15px;accent-color:#185FA5">'
+        +'<div><div style="font-weight:600">Include scoring rubric (0–5)</div>'
+        +'<div style="font-size:11px;color:var(--text2)">AI generates descriptions for each score level per checkpoint</div></div>'
+      +'</label>'
+
+      +'<div><label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">Additional Context <span style="font-weight:400;color:var(--text3)">(optional)</span></label>'
+      +'<textarea id="aiTpl_context" rows="2" placeholder="e.g. LkSG compliance, IATF 16949, high-volume serial production, single-source risk…" style="width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text);resize:vertical;box-sizing:border-box"></textarea></div>'
+
+      +'<button onclick="runAiTemplateGen()" style="width:100%;padding:12px;background:linear-gradient(135deg,#185FA5,#7B2FBE);color:#fff;border:none;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">'
+        +'<i class="ti ti-sparkles"></i> Generate Checklist'
+      +'</button>'
+      +'<div id="aiTpl_status" style="display:none;text-align:center;padding:12px;color:var(--text2);font-size:13px"><i class="ti ti-loader" style="animation:spin 1s linear infinite;font-size:20px"></i><div style="margin-top:8px">AI is creating your checklist…</div></div>'
+    +'</div>'
+  +'</div>';
+  m.onclick=function(e){if(e.target===m)m.remove();};
+  document.body.appendChild(m);
+  // Default: set "General Manufacturing" preset
+  setAiTplPreset('General Manufacturing');
+}
+
+function setAiTplPreset(name){
+  var areas=AI_PRESETS[name];if(!areas)return;
+  document.querySelectorAll('.aiTplFocusCb').forEach(function(cb){
+    cb.checked=areas.indexOf(cb.value)!==-1;
+  });
+}
+
+function addAiTplCustomArea(){
+  var inp=document.getElementById('aiTpl_customArea');if(!inp)return;
+  var val=inp.value.trim();if(!val)return;
+  inp.value='';
+  var list=document.getElementById('aiTpl_customList');if(!list)return;
+  var id='aiTplCustom_'+Date.now();
+  var tag=document.createElement('div');
+  tag.style.cssText='display:inline-flex;align-items:center;gap:5px;padding:4px 9px;background:linear-gradient(135deg,#185FA510,#7B2FBE10);border:1px solid #185FA540;border-radius:20px;font-size:12px';
+  tag.innerHTML='<input type="checkbox" id="'+id+'" value="'+val+'" checked class="aiTplFocusCb" style="width:12px;height:12px;accent-color:#185FA5"><span>'+val+'</span>'
+    +'<button type="button" onclick="this.parentNode.remove()" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:0;line-height:1;font-size:13px">×</button>';
+  list.appendChild(tag);
+}
+
+function runAiTemplateGen(){
+  var key=getApiKey();if(!key)return;
+  var industry=document.getElementById('aiTpl_industry').value.trim()||'General manufacturing';
+  var supType=document.getElementById('aiTpl_suptype').value.trim()||'Component supplier';
+  var tplName=document.getElementById('aiTpl_name').value.trim();
+  var cpCount=document.getElementById('aiTpl_cpcount').value;
+  var lang=document.getElementById('aiTpl_lang').value;
+  var includeRubric=document.getElementById('aiTpl_rubric').checked;
+  var context=document.getElementById('aiTpl_context').value.trim();
+  var focusAreas=[];
+  document.querySelectorAll('[id^="aiTplFocus_"]').forEach(function(cb){if(cb.checked)focusAreas.push(cb.value);});
+  if(!focusAreas.length){alert('Please select at least one focus area.');return;}
+  if(!tplName)tplName=industry+' – '+supType+' Audit';
+
+  var btn=document.querySelector('#aiTplModal button[onclick="runAiTemplateGen()"]');
+  var statusEl=document.getElementById('aiTpl_status');
+  if(btn)btn.style.display='none';
+  if(statusEl)statusEl.style.display='block';
+
+  var rubricInstr=includeRubric
+    ?'For each checkpoint also include a "rubric" object with keys "0" through "5", each containing a one-sentence description of what that score means for this specific checkpoint. Score 0 = not implemented at all, Score 5 = fully implemented and exemplary.'
+    :'Do NOT include rubric objects.';
+
+  var prompt='Create a professional supplier audit checklist template for the following context:\n\n'
+    +'Industry: '+industry+'\n'
+    +'Supplier type: '+supType+'\n'
+    +'Focus areas (create one category per focus area): '+focusAreas.join(', ')+'\n'
+    +'Checkpoints per category: '+cpCount+'\n'
+    +'Language: '+lang+'\n'
+    +(context?'Additional requirements: '+context+'\n':'')
+    +'\nIMPORTANT: Respond ONLY with a valid JSON object — no explanation, no markdown, no code fences.\n\n'
+    +'The JSON must have this exact structure:\n'
+    +'{\n'
+    +'  "name": "'+tplName+'",\n'
+    +'  "categories": {\n'
+    +'    "Category Name": [\n'
+    +'      {\n'
+    +'        "no": 1,\n'
+    +'        "checkpoint": "Specific, measurable audit question in '+lang+'",\n'
+    +'        "weight": 1'+(includeRubric?',\n        "rubric": {"0":"...","1":"...","2":"...","3":"...","4":"...","5":"..."}':'')+'\n'
+    +'      }\n'
+    +'    ]\n'
+    +'  }\n'
+    +'}\n\n'
+    +'Rules:\n'
+    +'- Each checkpoint must be a concrete, auditable statement or question (not vague)\n'
+    +'- Use industry-specific terminology relevant to '+industry+'\n'
+    +'- Weights: use 1 for standard checkpoints, 2 for critical/must-have requirements\n'
+    +rubricInstr;
+
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:(document.querySelector('input[name="aiModel"]:checked')||{value:'claude-sonnet-4-6'}).value,max_tokens:8000,system:'You are an expert in supplier quality management and procurement audits. You always respond with valid JSON only.',messages:[{role:'user',content:prompt}]})
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if(data.error){alert('AI Error: '+data.error.message);if(btn)btn.style.display='';if(statusEl)statusEl.style.display='none';return;}
+    var raw=data.content&&data.content[0]?data.content[0].text:'';
+    // Extract JSON: find outermost { ... }
+    var jsonStart=raw.indexOf('{');
+    var jsonEnd=raw.lastIndexOf('}');
+    if(jsonStart!==-1&&jsonEnd!==-1&&jsonEnd>jsonStart){raw=raw.slice(jsonStart,jsonEnd+1);}
+    else{raw=raw.replace(/^```json\s*/,'').replace(/^```\s*/,'').replace(/\s*```$/,'').trim();}
+    var parsed;
+    try{parsed=JSON.parse(raw);}catch(e){alert('AI returned invalid JSON. Try again.\n\nError: '+e.message+'\n\nPreview:\n'+raw.slice(0,400));if(btn)btn.style.display='';if(statusEl)statusEl.style.display='none';return;}
+    document.getElementById('aiTplModal').remove();
+    applyAiGenTemplate(parsed);
+  })
+  .catch(function(err){alert('Request failed: '+err.message);if(btn)btn.style.display='';if(statusEl)statusEl.style.display='none';});
+}
+
+function applyAiGenTemplate(data){
+  if(!data||!data.categories){alert('Invalid template structure from AI.');return;}
+  tplDraft={name:data.name||'AI Generated Template',categories:{}};
+  tplDraftIdx=-1;
+  Object.entries(data.categories).forEach(function([cat,items]){
+    if(!Array.isArray(items))return;
+    tplDraft.categories[cat]=items.map(function(item,i){
+      return {
+        no:item.no||(i+1),
+        checkpoint:item.checkpoint||'',
+        weight:typeof item.weight==='number'?item.weight:1,
+        rubric:item.rubric&&typeof item.rubric==='object'?item.rubric:null
+      };
+    });
+  });
+  renderTplBuilderList();
+  renderTplEditor();
+  // Switch to builder tab
+  var btn=document.getElementById('ntab-builder');
+  if(btn)btn.click();
+  toast('AI template ready — review and save when done');
+}
+
 function createSupplierFromTemplate(){
   var name=document.getElementById('newSupName').value.trim();
   var idx=document.getElementById('newSupTemplate').value;
@@ -1764,16 +2454,28 @@ function createSupplierFromTemplate(){
 function renderSuppliersList(){
   const el=document.getElementById('suppliersList');
   if(!el)return;
+  var stepperEl=document.getElementById('workflowStepperContainer');if(stepperEl)stepperEl.innerHTML=renderWorkflowStepper();
   if(!suppliers.length){el.innerHTML='';return;}
   let h='<div class="section-title" style="margin-top:24px"><i class="ti ti-users"></i> Suppliers ('+suppliers.length+')</div><div class="suppliers-grid">';
   suppliers.forEach((s,i)=>{
     const p=calcScore(s);
+    const prog=getAuditProgress(s);
+    const progColor=prog.pct===100?'#1A8A5A':prog.pct>0?'#E07B00':'var(--border2)';
     h+='<div class="sup-card" onclick="openSupplier('+i+')">'
       +'<button class="del-btn" onclick="event.stopPropagation();deleteSup('+i+')"><i class="ti ti-x"></i></button>'
       +'<div class="sup-name" title="'+esc(s.name)+'">'+esc(s.name)+'</div>'
       +'<div class="sup-score-big" style="color:'+sc(p)+'">'+(p!==null?p+'%':'--')+'</div>'
-      +'<div class="sup-label">'+Object.keys(s.categories).length+' '+'Categories'+' - '+Object.values(s.categories).flat().length+' '+'Criteria'+'</div>'
+      +'<div class="sup-label">'+Object.keys(s.categories).length+' Categories · '+Object.values(s.categories).flat().length+' Criteria</div>'
       +'<div class="score-bar"><div class="score-fill" style="width:'+(p||0)+'%;background:'+sc(p)+'"></div></div>'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">'
+        +'<span style="font-size:10px;color:'+progColor+'">'+prog.filled+'/'+prog.total+' filled</span>'
+        +'<span style="font-size:10px;color:'+progColor+';font-weight:700">'+prog.pct+'%</span>'
+      +'</div>'
+      +'<div class="sup-progress-bar"><div class="sup-progress-fill" style="width:'+prog.pct+'%;background:'+progColor+'"></div></div>'
+      +'<button class="sup-audit-btn" onclick="event.stopPropagation();openAuditWizard(\''+esc(s.name)+'\')">'
+        +'<i class="ti ti-'+(prog.pct===100?'check':'clipboard-list')+'"></i>'
+        +(prog.pct===100?'Audit complete':prog.pct>0?'Continue audit':'Start audit')
+      +'</button>'
       +'</div>';
   });
   el.innerHTML=h+'</div>';
@@ -1810,10 +2512,313 @@ function clearOvFilters(){ovFilterColor=null;ovFilterCat=null;buildTlChips('ov_t
 function toggleDetFilter(color){detFilterColor=detFilterColor===color?null:color;buildTlChips('det_tl_chips','toggleDetFilter',detFilterColor);renderDetail();}
 function clearDetFilters(){detFilterColor=null;buildTlChips('det_tl_chips','toggleDetFilter',null);renderDetail();}
 
+function renderDashboard(){
+  var el=document.getElementById('dashboardContent');if(!el)return;
+  if(!suppliers.length){
+    el.innerHTML='<div class="card" style="text-align:center;padding:48px 24px">'
+      +'<div style="font-size:44px;margin-bottom:14px">📊</div>'
+      +'<div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px">No data to display</div>'
+      +'<div style="font-size:13px;color:var(--text2);margin-bottom:20px">Import suppliers or load a project to see your dashboard.</div>'
+      +'<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'
+        +'<button class="btn primary" onclick="showPage(\'new\',document.querySelectorAll(\'.nav-btn\')[1]);setTimeout(function(){var b=document.getElementById(\'ntab-import\');if(b)b.click();},80)"><i class="ti ti-file-spreadsheet"></i> Import Excel</button>'
+        +'<button class="btn" onclick="showPage(\'new\',document.querySelectorAll(\'.nav-btn\')[1])"><i class="ti ti-user-plus"></i> Add Supplier</button>'
+      +'</div></div>';
+    return;
+  }
+
+  var cats=allCats();
+  var today=new Date();today.setHours(0,0,0,0);
+
+  // ── KPI calculations ────────────────────────────────────────────────────────
+  var scores=suppliers.map(function(s){return calcScore(s);}).filter(function(v){return v!==null;});
+  var avgScore=scores.length?Math.round(scores.reduce(function(a,b){return a+b;},0)/scores.length):null;
+  var allItems=suppliers.reduce(function(arr,s){return arr.concat(Object.values(s.categories).reduce(function(a,b){return a.concat(b);},[]));},[]);
+  var filledItems=allItems.filter(function(i){return i.score!==null&&i.score!==''&&i.score!==undefined;});
+  var coveragePct=allItems.length?Math.round(filledItems.length/allItems.length*100):0;
+  var openActs=actions.filter(function(a){return a.status!=='Done';});
+  var overdueActs=openActs.filter(function(a){return a.dueDate&&new Date(a.dueDate)<today;})
+    .sort(function(a,b){return new Date(a.dueDate)-new Date(b.dueDate);});
+  var tierColor=avgScore!==null?sc(avgScore):'var(--text2)';
+  var covColor=coveragePct===100?'#1A8A5A':coveragePct>0?'#E07B00':'var(--text3)';
+
+  // ── 1. KPI Row ──────────────────────────────────────────────────────────────
+  var actNavBtn='document.querySelectorAll(\'.nav-btn\')[4]';
+  var h='<div class="db-kpi-row">'
+    +'<div class="db-kpi" onclick="showPage(\'import\',document.querySelector(\'.nav-btn\'))" style="cursor:pointer">'
+      +'<div class="db-kpi-icon" style="background:#185FA522"><i class="ti ti-users" style="color:#185FA5"></i></div>'
+      +'<div><div class="db-kpi-val">'+suppliers.length+'</div><div class="db-kpi-lbl">Suppliers</div></div>'
+    +'</div>'
+    +'<div class="db-kpi">'
+      +'<div class="db-kpi-icon" style="background:'+tierColor+'22"><i class="ti ti-chart-bar" style="color:'+tierColor+'"></i></div>'
+      +'<div><div class="db-kpi-val" style="color:'+tierColor+'">'+(avgScore!==null?avgScore+'%':'—')+'</div><div class="db-kpi-lbl">Avg Score</div></div>'
+    +'</div>'
+    +'<div class="db-kpi">'
+      +'<div class="db-kpi-icon" style="background:'+covColor+'22"><i class="ti ti-clipboard-list" style="color:'+covColor+'"></i></div>'
+      +'<div><div class="db-kpi-val" style="color:'+covColor+'">'+coveragePct+'%</div><div class="db-kpi-lbl">Audit Coverage<br><span style="font-weight:400">'+filledItems.length+'/'+allItems.length+' checkpoints</span></div></div>'
+    +'</div>'
+    +'<div class="db-kpi" onclick="showPage(\'actions\','+actNavBtn+')" style="cursor:pointer">'
+      +'<div class="db-kpi-icon" style="background:'+(overdueActs.length?'#C0392B':'#E07B00')+'22"><i class="ti ti-clipboard-check" style="color:'+(overdueActs.length?'#C0392B':'#E07B00')+'"></i></div>'
+      +'<div><div class="db-kpi-val" style="color:'+(overdueActs.length?'#C0392B':'var(--text)')+'">'+openActs.length+'</div><div class="db-kpi-lbl">Open Actions'+(overdueActs.length?'<br><span style="color:#C0392B;font-weight:600">'+overdueActs.length+' overdue</span>':'')+'</div></div>'
+    +'</div>'
+  +'</div>';
+
+  // ── 2. Supplier Scores | Actions Summary ─────────────────────────────────
+  var sorted=[].concat(suppliers).map(function(s){var p=calcScore(s);return {s:s,pct:p,prog:getAuditProgress(s)};}).sort(function(a,b){return (b.pct||0)-(a.pct||0);});
+
+  h+='<div class="db-grid2">';
+
+  // Left — Supplier Score Cards
+  h+='<div class="card" style="padding:16px 18px">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
+      +'<span style="font-size:13px;font-weight:700"><i class="ti ti-trophy" style="color:var(--primary);margin-right:6px"></i>Supplier Scores</span>'
+      +'<span style="font-size:11px;color:var(--text3)">click to drill down</span>'
+    +'</div>'
+    +'<div style="display:flex;flex-direction:column;gap:7px">';
+  sorted.forEach(function(item,i){
+    var pct=item.pct,prog=item.prog,s=item.s;
+    var col=pct!==null?sc(pct):'var(--text3)';
+    var tier=pct!==null?(TIERS.find(function(t){return pct>=t.min;})||TIERS[TIERS.length-1]):null;
+    var progCol=prog.pct===100?'#1A8A5A':prog.pct>0?'#E07B00':'var(--border)';
+    h+='<div class="db-row-card" onclick="openSupplierDrilldown(\''+esc(s.name)+'\')">'
+      +'<div style="font-size:11px;font-weight:700;color:var(--text3);width:18px;text-align:center;flex-shrink:0">#'+(i+1)+'</div>'
+      +'<div style="flex:1;min-width:0">'
+        +'<div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px">'+esc(s.name)+'</div>'
+        +'<div style="display:flex;align-items:center;gap:6px">'
+          +'<div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+(pct||0)+'%;background:'+col+';border-radius:3px;transition:width .4s"></div></div>'
+          +(pct===null?'<span style="font-size:10px;color:var(--text3)">No data</span>':'')
+        +'</div>'
+      +'</div>'
+      +'<div style="flex-shrink:0;text-align:right">'
+        +'<div style="font-size:18px;font-weight:800;color:'+col+'">'+(pct!==null?pct+'%':'—')+'</div>'
+        +(tier?'<div style="font-size:9px;font-weight:700;background:'+tier.color+'22;color:'+tier.color+';padding:1px 7px;border-radius:8px;margin-top:2px;white-space:nowrap">'+esc(tier.label)+'</div>':'')
+      +'</div>'
+    +'</div>';
+  });
+  h+='</div></div>';
+
+  // Right — Actions + Audit Coverage stacked
+  var actOpen=actions.filter(function(a){return a.status==='Open';}).length;
+  var actInProg=actions.filter(function(a){return a.status==='In Progress';}).length;
+  var actDone=actions.filter(function(a){return a.status==='Done';}).length;
+
+  h+='<div style="display:flex;flex-direction:column;gap:14px">'
+    // Actions card
+    +'<div class="card" style="padding:16px 18px">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
+        +'<span style="font-size:13px;font-weight:700"><i class="ti ti-list-check" style="color:var(--primary);margin-right:6px"></i>Actions</span>'
+        +'<button onclick="showPage(\'actions\','+actNavBtn+')" style="font-size:11px;color:var(--primary);background:none;border:none;cursor:pointer;font-weight:700">View all →</button>'
+      +'</div>'
+      +'<div style="display:flex;gap:8px;margin-bottom:12px">'
+        +'<div style="flex:1;text-align:center;padding:10px 4px;background:#C0392B11;border-radius:8px">'
+          +'<div style="font-size:20px;font-weight:800;color:#C0392B">'+actOpen+'</div>'
+          +'<div style="font-size:10px;color:#C0392B;font-weight:600;margin-top:2px">Open</div>'
+        +'</div>'
+        +'<div style="flex:1;text-align:center;padding:10px 4px;background:#E07B0011;border-radius:8px">'
+          +'<div style="font-size:20px;font-weight:800;color:#E07B00">'+actInProg+'</div>'
+          +'<div style="font-size:10px;color:#E07B00;font-weight:600;margin-top:2px">In Progress</div>'
+        +'</div>'
+        +'<div style="flex:1;text-align:center;padding:10px 4px;background:#1A8A5A11;border-radius:8px">'
+          +'<div style="font-size:20px;font-weight:800;color:#1A8A5A">'+actDone+'</div>'
+          +'<div style="font-size:10px;color:#1A8A5A;font-weight:600;margin-top:2px">Done</div>'
+        +'</div>'
+      +'</div>'
+      +(overdueActs.length
+        ?'<div>'
+          +'<div style="font-size:11px;font-weight:700;color:#C0392B;margin-bottom:6px;display:flex;align-items:center;gap:4px"><i class="ti ti-alert-triangle"></i> Overdue ('+overdueActs.length+')</div>'
+          +overdueActs.slice(0,4).map(function(a){
+            return '<div onclick="showPage(\'actions\','+actNavBtn+')" style="padding:5px 8px;border-left:3px solid #C0392B;background:#C0392B08;border-radius:0 6px 6px 0;margin-bottom:4px;cursor:pointer">'
+              +'<div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(a.title)+'</div>'
+              +'<div style="font-size:10px;color:var(--text2)">'+esc(a.supplier||'—')+(a.dueDate?' · Due '+new Date(a.dueDate).toLocaleDateString('en-GB'):'')+'</div>'
+            +'</div>';
+          }).join('')
+          +(overdueActs.length>4?'<div style="font-size:11px;color:var(--text3);text-align:center;padding-top:2px">+'+( overdueActs.length-4)+' more</div>':'')
+        +'</div>'
+        :'<div style="font-size:12px;color:var(--text3);text-align:center;padding:8px 0"><i class="ti ti-circle-check" style="color:#1A8A5A"></i> No overdue actions</div>')
+    +'</div>'
+    // Audit Coverage card
+    +'<div class="card" style="padding:16px 18px">'
+      +'<div style="font-size:13px;font-weight:700;margin-bottom:12px"><i class="ti ti-clipboard-list" style="color:var(--primary);margin-right:6px"></i>Audit Coverage</div>'
+      +'<div style="display:flex;flex-direction:column;gap:8px">';
+  suppliers.forEach(function(s){
+    var prog=getAuditProgress(s);
+    var col=prog.pct===100?'#1A8A5A':prog.pct>0?'#E07B00':'var(--text3)';
+    h+='<div style="display:flex;align-items:center;gap:8px">'
+      +'<div style="font-size:12px;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(s.name)+'</div>'
+      +'<div style="width:80px;height:5px;background:var(--border);border-radius:3px;overflow:hidden;flex-shrink:0"><div style="height:100%;width:'+prog.pct+'%;background:'+col+';border-radius:3px"></div></div>'
+      +'<div style="font-size:11px;font-weight:700;color:'+col+';min-width:30px;text-align:right;flex-shrink:0">'+prog.pct+'%</div>'
+      +'<button onclick="openAuditWizard(\''+esc(s.name)+'\')" style="flex-shrink:0;font-size:10px;padding:3px 8px;border:1px solid '+col+';border-radius:5px;background:transparent;color:'+col+';cursor:pointer;white-space:nowrap">'+(prog.pct===100?'Review':'Audit')+'</button>'
+    +'</div>';
+  });
+  h+='</div></div>'
+  +'</div>'; // end right column
+  h+='</div>'; // end db-grid2
+
+  // ── 3. Category Performance | Radar ──────────────────────────────────────
+  if(cats.length){
+    h+='<div class="db-grid3">';
+    // Category performance bars
+    h+='<div class="card" style="padding:16px 18px">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
+        +'<span style="font-size:13px;font-weight:700"><i class="ti ti-chart-bar" style="color:var(--primary);margin-right:6px"></i>Category Performance</span>'
+        +'<span style="font-size:11px;color:var(--text3)">avg across all suppliers</span>'
+      +'</div>'
+      +'<div style="display:flex;flex-direction:column;gap:10px">';
+    cats.forEach(function(cat){
+      var vals=suppliers.map(function(s){return calcScore(s,cat);}).filter(function(v){return v!==null;});
+      var avg2=vals.length?Math.round(vals.reduce(function(a,b){return a+b;},0)/vals.length):null;
+      var col=sc(avg2);
+      // Weakest supplier in this category
+      var worst=null;var worstScore=999;
+      suppliers.forEach(function(s){var v=calcScore(s,cat);if(v!==null&&v<worstScore){worstScore=v;worst=s;}});
+      h+='<div onclick="openCatDrilldown(\''+esc(cat)+'\')" style="cursor:pointer;padding:4px 0" onmouseover="this.style.opacity=\'.85\'" onmouseout="this.style.opacity=\'1\'">'
+        +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'
+          +'<span style="font-size:12px;font-weight:600;color:var(--text)">'+esc(cat)+'</span>'
+          +'<div style="display:flex;align-items:center;gap:8px">'
+            +(worst&&worstScore<(threshYellow||70)?'<span style="font-size:10px;color:#C0392B;background:#C0392B11;padding:1px 6px;border-radius:8px;font-weight:600"><i class="ti ti-arrow-down-right"></i> '+esc(worst.name.split(' ')[0])+'</span>':'')
+            +'<span style="font-size:13px;font-weight:800;color:'+col+'">'+(avg2!==null?avg2+'%':'—')+'</span>'
+          +'</div>'
+        +'</div>'
+        +'<div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden">'
+          +'<div style="height:100%;width:'+(avg2||0)+'%;background:'+col+';border-radius:4px;transition:width .5s"></div>'
+        +'</div>'
+      +'</div>';
+    });
+    h+='</div></div>';
+
+    // Radar chart with supplier filter
+    if(cats.length>=3){
+      var activeRad=_dbRadarFilter.length?_dbRadarFilter:suppliers.map(function(s){return s.name;});
+      h+='<div class="card" style="padding:16px 18px">'
+        +'<div style="font-size:13px;font-weight:700;margin-bottom:8px"><i class="ti ti-chart-radar" style="color:var(--primary);margin-right:6px"></i>Radar Overview</div>'
+        +'<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">'
+        +suppliers.map(function(s){
+          var on=activeRad.indexOf(s.name)>=0;
+          var cc=sc(calcScore(s,null));
+          return '<span onclick="toggleDbRadar(\''+esc(s.name)+'\')" style="cursor:pointer;font-size:10px;font-weight:600;padding:2px 9px;border-radius:10px;border:1.5px solid '+(on?cc:'var(--border)')+';color:'+(on?cc:'var(--text3)')+';background:'+(on?cc+'14':'transparent')+';user-select:none;transition:all .15s">'+esc(s.name.split(' ')[0])+'</span>';
+        }).join('')
+        +'</div>'
+        +'<div style="height:260px"><canvas id="dbRadarChart"></canvas></div>'
+      +'</div>';
+    }
+    h+='</div>'; // end db-grid3
+
+    // ── 4. Supplier × Category Heat Map ────────────────────────────────────────
+    h+='<div class="card" style="padding:16px 18px;overflow-x:auto;margin-bottom:4px">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
+        +'<span style="font-size:13px;font-weight:700"><i class="ti ti-table" style="color:var(--primary);margin-right:6px"></i>Supplier × Category Heat Map</span>'
+        +'<span style="font-size:11px;color:var(--text3)">click any cell to drill down</span>'
+      +'</div>'
+      +'<table style="width:100%;border-collapse:collapse;font-size:11px">'
+        +'<thead><tr>'
+          +'<th style="text-align:left;padding:7px 12px;border-bottom:2px solid var(--border);font-weight:700;color:var(--text2);min-width:120px">Supplier</th>'
+          +cats.map(function(cat){return '<th style="text-align:center;padding:7px 8px;border-bottom:2px solid var(--border);font-weight:600;color:var(--text2);white-space:nowrap;cursor:pointer" onclick="openCatDrilldown(\''+esc(cat)+'\')">'+esc(cat)+'</th>';}).join('')
+          +'<th style="text-align:center;padding:7px 8px;border-bottom:2px solid var(--border);font-weight:700;color:var(--text2);border-left:2px solid var(--border)">Overall</th>'
+        +'</tr></thead>'
+        +'<tbody>'
+        +suppliers.map(function(s){
+          var rowAvg=calcScore(s,null);
+          var rowCol=rowAvg!==null?sc(rowAvg):'var(--text3)';
+          return '<tr style="border-bottom:1px solid var(--border)">'
+            +'<td style="padding:7px 12px;font-weight:600;font-size:11px;cursor:pointer;white-space:nowrap" onclick="openSupplierDrilldown(\''+esc(s.name)+'\')">'+esc(s.name)+'</td>'
+            +cats.map(function(cat){
+              var v=calcScore(s,cat);
+              var cc=v!==null?sc(v):'var(--border)';
+              var bg=v!==null?cc+'1A':'var(--bg)';
+              return '<td onclick="openCatDrilldown(\''+esc(cat)+'\')" style="text-align:center;padding:7px 8px;background:'+bg+';font-weight:700;color:'+cc+';cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity=\'.75\'" onmouseout="this.style.opacity=\'1\'">'+(v!==null?v+'%':'—')+'</td>';
+            }).join('')
+            +'<td style="text-align:center;padding:7px 8px;font-weight:800;color:'+rowCol+';border-left:2px solid var(--border);background:'+rowCol+'11">'+(rowAvg!==null?rowAvg+'%':'—')+'</td>'
+          +'</tr>';
+        }).join('')
+        +'<tr style="border-top:2px solid var(--border)">'
+          +'<td style="padding:7px 12px;font-weight:700;font-size:11px;color:var(--text2)">Category Avg</td>'
+          +cats.map(function(cat){
+            var vals=suppliers.map(function(s){return calcScore(s,cat);}).filter(function(v){return v!==null;});
+            var avg=vals.length?Math.round(vals.reduce(function(a,b){return a+b;},0)/vals.length):null;
+            var cc=avg!==null?sc(avg):'var(--text3)';
+            return '<td style="text-align:center;padding:7px 8px;font-weight:800;color:'+cc+';background:'+cc+'11">'+(avg!==null?avg+'%':'—')+'</td>';
+          }).join('')
+          +'<td style="text-align:center;padding:7px 8px;font-weight:800;color:'+(avgScore!==null?sc(avgScore):'var(--text3)')+';border-left:2px solid var(--border)">'+(avgScore!==null?avgScore+'%':'—')+'</td>'
+        +'</tr>'
+        +'</tbody></table></div>';
+  }
+
+  el.innerHTML=h;
+
+  // Render radar chart
+  if(cats.length>=3){
+    destroyChart('dbRadarChart');
+    var pal=['#185FA5','#1D9E75','#E24B4A','#EF9F27','#534AB7','#D4537E','#3B6D11','#BA7517'];
+    var radarSups=(_dbRadarFilter.length?suppliers.filter(function(s){return _dbRadarFilter.indexOf(s.name)>=0;}):suppliers).slice(0,8);
+    charts.dbRadarChart=new Chart(document.getElementById('dbRadarChart'),{
+      type:'radar',
+      data:{
+        labels:cats,
+        datasets:radarSups.map(function(s,i){return {
+          label:s.name,
+          data:cats.map(function(c){return calcScore(s,c)||0;}),
+          borderColor:pal[i%pal.length],
+          backgroundColor:pal[i%pal.length]+'14',
+          pointRadius:3,pointHoverRadius:5,
+          borderWidth:2
+        };})
+      },
+      options:{responsive:true,maintainAspectRatio:false,
+        scales:{r:{min:0,max:100,ticks:{stepSize:25,callback:function(v){return v+'%';},font:{size:9}},pointLabels:{font:{size:10}}}},
+        plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10,padding:8}}}
+      }
+    });
+  }
+}
+
+function openSupplierDrilldown(name){
+  showPage('detail',null);
+  _detailFromDashboard=true;
+  setTimeout(function(){
+    populateSelects('detailSupSelect','detailCatFilter');
+    var sel=document.getElementById('detailSupSelect');
+    if(sel){sel.value=name;renderDetail();}
+  },50);
+}
+
+function openCatDrilldown(cat){
+  showPage('detail',null);
+  _detailFromDashboard=true;
+  setTimeout(function(){
+    populateSelects('detailSupSelect','detailCatFilter');
+    var sel=document.getElementById('detailCatFilter');
+    if(sel){sel.value=cat;renderDetail();}
+  },50);
+}
+
+var _detailFromDashboard=false;
+var _dbRadarFilter=[];
+function toggleDbRadar(name){
+  var idx=_dbRadarFilter.indexOf(name);
+  if(idx>=0)_dbRadarFilter.splice(idx,1);
+  else _dbRadarFilter.push(name);
+  renderDashboard();
+}
+function refreshDashboardIfVisible(){
+  if(document.getElementById('page-dashboard')&&document.getElementById('page-dashboard').classList.contains('active')){
+    renderDashboard();
+  }
+}
+
 function renderOverview(){
   const el=document.getElementById('overviewContent');
   if(!el)return;
-  if(!suppliers.length){el.innerHTML='<div class="empty"><i class="ti ti-upload"></i>'+'No data'+'</div>';return;}
+  if(!suppliers.length){
+    el.innerHTML='<div class="card" style="text-align:center;padding:32px 24px">'
+        +'<div style="font-size:40px;margin-bottom:12px">📋</div>'
+        +'<div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px">No suppliers yet</div>'
+        +'<div style="font-size:13px;color:var(--text2);margin-bottom:20px;max-width:380px;margin-left:auto;margin-right:auto">Start by defining an audit template and adding a supplier — or import an existing Excel file.</div>'
+        +'<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'
+          +'<button class="btn primary" onclick="showPage(\'new\',document.querySelectorAll(\'.nav-btn\')[1]);setTimeout(function(){var b=document.getElementById(\'ntab-builder\');if(b)b.click();},80)"><i class="ti ti-template"></i> Create template</button>'
+          +'<button class="btn" onclick="showPage(\'new\',document.querySelectorAll(\'.nav-btn\')[1]);setTimeout(function(){var b=document.getElementById(\'ntab-import\');if(b)b.click();},80)"><i class="ti ti-file-spreadsheet"></i> Import data</button>'
+        +'</div>'
+      +'</div>';
+    return;
+  }
   const cats=allCats();
   let visSups=suppliers.map(s=>({...s,pct:calcScore(s,ovFilterCat)}));
   if(ovFilterColor)visSups=visSups.filter(s=>colorBucket(s.pct)===ovFilterColor);
@@ -1868,6 +2873,8 @@ function renderOverview(){
 }
 
 function renderDetail(){
+  var backBtn=document.getElementById('detBackBtn');
+  if(backBtn)backBtn.style.display=_detailFromDashboard?'flex':'none';
   var _sn=document.getElementById('detailSupSelect');
   var _cf=document.getElementById('detailCatFilter');
   var el=document.getElementById('detailContent');
@@ -1914,8 +2921,29 @@ function renderDetail(){
     if(cns.length>=3)h+='<div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:12px">'+'Radar'+'</div><div class="chart-wrap" style="height:300px"><canvas id="detailRadar" role="img" aria-label="Radar"></canvas></div></div>';
     Object.entries(supCats).forEach(function(e2){
       var cat=e2[0];var items=e2[1];if(!items||!items.length)return;
-      h+='<div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:10px">'+cat+'</div><div style="overflow-x:auto"><table class="data-table"><thead><tr><th>#</th><th>'+'Checkpoint'+'</th><th>'+'Score'+'</th><th>'+'Evidence / Notes'+'</th></tr></thead><tbody>';
-      items.forEach(function(item){var p2=item.score;var bc=p2==='N.A.'||p2===null?'na':(p2>=4?'high':p2>=2.5?'mid':'low');h+='<tr><td style="color:var(--text3)">'+item.no+'</td><td>'+esc(item.checkpoint)+'</td><td><span class="badge '+bc+'">'+(p2===null?'--':p2)+'</span></td><td style="font-size:12px;color:var(--text2)">'+esc(item.notes||'')+'</td></tr>';});
+      var hasAnyPhoto=items.some(function(it){return it.images&&it.images.length;});
+      h+='<div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:10px">'+esc(cat)+'</div><div style="overflow-x:auto"><table class="data-table"><thead><tr><th>#</th><th>Checkpoint</th><th>Score</th><th>Evidence / Notes</th>'+(hasAnyPhoto?'<th>Photos</th>':'')+'</tr></thead><tbody>';
+      items.forEach(function(item,idx){
+        var p2=item.score;
+        var bc=p2==='N.A.'||p2===null?'na':(p2>=4?'high':p2>=2.5?'mid':'low');
+        var imgs=item.images||[];
+        var photoCell=hasAnyPhoto
+          ?(imgs.length
+            ?'<td style="white-space:nowrap;vertical-align:middle">'
+              +imgs.map(function(im,ii){
+                return '<img src="'+im.data+'" onclick="openImgViewer(\''+esc(sn)+'\',\''+esc(cat)+'\','+idx+','+ii+')" style="width:36px;height:36px;object-fit:cover;border-radius:4px;cursor:pointer;border:1px solid var(--border);margin-right:3px" title="'+esc(im.name||'Photo')+'">';
+              }).join('')
+            +'</td>'
+            :'<td style="color:var(--text3);font-size:11px;text-align:center">—</td>')
+          :'';
+        h+='<tr>'
+          +'<td style="color:var(--text3)">'+item.no+'</td>'
+          +'<td>'+esc(item.checkpoint)+'</td>'
+          +'<td><span class="badge '+bc+'">'+(p2===null?'--':p2)+'</span></td>'
+          +'<td style="font-size:12px;color:var(--text2)">'+esc(item.notes||'')+'</td>'
+          +photoCell
+        +'</tr>';
+      });
       h+='</tbody></table></div></div>';
     });
     el.innerHTML=h;
@@ -1943,12 +2971,49 @@ function renderDetail(){
   // Standard: ranking
   var sorted=[...suppliers].sort(function(a,b){return (calcScore(b,cf||null)||0)-(calcScore(a,cf||null)||0);});
   var barH=Math.max(200,sorted.length*42+60);
-  var h='<div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:12px">'+'Ranking'+(cf?' - '+cf:'')+'</div><div class="chart-wrap" style="height:'+barH+'px"><canvas id="detailBar" role="img" aria-label="Vergleich"></canvas></div></div>';
-  catsToShow.forEach(function(cat){
-    h+='<div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:10px">'+cat+'</div>';
-    sorted.forEach(function(sv){var p=calcScore(sv,cat);h+='<div class="cat-row" style="cursor:pointer" data-sup-name="'+esc(sv.name)+'" onclick="quickOpenSup(this.dataset.supName)"><div class="cat-name">'+esc(sv.name)+'</div><div class="cat-bar-wrap"><div class="cat-bar" style="width:'+(p||0)+'%;background:'+sc(p)+'"></div></div><div class="cat-pct" style="color:'+sc(p)+'">'+(p!==null?p+'%':'--')+'</div></div>';});
-    h+='</div>';
-  });
+  var h='<div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:12px">Supplier Ranking'+(cf?' — '+cf:'')+'</div><div class="chart-wrap" style="height:'+barH+'px"><canvas id="detailBar" role="img" aria-label="Ranking"></canvas></div></div>';
+
+  if(cf){
+    // ── Cross-supplier checkpoint comparison table ─────────────────────────
+    var refSup=sorted.find(function(s){return s.categories[cf]&&s.categories[cf].length;});
+    if(refSup){
+      h+='<div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:12px">Checkpoint Comparison — <span style="color:var(--primary)">'+esc(cf)+'</span></div>'
+        +'<div style="overflow-x:auto"><table class="data-table" style="table-layout:auto"><thead><tr>'
+        +'<th style="min-width:28px">#</th>'
+        +'<th style="min-width:200px">Checkpoint</th>'
+        +sorted.map(function(s){
+          var sp=calcScore(s,cf);
+          return '<th style="text-align:center;white-space:nowrap;font-size:11px"><div>'+esc(s.name.split(' ')[0])+'</div><div style="color:'+sc(sp)+';font-weight:700">'+(sp!==null?sp+'%':'—')+'</div></th>';
+        }).join('')
+        +'</tr></thead><tbody>';
+      refSup.categories[cf].forEach(function(item,idx){
+        // Compute average across suppliers for this checkpoint
+        var vals=sorted.map(function(s){var it=s.categories[cf]&&s.categories[cf][idx];return it&&it.score!==null&&it.score!=='N.A.'?Number(it.score):null;}).filter(function(v){return v!==null;});
+        var avg=vals.length?Math.round(vals.reduce(function(a,b){return a+b;},0)/vals.length*10)/10:null;
+        var avgBadge=avg===null?'na':(avg>=4?'high':avg>=2.5?'mid':'low');
+        h+='<tr>'
+          +'<td style="color:var(--text3);font-size:11px">'+esc(String(item.no))+'</td>'
+          +'<td style="font-size:12px;line-height:1.35">'+esc(item.checkpoint)+'</td>'
+          +sorted.map(function(s){
+            var it=s.categories[cf]&&s.categories[cf][idx];
+            var v=it?it.score:null;
+            var bc=v==='N.A.'?'na':v===null?'na':(v>=4?'high':v>=2.5?'mid':'low');
+            var note=it&&it.notes?'<div style="font-size:10px;color:var(--text2);margin-top:2px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(it.notes||'')+'">'+esc(it.notes||'')+'</div>':'';
+            return '<td style="text-align:center;vertical-align:top;padding:6px 8px"><span class="badge '+bc+'">'+(v===null?'—':v)+'</span>'+note+'</td>';
+          }).join('')
+        +'</tr>';
+      });
+      h+='</tbody></table></div></div>';
+    }
+  } else {
+    // ── Per-category supplier bars (multi-category view) ───────────────────
+    catsToShow.forEach(function(cat){
+      h+='<div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:10px">'+esc(cat)+'</div>';
+      sorted.forEach(function(sv){var p=calcScore(sv,cat);h+='<div class="cat-row" style="cursor:pointer" data-sup-name="'+esc(sv.name)+'" onclick="quickOpenSup(this.dataset.supName)"><div class="cat-name">'+esc(sv.name)+'</div><div class="cat-bar-wrap"><div class="cat-bar" style="width:'+(p||0)+'%;background:'+sc(p)+'"></div></div><div class="cat-pct" style="color:'+sc(p)+'">'+(p!==null?p+'%':'--')+'</div></div>';});
+      h+='</div>';
+    });
+  }
+
   el.innerHTML=h;
   destroyChart('detailBar');
   charts.detailBar=new Chart(document.getElementById('detailBar'),{type:'bar',data:{labels:sorted.map(function(s){return s.name;}),datasets:[{label:'Score %',data:sorted.map(function(s){return calcScore(s,cf||null)||0;}),backgroundColor:sorted.map(function(s){return sc(calcScore(s,cf||null));}),borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{max:100,ticks:{callback:function(v){return v+'%';}}}}}});
@@ -2044,6 +3109,49 @@ function openImgViewer(sup,cat,idx,imgIdx){
   render();
 }
 
+function openActionImgViewer(actionId,imgIdx){
+  var a=actions.find(function(x){return x.id===actionId;});
+  if(!a||!a.images||!a.images.length)return;
+  var imgs=a.images;
+  var current=imgIdx||0;
+  function render(){
+    var img=imgs[current];
+    var ex=document.getElementById('imgViewerOverlay');if(ex)ex.remove();
+    var overlay=document.createElement('div');
+    overlay.id='imgViewerOverlay';
+    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:2000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px';
+    overlay.innerHTML=
+      '<div style="position:absolute;top:16px;right:16px;display:flex;gap:10px">'
+        +'<a href="'+img.data+'" download="'+(img.name||'photo.jpg')+'" style="color:#fff;font-size:22px;text-decoration:none" title="Download"><i class="ti ti-download"></i></a>'
+        +'<button onclick="deleteActionImg('+actionId+','+current+')" style="background:none;border:none;cursor:pointer;color:#ff6b6b;font-size:22px" title="Remove from task"><i class="ti ti-unlink"></i></button>'
+        +'<button onclick="document.getElementById(\'imgViewerOverlay\').remove()" style="background:none;border:none;cursor:pointer;color:#fff;font-size:26px"><i class="ti ti-x"></i></button>'
+      +'</div>'
+      +'<div style="color:#aaa;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase">Task: '+esc(a.title)+'</div>'
+      +'<div style="color:#ccc;font-size:13px">'+(current+1)+' / '+imgs.length+(img.name?' — '+esc(img.name):'')+'</div>'
+      +'<img src="'+img.data+'" style="max-width:90vw;max-height:70vh;object-fit:contain;border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,.5)">'
+      +'<div style="display:flex;gap:16px">'
+        +(current>0?'<button id="imgPrev" style="background:rgba(255,255,255,.15);border:none;cursor:pointer;color:#fff;padding:8px 20px;border-radius:var(--r);font-size:14px"><i class="ti ti-chevron-left"></i> Prev</button>':'')
+        +(current<imgs.length-1?'<button id="imgNext" style="background:rgba(255,255,255,.15);border:none;cursor:pointer;color:#fff;padding:8px 20px;border-radius:var(--r);font-size:14px">Next <i class="ti ti-chevron-right"></i></button>':'')
+      +'</div>';
+    document.body.appendChild(overlay);
+    var prev=document.getElementById('imgPrev');var next=document.getElementById('imgNext');
+    if(prev)prev.onclick=function(){current--;render();};
+    if(next)next.onclick=function(){current++;render();};
+  }
+  render();
+}
+
+function deleteActionImg(actionId,imgIdx){
+  var a=actions.find(function(x){return x.id===actionId;});
+  if(!a||!a.images)return;
+  if(!confirm('Remove this photo from the task?'))return;
+  a.images.splice(imgIdx,1);
+  document.getElementById('imgViewerOverlay').remove();
+  if(a.images.length)openActionImgViewer(actionId,Math.min(imgIdx,a.images.length-1));
+  renderActions();
+  toast('Photo removed from task');
+}
+
 function deleteImg(sup,cat,idx,imgIdx){
   var s=suppliers.find(function(x){return x.name===sup;});
   if(!s)return;
@@ -2053,7 +3161,8 @@ function deleteImg(sup,cat,idx,imgIdx){
   item.images.splice(imgIdx,1);
   document.getElementById('imgViewerOverlay').remove();
   if(item.images.length)openImgViewer(sup,cat,idx,Math.min(imgIdx,item.images.length-1));
-  renderDataTable();
+  if(document.getElementById('auditWizard'))renderAuditWizard();
+  else renderDataTable();
   toast('Photo deleted');
 }
 
@@ -2117,6 +3226,7 @@ function renderDataTable(){
         +'<td>'
         +'<div style="display:flex;align-items:center;gap:4px">'
           +'<input class="notes-input" data-sup="'+esc(sn)+'" data-cat="'+esc(cat)+'" data-idx="'+idx+'" value="'+esc(item.notes||'')+'" placeholder="Notes..." style="flex:1;min-width:0">'
+          +'<button onclick="openNotesExpand(\''+esc(sn)+'\',\''+esc(cat)+'\','+idx+')" title="Expand notes editor" style="background:none;border:none;cursor:pointer;color:var(--text2);padding:2px;flex-shrink:0" onmouseover="this.style.color=\'var(--primary)\'" onmouseout="this.style.color=\'var(--text2)\'"><i class="ti ti-arrows-maximize" style="font-size:13px"></i></button>'
           +'<button id="ai_note_'+esc(sn).replace(/\W/g,"_")+'_'+esc(cat).replace(/\W/g,"_")+'_'+idx+'" onclick="aiImproveNote(\''+esc(sn)+'\',\''+esc(cat)+'\','+idx+')" title="Improve note with AI" style="background:none;border:none;cursor:pointer;color:#185FA5;padding:2px;flex-shrink:0"><i class="ti ti-sparkles" style="font-size:13px"></i></button>'
         +'</div>'
         +'<div id="ai_prev_'+esc(sn).replace(/\W/g,"_")+'_'+esc(cat).replace(/\W/g,"_")+'_'+idx+'" style="display:none;margin-top:6px;border:1px solid #185FA533;border-radius:6px;background:rgba(24,95,165,.05);padding:8px 10px">'
@@ -2140,6 +3250,37 @@ function toggleRubricPanel(btn){
   if(panel&&panel.classList.contains('rubric-panel'))panel.style.display=panel.style.display==='none'?'block':'none';
 }
 
+var _notesExpandTarget={sn:'',cat:'',idx:0};
+function openNotesExpand(sn,cat,idx){
+  _notesExpandTarget={sn:sn,cat:cat,idx:idx};
+  var s=suppliers.find(function(x){return x.name===sn;});
+  var item=s&&s.categories[cat]&&s.categories[cat][idx];
+  // Read current value from the live input first (unsaved edits)
+  var inp=document.querySelector('.notes-input[data-sup="'+sn+'"][data-cat="'+cat+'"][data-idx="'+idx+'"]');
+  var current=inp?inp.value:(item?item.notes||'':'');
+  document.getElementById('notesExpandTitle').textContent='Evidence / Notes — '+sn;
+  document.getElementById('notesExpandCheckpoint').textContent=item?'Checkpoint: '+item.checkpoint:'';
+  document.getElementById('notesExpandArea').value=current;
+  var m=document.getElementById('notesExpandModal');
+  m.style.display='flex';
+  setTimeout(function(){document.getElementById('notesExpandArea').focus();},50);
+}
+function saveNotesExpand(){
+  var val=document.getElementById('notesExpandArea').value;
+  var inp=document.querySelector('.notes-input[data-sup="'+_notesExpandTarget.sn+'"][data-cat="'+_notesExpandTarget.cat+'"][data-idx="'+_notesExpandTarget.idx+'"]');
+  if(inp)inp.value=val;
+  // Also persist immediately to the data model
+  var s=suppliers.find(function(x){return x.name===_notesExpandTarget.sn;});
+  if(s&&s.categories[_notesExpandTarget.cat]&&s.categories[_notesExpandTarget.cat][_notesExpandTarget.idx]){
+    s.categories[_notesExpandTarget.cat][_notesExpandTarget.idx].notes=val;
+  }
+  closeNotesExpand();
+  toast('Notes saved');
+}
+function closeNotesExpand(){
+  document.getElementById('notesExpandModal').style.display='none';
+}
+
 function saveSupMeta(sn,field,val){
   var s=suppliers.find(function(x){return x.name===sn;});
   if(!s)return;
@@ -2151,7 +3292,9 @@ function saveDataEdits(){
   document.querySelectorAll('.score-input').forEach(inp=>{const s=suppliers.find(x=>x.name===inp.dataset.sup);if(!s)return;const items=s.categories[inp.dataset.cat];if(!items)return;const v=inp.value.trim().toUpperCase();if(['N.A.','NA','N/A'].includes(v))items[inp.dataset.idx].score='N.A.';else if(v==='')items[inp.dataset.idx].score=null;else if(!isNaN(Number(v)))items[inp.dataset.idx].score=Number(v);});
   document.querySelectorAll('.notes-input').forEach(inp=>{const s=suppliers.find(x=>x.name===inp.dataset.sup);if(!s)return;const items=s.categories[inp.dataset.cat];if(!items)return;items[inp.dataset.idx].notes=inp.value;});
   document.querySelectorAll('.weight-input').forEach(inp=>{const s=suppliers.find(x=>x.name===inp.dataset.sup);if(!s)return;const items=s.categories[inp.dataset.cat];if(!items)return;var v=parseFloat(inp.value);if(!isNaN(v)&&v>=0)items[inp.dataset.idx].weight=v;});
-  renderSuppliersList();toast('Changes saved');
+  renderSuppliersList();
+  refreshDashboardIfVisible();
+  toast('Changes saved');
 }
 
 function renderWeightControls(){
@@ -2192,34 +3335,46 @@ function loadProject(file){
   reader.onload=function(e){
     try{
       var d=JSON.parse(e.target.result);
-      suppliers=d.suppliers||[];
-      weights=d.weights||{};
-      templates=d.templates||[];
-      actions=d.actions||[];
-      actionIdCounter=d.actionIdCounter||actions.reduce(function(m,a){return Math.max(m,a.id||0);},0)+1;
-      // Restore TIERS if saved
-      if(d.tiers&&Array.isArray(d.tiers)&&d.tiers.length>0){
-        TIERS=d.tiers;
-        threshGreen=TIERS[0].min;
-        threshYellow=TIERS[1]?TIERS[1].min:70;
+      // Sanitize suppliers: ensure categories is always an object, each category an array
+      suppliers=(d.suppliers||[]).map(function(s){
+        var cats=s.categories&&typeof s.categories==='object'?s.categories:{};
+        Object.keys(cats).forEach(function(k){if(!Array.isArray(cats[k]))cats[k]=[];});
+        return Object.assign({},s,{categories:cats});
+      });
+      weights=d.weights&&typeof d.weights==='object'?d.weights:{};
+      templates=Array.isArray(d.templates)?d.templates:[];
+      actions=Array.isArray(d.actions)?d.actions:[];
+      actionIdCounter=d.actionIdCounter||actions.reduce(function(m,a){return Math.max(m,(a.id||0));},0)+1;
+      // Restore TIERS — validate each tier has required fields
+      if(Array.isArray(d.tiers)&&d.tiers.length>=2){
+        TIERS=d.tiers.map(function(t){
+          return {min:Number(t.min)||0,color:t.color||'#888888',hex:(t.color||'#888888').replace('#',''),label:t.label||'',risk:t.risk||''};
+        });
+        TIERS.sort(function(a,b){return b.min-a.min;});
+        TIERS[TIERS.length-1].min=0;
       } else {
-        threshGreen=d.threshGreen||85;
-        threshYellow=d.threshYellow||70;
+        TIERS=JSON.parse(JSON.stringify(DEFAULT_TIERS));
       }
+      threshGreen=TIERS[0].min;
+      threshYellow=TIERS[1]?TIERS[1].min:70;
       selectedTheme=d.selectedTheme||'ElectricBlue';
-      // Safely set form fields (they may not exist if settings page not open)
       function safeSet(id,val){var el=document.getElementById(id);if(el&&val!=null)el.value=val;}
-      safeSet('auditorName', d.auditor);
-      safeSet('companyName', d.company);
-      safeSet('projectName', d.project);
-      safeSet('apiKey', d.apiKey);
+      safeSet('auditorName',d.auditor);
+      safeSet('companyName',d.company);
+      safeSet('projectName',d.project);
+      safeSet('apiKey',d.apiKey);
       if(d.aiModel){var rb=document.querySelector('input[name="aiModel"][value="'+d.aiModel+'"]');if(rb)rb.checked=true;}
+      _selActions.clear();
       renderSuppliersList();
       renderTiersEditor();
       renderWeightControls();
       updateBadgeColors();
-      toast('Project loaded: '+suppliers.length+' suppliers');
-    }catch(err){alert('Load error: '+err.message);}
+      refreshDashboardIfVisible();
+      toast('Project loaded: '+suppliers.length+' supplier'+(suppliers.length===1?'':'s'));
+    }catch(err){
+      console.error('loadProject error:',err);
+      toast('Load error: '+err.message,'#C0392B');
+    }
   };
   reader.readAsText(file);
 }
@@ -2235,27 +3390,36 @@ function updateBadgeColors(){
 
 function renderTiersEditor(){
   var el=document.getElementById('tiersEditor');if(!el)return;
-  var el=document.getElementById('tiersEditor');if(!el)return;
-  var h='<table style="width:100%;border-collapse:collapse;font-size:13px">'
-    +'<thead><tr>'
-    +'<th style="text-align:left;padding:6px 8px;color:var(--text2);font-weight:500;border-bottom:1px solid var(--border);font-size:11px">FROM %</th>'
-    +'<th style="text-align:left;padding:6px 8px;color:var(--text2);font-weight:500;border-bottom:1px solid var(--border);font-size:11px">COLOR</th>'
-    +'<th style="text-align:left;padding:6px 8px;color:var(--text2);font-weight:500;border-bottom:1px solid var(--border);font-size:11px">LABEL</th>'
-    +'<th style="text-align:left;padding:6px 8px;color:var(--text2);font-weight:500;border-bottom:1px solid var(--border);font-size:11px">DESCRIPTION</th>'
-    +'<th style="padding:6px 8px;border-bottom:1px solid var(--border);font-size:11px">PREVIEW</th>'
+  var h='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">'
+    +'<thead><tr style="border-bottom:2px solid var(--border)">'
+    +'<th style="text-align:left;padding:7px 8px;color:var(--text2);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px">Min %</th>'
+    +'<th style="text-align:left;padding:7px 8px;color:var(--text2);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px">Color</th>'
+    +'<th style="text-align:left;padding:7px 8px;color:var(--text2);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px">Label</th>'
+    +'<th style="text-align:left;padding:7px 8px;color:var(--text2);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px">Description / Risk</th>'
+    +'<th style="padding:7px 8px;color:var(--text2);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px">Preview</th>'
+    +'<th style="width:36px"></th>'
     +'</tr></thead><tbody>';
   TIERS.forEach(function(tier,i){
     var isLast=i===TIERS.length-1;
-    var minVal=isLast?(i>0?'< '+TIERS[i-1].min+'%':'0%'):'';
     h+='<tr style="border-bottom:1px solid var(--border)">'
-      +'<td style="padding:8px">'+(isLast?'<span style="font-size:12px;color:var(--text3)">'+minVal+'</span>':'<input type="number" min="1" max="100" value="'+tier.min+'" id="tier_min_'+i+'" style="width:55px;padding:4px 6px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:12px"> %')+'</td>'
-      +'<td style="padding:8px"><input type="color" value="'+tier.color+'" id="tier_col_'+i+'" style="width:38px;height:30px;border:1px solid var(--border);border-radius:var(--r);cursor:pointer;padding:2px" oninput="previewTier('+i+')"></td>'
-      +'<td style="padding:8px"><input type="text" value="'+tier.label+'" id="tier_lbl_'+i+'" style="width:100px;padding:4px 6px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:12px" oninput="previewTier('+i+')"></td>'
-      +'<td style="padding:8px"><input type="text" value="'+tier.risk+'" id="tier_risk_'+i+'" style="width:200px;padding:4px 6px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:12px"></td>'
-      +'<td style="padding:8px"><span id="tier_prev_'+i+'" style="background:'+tier.color+';color:#fff;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600">'+tier.label+'</span></td>'
+      +'<td style="padding:7px 8px">'
+        +(isLast
+          ?'<span style="font-size:12px;color:var(--text3);font-style:italic">0 (Rest)</span>'
+          :'<div style="display:flex;align-items:center;gap:4px"><input type="number" min="1" max="99" value="'+tier.min+'" id="tier_min_'+i+'" style="width:52px;padding:4px 6px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:12px;text-align:center"> <span style="font-size:11px;color:var(--text3)">%</span></div>')
+      +'</td>'
+      +'<td style="padding:7px 8px"><input type="color" value="'+tier.color+'" id="tier_col_'+i+'" style="width:40px;height:32px;border:1px solid var(--border);border-radius:var(--r);cursor:pointer;padding:2px" oninput="previewTier('+i+')"></td>'
+      +'<td style="padding:7px 8px"><input type="text" value="'+esc(tier.label)+'" id="tier_lbl_'+i+'" placeholder="e.g. Very Good" style="width:110px;padding:4px 8px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:12px" oninput="previewTier('+i+')"></td>'
+      +'<td style="padding:7px 8px"><input type="text" value="'+esc(tier.risk)+'" id="tier_risk_'+i+'" placeholder="e.g. Low risk" style="width:220px;padding:4px 8px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:12px"></td>'
+      +'<td style="padding:7px 8px"><span id="tier_prev_'+i+'" style="background:'+tier.color+';color:#fff;padding:3px 12px;border-radius:12px;font-size:11px;font-weight:700;white-space:nowrap">'+esc(tier.label)+'</span></td>'
+      +'<td style="padding:7px 4px;text-align:center">'
+        +(TIERS.length>2?'<button onclick="deleteTier('+i+')" title="Delete tier" style="background:none;border:none;cursor:pointer;color:#C0392B;padding:3px;border-radius:4px" onmouseover="this.style.background=\'#C0392B20\'" onmouseout="this.style.background=\'none\'"><i class="ti ti-trash" style="font-size:14px"></i></button>':'')
+      +'</td>'
       +'</tr>';
   });
-  h+='</tbody></table>';
+  h+='</tbody></table></div>'
+    +'<div style="margin-top:10px">'
+      +'<button onclick="addTier()" class="btn" style="font-size:12px"><i class="ti ti-plus"></i> Add Tier</button>'
+    +'</div>';
   el.innerHTML=h;
 }
 
@@ -2266,32 +3430,52 @@ function previewTier(i){
   if(col&&lbl&&prev){prev.style.background=col.value;prev.textContent=lbl.value;}
 }
 
-function applyTiers(){
-  var newTiers=[];
+function addTier(){
+  // Collect current values first
+  _collectTierEdits();
+  // Insert a new tier above the last (lowest) tier
+  var insertIdx=Math.max(0,TIERS.length-1);
+  // Pick a sensible default min between last two tiers
+  var prevMin=insertIdx>0?TIERS[insertIdx-1].min:100;
+  var lastMin=TIERS[insertIdx].min;
+  var newMin=Math.round((prevMin+lastMin)/2);
+  TIERS.splice(insertIdx,0,{min:newMin,color:'#888888',hex:'888888',label:'New Tier',risk:'Custom threshold'});
+  renderTiersEditor();
+}
+
+function deleteTier(i){
+  if(TIERS.length<=2){toast('At least 2 tiers required');return;}
+  _collectTierEdits();
+  TIERS.splice(i,1);
+  TIERS[TIERS.length-1].min=0;
+  renderTiersEditor();
+}
+
+function _collectTierEdits(){
   for(var i=0;i<TIERS.length;i++){
     var minEl=document.getElementById('tier_min_'+i);
     var colEl=document.getElementById('tier_col_'+i);
     var lblEl=document.getElementById('tier_lbl_'+i);
     var riskEl=document.getElementById('tier_risk_'+i);
-    if(!colEl)continue;
-    var col=colEl.value;
-    newTiers.push({
-      min:minEl?parseInt(minEl.value)||0:0,
-      color:col,hex:col.replace('#',''),
-      label:lblEl?lblEl.value:'',
-      risk:riskEl?riskEl.value:''
-    });
+    if(colEl)TIERS[i].color=colEl.value,TIERS[i].hex=colEl.value.replace('#','');
+    if(lblEl)TIERS[i].label=lblEl.value;
+    if(riskEl)TIERS[i].risk=riskEl.value;
+    if(minEl)TIERS[i].min=parseInt(minEl.value)||0;
   }
-  newTiers.sort(function(a,b){return b.min-a.min;});
-  newTiers[newTiers.length-1].min=0;
-  TIERS=newTiers;
-  threshGreen=TIERS[0].min;threshYellow=TIERS[1].min;
+}
+
+function applyTiers(){
+  _collectTierEdits();
+  TIERS.sort(function(a,b){return b.min-a.min;});
+  TIERS[TIERS.length-1].min=0;
+  threshGreen=TIERS[0].min;
+  threshYellow=TIERS[1]?TIERS[1].min:70;
   renderTiersEditor();
   renderSuppliersList();
   updateBadgeColors();
   buildTlChips('ov_tl_chips','toggleOvFilter',ovFilterColor);
   buildTlChips('det_tl_chips','toggleDetFilter',detFilterColor);
-  toast('Thresholds applied');
+  toast('Tiers saved');
 }
 
 function resetTiers(){
@@ -2302,7 +3486,7 @@ function resetTiers(){
   updateBadgeColors();
   buildTlChips('ov_tl_chips','toggleOvFilter',ovFilterColor);
   buildTlChips('det_tl_chips','toggleDetFilter',detFilterColor);
-  toast('Thresholds reset to default');
+  toast('Tiers reset to default');
 }
 
 // ── AI Features ───────────────────────────────────────────────────────────────
