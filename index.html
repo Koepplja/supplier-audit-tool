@@ -526,6 +526,10 @@ input[type=range]{flex:2;accent-color:#185FA5}
           <option value="">-- None --</option>
         </select>
       </div>
+      <div style="grid-column:1/-1;display:none" id="actCheckpointNoteRow">
+        <label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;margin-bottom:6px"><i class="ti ti-note"></i> Notiz / Evidenz vom Checkpoint <span id="actCheckpointScore" style="font-weight:700"></span></label>
+        <div id="actCheckpointNote" style="font-size:13px;color:var(--text);background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:8px 10px;white-space:pre-wrap;line-height:1.5;max-height:140px;overflow:auto"></div>
+      </div>
       <div style="grid-column:1/-1;display:none" id="actCheckpointPhotosRow">
         <label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;margin-bottom:8px"><i class="ti ti-camera"></i> Checkpoint photos — select to carry over to this task</label>
         <div id="actCheckpointPhotos" style="display:flex;gap:8px;flex-wrap:wrap"></div>
@@ -1000,7 +1004,7 @@ function parseSupplier(wb,filename,detected){
 function aiImportExcel(file){
   if(!file)return;
   if(!getApiKey()){alert('Please enter your Anthropic API key in Settings first.');return;}
-  setStatus('<i class="ti ti-sparkles"></i> AI is analysing your Excel file...');
+  setStatus(aiLoaderHtml('AI is analysing your Excel file…','aiElapsed_imp'));aiTimerStart('aiElapsed_imp');
   var reader=new FileReader();
   reader.onload=function(e){
     try{
@@ -1021,6 +1025,7 @@ function aiImportExcel(file){
       callClaude(prompt,
         'You are a data import expert. Analyse Excel structures carefully. Return only valid JSON arrays. Column indices are 0-based integers or null.',
         function(text){
+          aiTimerStop('aiElapsed_imp');
           var mapping;
           try{var m=text.match(/\[[\s\S]*\]/);mapping=JSON.parse(m[0]);}
           catch(ex){setStatus('AI could not parse the structure. Try Standard Import.');return;}
@@ -1028,7 +1033,7 @@ function aiImportExcel(file){
           showAiImportModal(wb,previews,mapping,file.name);
         }
       );
-    }catch(err){setStatus('Error reading file: '+err.message);}
+    }catch(err){aiTimerStop('aiElapsed_imp');setStatus('Error reading file: '+err.message);}
   };
   reader.readAsArrayBuffer(file);
 }
@@ -1239,15 +1244,15 @@ function renderActions(){
       var dueStr=due?due.toLocaleDateString('de-DE'):'—';
       if(isOverdue)dueStr='<span style="color:#C0392B;font-weight:600">'+dueStr+' ⚠</span>';
       var chk=_selActions.has(a.id);
-      return '<tr style="'+(a.status==='Done'?'opacity:.6':'')+(chk?';background:var(--primary)0D':'')+'" onclick="toggleActionSelect('+a.id+',event)">'
+      return '<tr style="cursor:pointer;'+(a.status==='Done'?'opacity:.6':'')+(chk?';background:var(--primary)0D':'')+'" onclick="openActionModal('+a.id+')" title="Click to open">'
         +'<td style="padding-left:10px" onclick="event.stopPropagation()"><input type="checkbox" '+(chk?'checked':'')+' onchange="toggleActionSelect('+a.id+',event)" style="width:15px;height:15px;cursor:pointer"></td>'
         +'<td><span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:'+pc+'22;color:'+pc+'">'+a.priority+'</span></td>'
-        +'<td style="font-weight:500;max-width:220px">'
-          +'<div style="display:flex;align-items:center;gap:6px">'
-            +'<span title="'+esc(a.title)+'">'+esc(a.title)+'</span>'
+        +'<td style="font-weight:500;max-width:340px">'
+          +'<div style="display:flex;align-items:flex-start;gap:6px">'
+            +'<span>'+esc(a.title)+'</span>'
             +(a.images&&a.images.length?'<span onclick="event.stopPropagation();openActionImgViewer('+a.id+',0)" title="View photos" style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;background:#185FA518;color:#185FA5;cursor:pointer;flex-shrink:0"><i class="ti ti-camera" style="font-size:11px"></i>'+a.images.length+'</span>':'')
           +'</div>'
-          +(a.checkpoint?'<div style="font-size:11px;color:var(--text2);margin-top:2px">↳ '+esc(a.checkpoint.slice(0,60))+(a.checkpoint.length>60?'…':'')+'</div>':'')
+          +(a.checkpoint?'<div style="font-size:11px;color:var(--text2);margin-top:2px;line-height:1.4">↳ '+esc(a.checkpoint)+'</div>':'')
         +'</td>'
         +'<td style="font-size:12px">'+esc(a.supplier||'—')+'</td>'
         +'<td style="font-size:12px">'+esc(a.category||'—')+'</td>'
@@ -1568,15 +1573,31 @@ function populateActCheckpointSelect(selectedCp){
 function renderActCheckpointPhotos(){
   var row=document.getElementById('actCheckpointPhotosRow');
   var container=document.getElementById('actCheckpointPhotos');
+  var noteRow=document.getElementById('actCheckpointNoteRow');
+  var noteEl=document.getElementById('actCheckpointNote');
+  var scoreEl=document.getElementById('actCheckpointScore');
   if(!row||!container)return;
   var supName=document.getElementById('actSupplier').value;
   var catName=document.getElementById('actCategory').value;
   var cpText=document.getElementById('actCheckpoint').value;
-  if(!supName||!catName||!cpText){row.style.display='none';return;}
-  var sup=suppliers.find(function(s){return s.name===supName;});
-  if(!sup){row.style.display='none';return;}
-  var items=sup.categories[catName]||[];
-  var item=items.find(function(i){return i.checkpoint===cpText;});
+  var item=null;
+  if(supName&&catName&&cpText){
+    var sup=suppliers.find(function(s){return s.name===supName;});
+    if(sup){var items=sup.categories[catName]||[];item=items.find(function(i){return i.checkpoint===cpText;})||null;}
+  }
+  // Read-only note / evidence carried over from the checkpoint
+  if(noteRow&&noteEl){
+    if(item&&item.notes&&item.notes.trim()){
+      noteEl.textContent=item.notes;
+      if(scoreEl){
+        var sv=item.score;
+        if(sv!==null&&sv!==undefined&&sv!==''){var col=sv==='N.A.'?'var(--text3)':(typeof sv==='number'?sc((sv/5)*100):'var(--text3)');scoreEl.textContent='· Score: '+sv;scoreEl.style.color=col;}
+        else{scoreEl.textContent='';}
+      }
+      noteRow.style.display='';
+    } else { noteRow.style.display='none'; }
+  }
+  // Photos
   if(!item||!item.images||!item.images.length){row.style.display='none';return;}
   row.style.display='';
   var existingData=new Set((_actExistingImages||[]).map(function(im){return im.data;}));
@@ -3669,7 +3690,19 @@ function callClaude(userMsg,systemMsg,onResult,onLoading){
   .catch(function(err){if(onLoading)onLoading(false);alert('AI request failed: '+err.message);});
 }
 
+// ── Shared AI loading indicator — consistent look across ALL AI features ──
+function aiLoaderHtml(msg,id){
+  return '<div style="padding:18px 16px;color:var(--text2);font-size:13px">'
+    +'<div style="display:flex;align-items:center;justify-content:center;gap:8px"><i class="ti ti-loader" style="animation:spin 1s linear infinite;font-size:18px;color:#185FA5"></i><span>'+esc(msg||'AI is working…')+' <span id="'+(id||'aiElapsed')+'" style="color:var(--text3);font-weight:600">0s</span></span></div>'
+    +'<div class="indet-bar"><div></div></div>'
+  +'</div>';
+}
+var _aiTimers={};
+function aiTimerStart(id){id=id||'aiElapsed';aiTimerStop(id);var t0=Date.now();_aiTimers[id]=setInterval(function(){var e=document.getElementById(id);if(e)e.textContent=Math.round((Date.now()-t0)/1000)+'s';},250);}
+function aiTimerStop(id){id=id||'aiElapsed';if(_aiTimers[id]){clearInterval(_aiTimers[id]);delete _aiTimers[id];}}
+
 function showAiModal(title,content){
+  aiTimerStop('aiElapsed_modal');
   var ex=document.getElementById('aiModal');if(ex)ex.remove();
   var m=document.createElement('div');m.id='aiModal';
   m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:3000;display:flex;align-items:flex-end;justify-content:center;padding:16px';
@@ -3684,7 +3717,7 @@ function showAiModal(title,content){
   document.body.appendChild(m);
 }
 
-function showAiLoading(title){showAiModal(title,'<div style="text-align:center;padding:32px;color:var(--text2)"><i class="ti ti-loader" style="font-size:32px;animation:spin 1s linear infinite"></i><div style="margin-top:12px">Analysing with AI...</div></div>');}
+function showAiLoading(title){showAiModal(title,aiLoaderHtml('Analysing with AI…','aiElapsed_modal'));aiTimerStart('aiElapsed_modal');}
 
 function runAI(){
   if(!suppliers.length){alert('No suppliers loaded.');return;}
@@ -3874,16 +3907,15 @@ function _showAiActLoading(){
       +'<div style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:var(--text)"><i class="ti ti-sparkles" style="color:#185FA5"></i> AI Action Suggestions</div>'
       +'<button onclick="document.getElementById(\'aiActModal\').remove()" style="background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px"><i class="ti ti-x"></i></button>'
     +'</div>'
-    +'<div style="padding:32px;text-align:center;color:var(--text2)">'
-      +'<i class="ti ti-loader" style="font-size:36px;animation:spin 1s linear infinite;color:#185FA5"></i>'
-      +'<div style="margin-top:14px;font-size:14px">Analysing audit data and generating action recommendations...</div>'
-    +'</div>'
+    +aiLoaderHtml('Analysing audit data and generating action recommendations…','aiElapsed_act')
   +'</div>';
   m.onclick=function(e){if(e.target===m)m.remove();};
   document.body.appendChild(m);
+  aiTimerStart('aiElapsed_act');
 }
 
 function _showAiActSuggestionsRender(){
+  aiTimerStop('aiElapsed_act');
   var ex=document.getElementById('aiActModal');if(ex)ex.remove();
   var sugg=_aiSuggestions;
   if(!sugg.length){
