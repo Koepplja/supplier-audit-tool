@@ -84,7 +84,7 @@ select,input[type=text],input[type=number]{padding:7px 10px;border:1px solid var
 .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
 .badge.high{background:#E1F5EE;color:#085041}.badge.mid{background:#FAEEDA;color:#633806}.badge.low{background:#FCEBEB;color:#501313}.badge.na{background:var(--bg2);color:var(--text3)}
 .score-input{width:75px;padding:5px 8px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:12px;font-family:inherit}
-.notes-input{width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:12px;font-family:inherit}
+.notes-input{width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:12px;font-family:inherit;resize:none;overflow:hidden;line-height:1.4}
 .weight-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border)}
 .weight-row:last-child{border-bottom:none}.weight-label{flex:1;font-size:13px}.weight-val{min-width:36px;text-align:right;font-size:13px;font-weight:600;color:#185FA5}
 input[type=range]{flex:2;accent-color:#185FA5}
@@ -3342,6 +3342,7 @@ function deleteImg(sup,cat,idx,imgIdx){
   toast('Photo deleted');
 }
 
+function growNote(el){ if(!el)return; el.style.height='auto'; var h=Math.min(el.scrollHeight,200); el.style.height=h+'px'; el.style.overflowY=el.scrollHeight>200?'auto':'hidden'; }
 function renderDataTable(){
   var _ds=document.getElementById('dataSupSelect'),_dc=document.getElementById('dataCatSelect'),el=document.getElementById('dataTableContent');
   if(!_ds||!el)return;
@@ -3400,8 +3401,8 @@ function renderDataTable(){
         +'</td>'
         +'<td style="vertical-align:top"><input class="weight-input" type="number" data-sup="'+esc(sn)+'" data-cat="'+esc(cat)+'" data-idx="'+idx+'" value="'+(item.weight!==undefined?item.weight:1)+'" min="0" max="10" step="0.1" title="Checkpoint weight (0=excluded, 1=normal)" style="width:56px;text-align:center"></td>'
         +'<td>'
-        +'<div style="display:flex;align-items:center;gap:4px">'
-          +'<input class="notes-input" data-sup="'+esc(sn)+'" data-cat="'+esc(cat)+'" data-idx="'+idx+'" value="'+esc(item.notes||'')+'" placeholder="Notes..." style="flex:1;min-width:0">'
+        +'<div style="display:flex;align-items:flex-start;gap:4px">'
+          +'<textarea class="notes-input" rows="1" data-sup="'+esc(sn)+'" data-cat="'+esc(cat)+'" data-idx="'+idx+'" placeholder="Notes..." oninput="growNote(this)" style="flex:1;min-width:0">'+esc(item.notes||'')+'</textarea>'
           +'<button onclick="openNotesExpand(\''+esc(sn)+'\',\''+esc(cat)+'\','+idx+')" title="Expand notes editor" style="background:none;border:none;cursor:pointer;color:var(--text2);padding:2px;flex-shrink:0" onmouseover="this.style.color=\'var(--primary)\'" onmouseout="this.style.color=\'var(--text2)\'"><i class="ti ti-arrows-maximize" style="font-size:13px"></i></button>'
           +'<button id="ai_note_'+esc(sn).replace(/\W/g,"_")+'_'+esc(cat).replace(/\W/g,"_")+'_'+idx+'" onclick="aiImproveNote(\''+esc(sn)+'\',\''+esc(cat)+'\','+idx+')" title="Improve note with AI" style="background:none;border:none;cursor:pointer;color:#185FA5;padding:2px;flex-shrink:0"><i class="ti ti-sparkles" style="font-size:13px"></i></button>'
         +'</div>'
@@ -3420,6 +3421,7 @@ function renderDataTable(){
     h+='</tbody></table></div></div>';
   });
   el.innerHTML=h||'<div class="empty">No data</div>';
+  el.querySelectorAll('textarea.notes-input').forEach(growNote);
 }
 function toggleRubricPanel(btn){
   var panel=btn.parentElement.nextElementSibling;
@@ -3444,7 +3446,7 @@ function openNotesExpand(sn,cat,idx){
 function saveNotesExpand(){
   var val=document.getElementById('notesExpandArea').value;
   var inp=document.querySelector('.notes-input[data-sup="'+_notesExpandTarget.sn+'"][data-cat="'+_notesExpandTarget.cat+'"][data-idx="'+_notesExpandTarget.idx+'"]');
-  if(inp)inp.value=val;
+  if(inp){inp.value=val;growNote(inp);}
   // Also persist immediately to the data model
   var s=suppliers.find(function(x){return x.name===_notesExpandTarget.sn;});
   if(s&&s.categories[_notesExpandTarget.cat]&&s.categories[_notesExpandTarget.cat][_notesExpandTarget.idx]){
@@ -3793,7 +3795,7 @@ function acceptAiNote(sn,cat,idx){
   if(!tEl)return;
   var improved=tEl.textContent;
   var noteEl=document.querySelector('.notes-input[data-sup="'+sn+'"][data-cat="'+cat+'"][data-idx="'+idx+'"]');
-  if(noteEl)noteEl.value=improved;
+  if(noteEl){noteEl.value=improved;growNote(noteEl);}
   var s=suppliers.find(function(x){return x.name===sn;});
   if(s&&s.categories[cat]&&s.categories[cat][idx])s.categories[cat][idx].notes=improved;
   var pEl=document.getElementById(prevId);
