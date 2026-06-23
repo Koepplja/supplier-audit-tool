@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -353,12 +353,12 @@ input[type=range]{flex:2;accent-color:#185FA5}
   <!-- Tab: Excel Import -->
   <div class="etab-content" id="ntab-import-content">
     <div style="max-width:900px;margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <span style="font-size:12px;font-weight:600;color:var(--text2)">Import als:</span>
+      <span style="font-size:12px;font-weight:600;color:var(--text2)">Import as:</span>
       <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;padding:6px 11px;border:1px solid var(--border);border-radius:20px">
-        <input type="radio" name="importMode" value="supplier" checked style="accent-color:#185FA5"> Lieferanten-Audit <span style="color:var(--text3);font-size:11px">(mit Bewertungen)</span>
+        <input type="radio" name="importMode" value="supplier" checked style="accent-color:#185FA5"> Supplier audit <span style="color:var(--text3);font-size:11px">(with scores)</span>
       </label>
       <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;padding:6px 11px;border:1px solid var(--border);border-radius:20px">
-        <input type="radio" name="importMode" value="template" style="accent-color:#185FA5"> Checkliste / Vorlage <span style="color:var(--text3);font-size:11px">(nur Struktur)</span>
+        <input type="radio" name="importMode" value="template" style="accent-color:#185FA5"> Checklist / template <span style="color:var(--text3);font-size:11px">(structure only)</span>
       </label>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;max-width:900px">
@@ -536,7 +536,7 @@ input[type=range]{flex:2;accent-color:#185FA5}
         </select>
       </div>
       <div style="grid-column:1/-1;display:none" id="actCheckpointNoteRow">
-        <label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;margin-bottom:6px"><i class="ti ti-note"></i> Notiz / Evidenz vom Checkpoint <span id="actCheckpointScore" style="font-weight:700"></span></label>
+        <label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;margin-bottom:6px"><i class="ti ti-note"></i> Note / evidence from checkpoint <span id="actCheckpointScore" style="font-weight:700"></span></label>
         <div id="actCheckpointNote" style="font-size:13px;color:var(--text);background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:8px 10px;white-space:pre-wrap;line-height:1.5;max-height:140px;overflow:auto"></div>
       </div>
       <div style="grid-column:1/-1;display:none" id="actCheckpointPhotosRow">
@@ -761,7 +761,7 @@ var LOGOS = {
 // Logo position from template Basic layout
 var LOGO_X = 12.55, LOGO_Y = 0.22, LOGO_W = 0.50, LOGO_H = 0.40;
 
-var selectedTheme='ElectricBlue',lang='de';
+var selectedTheme='ElectricBlue',lang='en';
 var suppliers=[],weights={},charts={},templates=[],actions=[];
 var actionIdCounter=1;
 var exportSelectedPptx=new Set(),exportSelectedExcel=new Set(),exportSelectedPdf=new Set();
@@ -973,7 +973,7 @@ function toggleChk(lbl,cbId){const cb=document.getElementById(cbId);cb.checked=!
 function getImportMode(){var r=document.querySelector('input[name="importMode"]:checked');return r?r.value:'supplier';}
 function handleDrop(e){e.preventDefault();e.currentTarget.classList.remove('drag');if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0]);}
 function handleFile(file){
-  if(!file)return;setStatus('<i class="ti ti-loader-2"></i> Lese Datei...');
+  if(!file)return;setStatus('<i class="ti ti-loader-2"></i> Reading file...');
   const reader=new FileReader();
   reader.onload=e=>{
     try{
@@ -984,12 +984,12 @@ function handleFile(file){
       if(getImportMode()==='template'){
         ensureTemplateFromImport(sup.name,sup.categories);
         switchNewTab('builder',document.getElementById('ntab-builder'));
-        setStatus('Checkliste als Vorlage importiert: <strong>'+esc(sup.name)+'</strong> — im Template Builder bearbeitbar');
+        setStatus('Checklist imported as template: <strong>'+esc(sup.name)+'</strong> — editable in Template Builder');
       } else {
         const idx=suppliers.findIndex(s=>s.name===sup.name);
         if(idx>=0)suppliers[idx]=sup;else suppliers.push(sup);
         initWeights(detected);renderSuppliersList();
-        setStatus('Lieferant importiert: <strong>'+esc(sup.name)+'</strong> - '+detected.length+' categories');
+        setStatus('Supplier imported: <strong>'+esc(sup.name)+'</strong> - '+detected.length+' categories');
       }
     }catch(err){setStatus('Fehler: '+err.message);}
   };
@@ -1179,7 +1179,7 @@ function confirmAiImport(){
   renderSuppliersList();
   if(getImportMode()==='template'){
     switchNewTab('builder',document.getElementById('ntab-builder'));
-    setStatus('AI Import: <strong>'+imported+' Checkliste(n) als Vorlage</strong> — im Template Builder bearbeitbar');
+    setStatus('AI Import: <strong>'+imported+' checklist(s) as template</strong> — editable in Template Builder');
     toast('Imported '+imported+' checklist'+(imported!==1?'s':'')+' as template(s)');
   } else {
     setStatus('AI Import complete: <strong>'+imported+' supplier'+(imported!==1?'s':'')+' imported</strong>');
@@ -1195,7 +1195,7 @@ function ensureTemplateFromImport(name, cats){
   Object.keys(cats).forEach(function(c){
     tplCats[c]=(cats[c]||[]).map(function(it,i){return {no:it.no||(i+1),checkpoint:it.checkpoint||'',weight:(it.weight!==undefined?it.weight:1),rubric:it.rubric||null};});
   });
-  var tplName=(name||'Import')+' (Checkliste)';
+  var tplName=(name||'Import')+' (Checklist)';
   var tpl={name:tplName,categories:tplCats};
   var ti=templates.findIndex(function(t){return t.name===tplName;});
   if(ti>=0)templates[ti]=tpl;else templates.push(tpl);
@@ -2110,24 +2110,24 @@ function showFirstRunModal(){
     +'<div style="background:linear-gradient(135deg,var(--primary),#7B2FBE);padding:28px 28px 24px;text-align:center">'
       +'<div style="font-size:36px;margin-bottom:10px">📋</div>'
       +'<div style="font-size:20px;font-weight:800;color:#fff;margin-bottom:6px">Supplier Audit Tool</div>'
-      +'<div style="font-size:13px;color:rgba(255,255,255,.8)">Professionelle Lieferantenaudits — strukturiert, messbar, exportierbar</div>'
+      +'<div style="font-size:13px;color:rgba(255,255,255,.8)">Professional supplier assessments — structured, measurable, exportable</div>'
     +'</div>'
     +'<div style="padding:24px 28px 20px;display:flex;flex-direction:column;gap:10px">'
       +'<div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">How would you like to start?</div>'
 
       +'<button onclick="frDismiss();showPage(\'settings\',document.querySelectorAll(\'.nav-btn\')[document.querySelectorAll(\'.nav-btn\').length-2])" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:2px solid var(--border);border-radius:12px;background:var(--bg2);cursor:pointer;text-align:left;width:100%">'
         +'<div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#185FA5,#0D3B6E);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-rocket" style="color:#fff;font-size:18px"></i></div>'
-        +'<div><div style="font-size:13px;font-weight:700;color:var(--text)">Von vorne starten</div><div style="font-size:11px;color:var(--text2)">API-Key eingeben, Template erstellen, Lieferanten anlegen</div></div>'
+        +'<div><div style="font-size:13px;font-weight:700;color:var(--text)">Start from scratch</div><div style="font-size:11px;color:var(--text2)">Enter API key, create a template, add suppliers</div></div>'
       +'</button>'
 
       +'<button onclick="frDismiss();showPage(\'new\',document.querySelectorAll(\'.nav-btn\')[1])" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:2px solid var(--border);border-radius:12px;background:var(--bg2);cursor:pointer;text-align:left;width:100%">'
         +'<div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#1A8A5A,#0D5C3A);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-upload" style="color:#fff;font-size:18px"></i></div>'
-        +'<div><div style="font-size:13px;font-weight:700;color:var(--text)">Daten importieren</div><div style="font-size:11px;color:var(--text2)">Excel-Datei oder gespeichertes Projekt laden</div></div>'
+        +'<div><div style="font-size:13px;font-weight:700;color:var(--text)">Import data</div><div style="font-size:11px;color:var(--text2)">Load an Excel file or a saved project</div></div>'
       +'</button>'
 
       +'<button onclick="frLoadDemo()" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:2px solid var(--border);border-radius:12px;background:var(--bg2);cursor:pointer;text-align:left;width:100%">'
         +'<div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#E07B00,#8B4A00);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-eye" style="color:#fff;font-size:18px"></i></div>'
-        +'<div><div style="font-size:13px;font-weight:700;color:var(--text)">Demo laden</div><div style="font-size:11px;color:var(--text2)">Beispieldaten anzeigen — ideal zum Ausprobieren</div></div>'
+        +'<div><div style="font-size:13px;font-weight:700;color:var(--text)">Load demo</div><div style="font-size:11px;color:var(--text2)">Show sample data — ideal for trying things out</div></div>'
       +'</button>'
 
       +'<button onclick="frDismiss()" style="font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;padding:6px;margin-top:2px">Close</button>'
@@ -2173,9 +2173,12 @@ function renderAuditWizard(){
 
   var checkpointsHtml=items.map(function(item,ii){
     var sc=item.score;
+    var rubricScores=[0,1,2,3,4,5].filter(function(v){return item.rubric&&item.rubric[v]&&String(item.rubric[v]).trim();});
+    var hasRubric=rubricScores.length>0;
     var btnRow=[0,1,2,3,4,5].map(function(v){
       var cls='score-btn'+(sc===v?' sb-'+v:'');
-      return '<button class="'+cls+'" onclick="awSetScore(\''+esc(cat)+'\','+ii+','+v+')">'+v+'</button>';
+      var tip=(item.rubric&&item.rubric[v]&&String(item.rubric[v]).trim())?' title="'+esc(item.rubric[v])+'"':'';
+      return '<button class="'+cls+'"'+tip+' onclick="awSetScore(\''+esc(cat)+'\','+ii+','+v+')">'+v+'</button>';
     }).join('');
     btnRow+='<button class="score-btn'+(sc==='N.A.'?' sb-na':'')+'" onclick="awSetScore(\''+esc(cat)+'\','+ii+',\'N.A.\')" style="font-size:10px;flex:0.8">N.A.</button>';
     var imgs=item.images||[];
@@ -2189,6 +2192,12 @@ function renderAuditWizard(){
         +'<div style="flex:1">'
           +'<div class="aw-cp-title">'+esc(item.checkpoint)+'</div>'
           +'<div class="score-btn-row">'+btnRow+'</div>'
+          +(hasRubric
+            ? '<button onclick="var p=document.getElementById(\'awrub_'+ii+'\');p.style.display=p.style.display===\'none\'?\'block\':\'none\'" style="background:none;border:none;cursor:pointer;color:#185FA5;font-size:11px;display:inline-flex;align-items:center;gap:4px;padding:4px 0;margin-top:2px"><i class="ti ti-info-circle" style="font-size:13px"></i> Scoring criteria</button>'
+              +'<div id="awrub_'+ii+'" style="display:none;margin-top:2px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px 10px">'
+                +rubricScores.map(function(v){var on=String(sc)===String(v);return '<div class="awrub-row" data-score="'+v+'" style="display:flex;gap:8px;align-items:flex-start;padding:3px 5px;border-radius:4px;'+(on?'background:#185FA51A;font-weight:600;':'')+'"><span style="font-weight:700;color:var(--primary);min-width:14px;text-align:right">'+v+'</span><span style="font-size:11px;color:var(--text);line-height:1.4">'+esc(item.rubric[v])+'</span></div>';}).join('')
+              +'</div>'
+            : '<div style="font-size:10px;color:var(--text3);font-style:italic;margin-top:3px">No scoring criteria defined</div>')
           +'<textarea class="aw-note" rows="2" placeholder="Evidence / Notes (optional)" oninput="awSetNote(\''+esc(cat)+'\','+ii+',this.value)">'+esc(item.notes||'')+'</textarea>'
           +'<div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap">'
             +thumbs
@@ -2253,6 +2262,8 @@ function awSetScore(cat,idx,val){
       if(v===val){btn.className='score-btn '+(v==='N.A.'?'sb-na':'sb-'+v);}
     });
   }
+  var pan=document.getElementById('awrub_'+idx);
+  if(pan){pan.querySelectorAll('.awrub-row').forEach(function(rw){var on=rw.getAttribute('data-score')===String(val);rw.style.background=on?'#185FA51A':'transparent';rw.style.fontWeight=on?'600':'400';});}
 }
 
 function awSetNote(cat,idx,val){
@@ -2371,13 +2382,13 @@ function aiGenerateTemplate(){
         +'<div id="aiTpl_customList" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>'
       +'</div>'
 
-      +'<div><label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">Bewertungsansatz / Approach</label>'
+      +'<div><label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">Approach</label>'
         +'<select id="aiTpl_approach" style="width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text)">'
-          +'<option value="assessment">Assessment — Reifegrad &amp; Potenzial (Beratungsfokus)</option>'
-          +'<option value="mixed" selected>Gemischt — Reifegrad + strukturierte Pr&uuml;fpunkte</option>'
-          +'<option value="audit">Audit — Konformit&auml;t &amp; Nachweis</option>'
+          +'<option value="assessment">Assessment — maturity &amp; potential (advisory focus)</option>'
+          +'<option value="mixed" selected>Mixed — maturity + structured checks</option>'
+          +'<option value="audit">Audit — conformity &amp; evidence</option>'
         +'</select>'
-        +'<div style="font-size:11px;color:var(--text3);margin-top:4px">Steuert, wie die KI die Checkpoints formuliert (Reifegrad-Frage vs. Pr&uuml;f-Anforderung) — flie&szlig;t direkt in den Prompt ein.</div>'
+        +'<div style="font-size:11px;color:var(--text3);margin-top:4px">Controls how the AI phrases checkpoints (maturity question vs. compliance requirement) — fed directly into the prompt.</div>'
       +'</div>'
 
       +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">'
