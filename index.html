@@ -352,6 +352,15 @@ input[type=range]{flex:2;accent-color:#185FA5}
 
   <!-- Tab: Excel Import -->
   <div class="etab-content" id="ntab-import-content">
+    <div style="max-width:900px;margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <span style="font-size:12px;font-weight:600;color:var(--text2)">Import als:</span>
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;padding:6px 11px;border:1px solid var(--border);border-radius:20px">
+        <input type="radio" name="importMode" value="supplier" checked style="accent-color:#185FA5"> Lieferanten-Audit <span style="color:var(--text3);font-size:11px">(mit Bewertungen)</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;padding:6px 11px;border:1px solid var(--border);border-radius:20px">
+        <input type="radio" name="importMode" value="template" style="accent-color:#185FA5"> Checkliste / Vorlage <span style="color:var(--text3);font-size:11px">(nur Struktur)</span>
+      </label>
+    </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;max-width:900px">
       <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()"
         ondragover="ev=event;ev.preventDefault();ev.currentTarget.classList.add('drag')"
@@ -961,6 +970,7 @@ function switchExportTab(id,btn){
 }
 function toggleChk(lbl,cbId){const cb=document.getElementById(cbId);cb.checked=!cb.checked;lbl.classList.toggle('on',cb.checked);}
 
+function getImportMode(){var r=document.querySelector('input[name="importMode"]:checked');return r?r.value:'supplier';}
 function handleDrop(e){e.preventDefault();e.currentTarget.classList.remove('drag');if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0]);}
 function handleFile(file){
   if(!file)return;setStatus('<i class="ti ti-loader-2"></i> Lese Datei...');
@@ -971,10 +981,16 @@ function handleFile(file){
       const detected=wb.SheetNames.filter(s=>isAuditSheet(XLSX.utils.sheet_to_json(wb.Sheets[s],{header:1,defval:null})));
       if(!detected.length){setStatus('No audit sheets detected.');return;}
       const sup=parseSupplier(wb,file.name,detected);
-      const idx=suppliers.findIndex(s=>s.name===sup.name);
-      if(idx>=0)suppliers[idx]=sup;else suppliers.push(sup);
-      initWeights(detected);renderSuppliersList();
-      setStatus('Importiert: <strong>'+esc(sup.name)+'</strong> - '+detected.length+' categories: '+detected.join(', '));
+      if(getImportMode()==='template'){
+        ensureTemplateFromImport(sup.name,sup.categories);
+        switchNewTab('builder',document.getElementById('ntab-builder'));
+        setStatus('Checkliste als Vorlage importiert: <strong>'+esc(sup.name)+'</strong> — im Template Builder bearbeitbar');
+      } else {
+        const idx=suppliers.findIndex(s=>s.name===sup.name);
+        if(idx>=0)suppliers[idx]=sup;else suppliers.push(sup);
+        initWeights(detected);renderSuppliersList();
+        setStatus('Lieferant importiert: <strong>'+esc(sup.name)+'</strong> - '+detected.length+' categories');
+      }
     }catch(err){setStatus('Fehler: '+err.message);}
   };
   reader.readAsArrayBuffer(file);
@@ -1149,18 +1165,42 @@ function confirmAiImport(){
     }
     if(!Object.keys(cats).length)return;
     var supName=m.supplierName||m.sheet;
-    var sup={name:supName,categories:cats};
-    var idx=suppliers.findIndex(function(s){return s.name===supName;});
-    if(idx>=0)suppliers[idx]=sup;else suppliers.push(sup);
+    if(getImportMode()==='template'){
+      ensureTemplateFromImport(supName,cats);
+    } else {
+      var sup={name:supName,categories:cats};
+      var idx=suppliers.findIndex(function(s){return s.name===supName;});
+      if(idx>=0)suppliers[idx]=sup;else suppliers.push(sup);
+    }
     initWeights(Object.keys(cats));
     imported++;
   });
   var mo=document.getElementById('aiModal');if(mo)mo.remove();
   renderSuppliersList();
-  setStatus('AI Import complete: <strong>'+imported+' supplier'+(imported!==1?'s':'')+' imported</strong>');
-  toast('Imported '+imported+' supplier'+(imported!==1?'s':''));
+  if(getImportMode()==='template'){
+    switchNewTab('builder',document.getElementById('ntab-builder'));
+    setStatus('AI Import: <strong>'+imported+' Checkliste(n) als Vorlage</strong> — im Template Builder bearbeitbar');
+    toast('Imported '+imported+' checklist'+(imported!==1?'s':'')+' as template(s)');
+  } else {
+    setStatus('AI Import complete: <strong>'+imported+' supplier'+(imported!==1?'s':'')+' imported</strong>');
+    toast('Imported '+imported+' supplier'+(imported!==1?'s':''));
+  }
 }
 // ── End AI Import ────────────────────────────────────────────────────────────
+
+// Derive an editable checklist template from an imported supplier structure (scores/notes stripped)
+function ensureTemplateFromImport(name, cats){
+  if(!cats||!Object.keys(cats).length)return;
+  var tplCats={};
+  Object.keys(cats).forEach(function(c){
+    tplCats[c]=(cats[c]||[]).map(function(it,i){return {no:it.no||(i+1),checkpoint:it.checkpoint||'',weight:(it.weight!==undefined?it.weight:1),rubric:it.rubric||null};});
+  });
+  var tplName=(name||'Import')+' (Checkliste)';
+  var tpl={name:tplName,categories:tplCats};
+  var ti=templates.findIndex(function(t){return t.name===tplName;});
+  if(ti>=0)templates[ti]=tpl;else templates.push(tpl);
+  if(typeof renderTplBuilderList==='function')renderTplBuilderList();
+}
 
 // ── Actions ───────────────────────────────────────────────────────────────────
 var ACT_PRIO_COLOR={High:'#C0392B',Medium:'#E07B00',Low:'#1A8A5A'};
@@ -1816,6 +1856,7 @@ function renameTplCat(oldName,newName){
   Object.keys(cats).forEach(function(k){rebuilt[k===oldName?newName:k]=cats[k];});
   tplDraft.categories=rebuilt;
   if(weights[oldName]!==undefined&&weights[newName]===undefined){weights[newName]=weights[oldName];delete weights[oldName];}
+  renderTplEditor(); // re-render so all per-category buttons reference the new name (fixes "Add checkpoint" not working after rename)
 }
 
 function deleteTplCat(cat){
