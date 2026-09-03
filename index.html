@@ -68,11 +68,11 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
 .card{background:var(--bg);border:1px solid var(--border-soft);border-radius:var(--rl);padding:18px;margin-bottom:var(--sp4);box-shadow:var(--shadow-sm)}
 .btn{padding:8px 16px;border:1px solid var(--border2);border-radius:var(--r);background:transparent;color:var(--text);cursor:pointer;font-size:13px;display:inline-flex;align-items:center;gap:6px;transition:all .15s;font-family:inherit}
 .btn:hover{background:var(--bg2)}.btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}.btn.primary:hover{background:var(--primary-dark)}
-.btn.success{background:#0F6E56;color:#fff;border-color:#0F6E56}.btn.success:hover{background:#085041}
-.btn.warn{background:#854F0B;color:#fff;border-color:#854F0B}.btn.sm{padding:5px 10px;font-size:12px}
+.btn.success{background:var(--primary);color:#fff;border-color:var(--primary)}.btn.success:hover{background:var(--primary-dark)}
+.btn.warn{background:var(--warn);color:#fff;border-color:var(--warn)}.btn.warn:hover{filter:brightness(.94)}.btn.sm{padding:5px 10px;font-size:12px}
 .btn.danger{background:var(--crit);color:#fff;border-color:var(--crit)}.btn.danger:hover{filter:brightness(.92);background:var(--crit)}
 /* Styled confirm dialog (uiConfirm) */
-.ui-confirm-ov{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(15,20,30,.5);backdrop-filter:blur(2px);opacity:0;transition:opacity .14s}
+.ui-confirm-ov{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(15,20,30,.5);backdrop-filter:blur(2px);opacity:0;transition:opacity .14s}
 .ui-confirm-ov.show{opacity:1}
 .ui-confirm{background:var(--bg);border:1px solid var(--border);border-radius:16px;box-shadow:0 18px 50px rgba(0,0,0,.28);padding:26px 26px 20px;width:400px;max-width:100%;text-align:center;transform:translateY(8px) scale(.98);transition:transform .16s}
 .ui-confirm-ov.show .ui-confirm{transform:none}
@@ -82,6 +82,27 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
 .ui-confirm-msg{font-size:13.5px;color:var(--text2);line-height:1.5;white-space:pre-line}
 .ui-confirm-btns{display:flex;gap:9px;margin-top:20px}
 .ui-confirm-btns .btn{flex:1;justify-content:center;padding:9px 16px}
+.ui-confirm-input{width:100%;box-sizing:border-box;margin-top:16px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;text-align:left}
+.ui-confirm-input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 18%,transparent)}
+.project-menu{position:fixed;z-index:5000;width:300px;max-width:calc(100vw - 16px);background:var(--bg);border:1px solid var(--border);border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.28);overflow:hidden;animation:pmIn .12s ease-out}
+@keyframes pmIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.project-menu .pm-head{padding:11px 14px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text3);display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border)}
+.project-menu .pm-list{max-height:320px;overflow:auto;padding:6px}
+.project-menu .pm-row{display:flex;align-items:center;gap:2px;border-radius:8px}
+.project-menu .pm-row:hover{background:var(--bg2)}
+.project-menu .pm-row.cur{background:color-mix(in srgb,var(--primary) 9%,transparent)}
+.project-menu .pm-open{flex:1;min-width:0;display:flex;align-items:center;gap:9px;background:none;border:none;cursor:pointer;padding:9px 10px;text-align:left;color:var(--text);font-family:inherit;font-size:13px}
+.project-menu .pm-open i{color:var(--primary);font-size:16px;flex-shrink:0}
+.project-menu .pm-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+.project-menu .pm-when{font-size:11px;color:var(--text3);white-space:nowrap;flex-shrink:0}
+.project-menu .pm-badge{font-size:10px;font-weight:700;color:var(--primary);background:color-mix(in srgb,var(--primary) 14%,transparent);border-radius:20px;padding:2px 8px;flex-shrink:0}
+.project-menu .pm-ic{background:none;border:none;cursor:pointer;color:var(--text3);padding:7px;border-radius:7px;flex-shrink:0;display:inline-flex}
+.project-menu .pm-ic:hover{color:var(--text);background:var(--bg3)}
+.project-menu .pm-ic.danger:hover{color:var(--crit);background:color-mix(in srgb,var(--crit) 12%,transparent)}
+.project-menu .pm-empty{padding:16px 14px;color:var(--text3);text-align:center;font-size:12.5px}
+.project-menu .pm-new{display:flex;gap:6px;padding:10px;border-top:1px solid var(--border);background:var(--bg2)}
+.project-menu .pm-new input{flex:1;min-width:0;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:12.5px;font-family:inherit}
+.project-menu .pm-new .btn{padding:8px 12px}
 select,input[type=text],input[type=number]{padding:7px 10px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:13px;font-family:inherit}
 .upload-zone{border:2px dashed var(--border2);border-radius:var(--rl);padding:48px 24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg)}
 .upload-zone:hover,.upload-zone.drag{border-color:var(--primary);background:var(--info-bg)}
@@ -153,7 +174,7 @@ select,input[type=text],input[type=number]{padding:7px 10px;border:1px solid var
 .data-table td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
 .data-table tr:last-child td{border-bottom:none}.data-table tbody tr:hover td{background:var(--bg2)}
 .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
-.badge.high{background:#E1F5EE;color:#085041}.badge.mid{background:#FAEEDA;color:#633806}.badge.low{background:#FCEBEB;color:#501313}.badge.na{background:var(--bg2);color:var(--text3)}
+.badge.high{background:var(--good-bg);color:var(--good)}.badge.mid{background:var(--warn-bg);color:var(--warn)}.badge.low{background:var(--crit-bg);color:var(--crit)}.badge.na{background:var(--bg2);color:var(--text3)}
 .score-input{width:75px;padding:5px 8px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:12px;font-family:inherit}
 .notes-input{width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:12px;font-family:inherit;resize:none;overflow:hidden;line-height:1.4}
 .weight-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border)}
@@ -264,6 +285,8 @@ input[type=range]{flex:2;accent-color:var(--primary)}
 .au-rr .rn{font-weight:700;color:var(--text3);min-width:12px;font-variant-numeric:tabular-nums}
 .au-rr.hot .rn{color:var(--primary)}
 .au-notes{width:100%;border:1px solid var(--border2);border-radius:9px;background:var(--bg);color:var(--text);font-family:inherit;font-size:13px;padding:10px 12px;resize:vertical;min-height:70px}
+.cmp-cell{transition:background .12s;border-radius:6px}
+.cmp-cell:hover{background:color-mix(in srgb,var(--primary) 9%,transparent)}
 .au-foot{display:flex;gap:8px;margin-top:14px;align-items:center;flex-wrap:wrap}
 
 /* Ledger grid (dense table view) */
@@ -365,15 +388,15 @@ input[type="color"].cp-swatch::-moz-color-swatch{border:none;border-radius:calc(
 .score-btn.sb-1{background:var(--crit);border-color:var(--crit);color:#fff}
 .score-btn.sb-2{background:var(--warn);border-color:var(--warn);color:#fff}
 .score-btn.sb-3{background:var(--warn);border-color:var(--warn);color:#fff}
-.score-btn.sb-4{background:#2E86AB;border-color:#2E86AB;color:#fff}
+.score-btn.sb-4{background:var(--accent);border-color:var(--accent);color:#fff}
 .score-btn.sb-5{background:var(--good);border-color:var(--good);color:#fff}
-.score-btn.sb-0{background:#8B0000;border-color:#8B0000;color:#fff}
+.score-btn.sb-0{background:color-mix(in srgb,var(--crit) 78%,#000);border-color:color-mix(in srgb,var(--crit) 78%,#000);color:#fff}
 .score-btn.sb-na{background:var(--text3);border-color:var(--text3);color:#fff;font-size:11px}
 .aw-note{width:100%;border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:12px;background:var(--bg);color:var(--text);resize:none;box-sizing:border-box;font-family:inherit;margin-top:2px}
 .filter-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
 .filter-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer;transition:all .15s;background:var(--bg)}
 .filter-chip:hover{background:var(--bg2)}.filter-chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
-.filter-chip.red.active{background:#A32D2D;border-color:#A32D2D}.filter-chip.yellow.active{background:#854F0B;border-color:#854F0B}.filter-chip.green.active{background:#0F6E56;border-color:#0F6E56}
+.filter-chip.red.active{background:var(--crit);border-color:var(--crit)}.filter-chip.yellow.active{background:var(--warn);border-color:var(--warn)}.filter-chip.green.active{background:var(--good);border-color:var(--good)}
 .theme-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:16px}
 .theme-card{border:2px solid var(--border);border-radius:var(--rl);padding:12px 10px;cursor:pointer;transition:all .15s;text-align:center}
 .theme-card:hover{border-color:var(--border2)}.theme-card.selected{border-width:2.5px}
@@ -402,7 +425,7 @@ input[type="color"].cp-swatch::-moz-color-swatch{border:none;border-radius:calc(
 .thresh-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:13px}
 .thresh-row label{min-width:80px;color:var(--text2)}.thresh-row input[type=number]{width:70px}
 .color-dot{width:14px;height:14px;border-radius:50%;display:inline-block;flex-shrink:0}
-.toast{position:fixed;bottom:20px;right:20px;background:#0F6E56;color:#fff;padding:10px 18px;border-radius:var(--r);font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999;display:flex;align-items:center;gap:8px}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--primary);color:#fff;padding:10px 18px;border-radius:var(--r);font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999;display:flex;align-items:center;gap:8px}
 .toast.show{opacity:1}
 .tabs-row{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:16px}
 .etab{padding:9px 18px;border:none;background:none;cursor:pointer;font-size:13px;color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;font-family:inherit}
@@ -1403,7 +1426,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
           <div style="display:flex;flex-direction:column;gap:6px" id="modelPicker">
             <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r)">
               <input type="radio" name="aiModel" value="claude-haiku-4-5-20251001" checked style="margin-top:2px">
-              <div><div style="font-size:13px;font-weight:600">Haiku 4.5 <span style="background:#E8F5E9;color:var(--good);font-size:10px;padding:2px 6px;border-radius:4px;font-weight:700">Recommended</span></div><div style="font-size:11px;color:var(--text2);margin-top:2px">Fastest · Cheapest · ~$0.001/request · Best for daily use</div></div>
+              <div><div style="font-size:13px;font-weight:600">Haiku 4.5 <span style="background:var(--good-bg);color:var(--good);font-size:10px;padding:2px 6px;border-radius:4px;font-weight:700">Recommended</span></div><div style="font-size:11px;color:var(--text2);margin-top:2px">Fastest · Cheapest · ~$0.001/request · Best for daily use</div></div>
             </label>
             <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r)">
               <input type="radio" name="aiModel" value="claude-sonnet-5" style="margin-top:2px">
@@ -1888,6 +1911,7 @@ function openProjectPicker(force){
 }
 function renderProjectPicker(list){
   var el=document.getElementById('projectPicker'); if(!el)return;
+  if(typeof closeProjectMenu==='function')closeProjectMenu();
   document.getElementById('appRoot').style.display='none';
   var rows=list.length?list.map(function(p){
     var when=p.updated_at?new Date(p.updated_at).toLocaleString():'';
@@ -1910,7 +1934,7 @@ function renderProjectPicker(list){
   el.style.display='flex';
 }
 function createProjectFromInput(){
-  var inp=document.getElementById('newProjectName');
+  var inp=document.getElementById('pmNewName')||document.getElementById('newProjectName');
   var name=(inp&&inp.value.trim())||'Untitled Project';
   supa.from('projects').insert({user_id:_cloudUser.id,name:name,data:{}}).select('id').single().then(function(res){
     if(res.error){toast('Create failed: '+res.error.message,'var(--crit)');return;}
@@ -1928,6 +1952,7 @@ function openProject(id){
     applyProjectData(res.data.data||{});
     renderThemeGrid();
     _cloudSuppressAutosave=false;
+    closeProjectMenu();
     document.getElementById('projectPicker').style.display='none';
     document.getElementById('appRoot').style.display='block';
     showPage('import',document.querySelector('.nav-btn'));
@@ -1937,22 +1962,82 @@ function openProject(id){
     toast('Opened “'+_currentProjectName+'”');
   });
 }
-function switchProject(){ openProjectPicker(true); }
-function promptRenameProject(id,cur){
-  var name=prompt('Rename project:',cur||'');
+// Switching projects opens a compact dropdown anchored to the topbar button —
+// no full-screen popup. (The full-screen picker stays only as the initial gate
+// before any project is open, in openProjectPicker.)
+var _projectMenuOpen=false;
+function switchProject(){ _projectMenuOpen?closeProjectMenu():openProjectMenu(); }
+function _projectSwitchBtn(){return document.querySelector('.topbar button[onclick*="switchProject"]');}
+function openProjectMenu(){ loadProjectList().then(renderProjectMenu); }
+function closeProjectMenu(){
+  _projectMenuOpen=false;
+  var m=document.getElementById('projectMenu');if(m)m.remove();
+  document.removeEventListener('mousedown',_projectMenuOutside,true);
+  document.removeEventListener('keydown',_projectMenuKey,true);
+}
+function _projectMenuOutside(e){
+  // Keep the menu open while a confirm/prompt dialog (rename, delete) is on top,
+  // so it can refresh in place after the action completes.
+  if(e.target.closest&&e.target.closest('.ui-confirm-ov'))return;
+  var m=document.getElementById('projectMenu'),btn=_projectSwitchBtn();
+  if(m&&!m.contains(e.target)&&!(btn&&btn.contains(e.target)))closeProjectMenu();
+}
+function _projectMenuKey(e){if(e.key==='Escape')closeProjectMenu();}
+function renderProjectMenu(list){
+  var btn=_projectSwitchBtn();
+  var m=document.getElementById('projectMenu');
+  if(!m){m=document.createElement('div');m.id='projectMenu';m.className='project-menu';document.body.appendChild(m);}
+  var rows=(list&&list.length)?list.map(function(p){
+    var cur=p.id===_currentProjectId;
+    var nm=esc((p.name||'').replace(/'/g,"\\'"));
+    var when=p.updated_at?new Date(p.updated_at).toLocaleDateString():'';
+    return '<div class="pm-row'+(cur?' cur':'')+'">'
+      +'<button class="pm-open" onclick="openProject(\''+p.id+'\')">'
+        +'<i class="ti ti-'+(cur?'folder-check':'folder')+'"></i>'
+        +'<span class="pm-name">'+esc(p.name||'Untitled Project')+'</span>'
+        +(cur?'<span class="pm-badge">current</span>':(when?'<span class="pm-when">'+esc(when)+'</span>':''))
+      +'</button>'
+      +'<button class="pm-ic" title="Rename" onclick="promptRenameProject(\''+p.id+'\',\''+nm+'\')"><i class="ti ti-pencil"></i></button>'
+      +'<button class="pm-ic danger" title="Delete" onclick="deleteProject(\''+p.id+'\',\''+nm+'\')"><i class="ti ti-trash"></i></button>'
+    +'</div>';
+  }).join(''):'<div class="pm-empty">No projects yet — create one below.</div>';
+  m.innerHTML='<div class="pm-head"><i class="ti ti-folders"></i> Projects</div>'
+    +'<div class="pm-list">'+rows+'</div>'
+    +'<div class="pm-new">'
+      +'<input id="pmNewName" type="text" placeholder="New project name…" onkeydown="if(event.key===\'Enter\')createProjectFromInput()">'
+      +'<button class="btn primary" onclick="createProjectFromInput()" title="Create project"><i class="ti ti-plus"></i></button>'
+    +'</div>';
+  var r=btn?btn.getBoundingClientRect():{left:12,bottom:50};
+  m.style.top=(r.bottom+6)+'px';
+  m.style.left=Math.max(8,Math.min(r.left,window.innerWidth-320))+'px';
+  if(!_projectMenuOpen){
+    _projectMenuOpen=true;
+    document.addEventListener('mousedown',_projectMenuOutside,true);
+    document.addEventListener('keydown',_projectMenuKey,true);
+  }
+}
+// Refresh whichever project surface is currently visible (dropdown or the
+// initial full-screen picker) after a rename/delete.
+function _refreshProjectSurfaces(){
+  if(_projectMenuOpen){loadProjectList().then(renderProjectMenu);return;}
+  var pp=document.getElementById('projectPicker');
+  if(pp&&pp.style.display!=='none')openProjectPicker(true);
+}
+async function promptRenameProject(id,cur){
+  var name=await uiPrompt({title:'Rename project',value:cur||'',placeholder:'Project name…',confirmText:'Rename',icon:'ti-pencil'});
   if(name==null)return; name=name.trim(); if(!name)return;
   supa.from('projects').update({name:name}).eq('id',id).then(function(res){
     if(res.error){toast('Rename failed: '+res.error.message,'var(--crit)');return;}
     if(id===_currentProjectId){_currentProjectName=name;updateProjectHeaderUI();}
-    openProjectPicker(true);
+    _refreshProjectSurfaces();
   });
 }
 async function deleteProject(id,name){
   if(!(await uiConfirm({title:'Delete project?',message:'“'+(name||'')+'” will be permanently removed. This cannot be undone.',confirmText:'Delete project'})))return;
   supa.from('projects').delete().eq('id',id).then(function(res){
     if(res.error){toast('Delete failed: '+res.error.message,'var(--crit)');return;}
-    if(id===_currentProjectId){_currentProjectId=null;localStorage.removeItem('sat_lastProject');}
-    openProjectPicker(true);
+    if(id===_currentProjectId){_currentProjectId=null;localStorage.removeItem('sat_lastProject');closeProjectMenu();openProjectPicker(true);return;}
+    _refreshProjectSurfaces();
   });
 }
 function updateProjectHeaderUI(){
@@ -2586,7 +2671,7 @@ function allCats(){const s=new Set();suppliers.forEach(sup=>Object.keys(sup.cate
 function destroyChart(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
 function toast(msg,col){
   const el=document.getElementById('toast');
-  el.style.background=col||'#0F6E56';
+  el.style.background=col||'var(--primary)';
   document.getElementById('toastMsg').textContent=msg;
   el.classList.add('show');clearTimeout(el._t);
   el._t=setTimeout(()=>el.classList.remove('show'),3000);
@@ -2624,6 +2709,57 @@ function uiConfirm(opts){
     ov.querySelector('.ui-confirm-ok').onclick=function(){close(true);};
     ov.querySelector('.ui-confirm-cancel').onclick=function(){close(false);};
     ov.addEventListener('mousedown',function(e){if(e.target===ov)close(false);});
+    document.addEventListener('keydown',onKey);
+    requestAnimationFrame(function(){ov.classList.add('show');var ok=ov.querySelector('.ui-confirm-ok');if(ok)ok.focus();});
+  });
+}
+// Styled text-input dialog — replaces the native prompt(). Resolves to the typed
+// string (may be empty) on OK/Enter, or null on Cancel/Escape/backdrop, matching
+// prompt() semantics so callers can keep their existing null/empty checks.
+function uiPrompt(opts){
+  if(typeof opts==='string')opts={message:opts};
+  var o=Object.assign({title:'',message:'',value:'',placeholder:'',confirmText:'Save',cancelText:'Cancel',icon:'ti-pencil'},opts||{});
+  return new Promise(function(resolve){
+    var prev=document.activeElement;
+    var ov=document.createElement('div');ov.className='ui-confirm-ov';
+    ov.innerHTML='<div class="ui-confirm" role="dialog" aria-modal="true">'
+      +'<div class="ui-confirm-ic"><i class="ti '+o.icon+'"></i></div>'
+      +(o.title?'<div class="ui-confirm-title">'+esc(o.title)+'</div>':'')
+      +(o.message?'<div class="ui-confirm-msg">'+esc(o.message)+'</div>':'')
+      +'<input class="ui-confirm-input" type="text" value="'+esc(o.value)+'" placeholder="'+esc(o.placeholder)+'">'
+      +'<div class="ui-confirm-btns">'
+        +'<button class="btn ui-confirm-cancel">'+esc(o.cancelText)+'</button>'
+        +'<button class="btn primary ui-confirm-ok">'+esc(o.confirmText)+'</button>'
+      +'</div></div>';
+    document.body.appendChild(ov);
+    var input=ov.querySelector('.ui-confirm-input');
+    function close(val){ov.classList.remove('show');document.removeEventListener('keydown',onKey);setTimeout(function(){ov.remove();if(prev&&prev.focus)try{prev.focus();}catch(e){}},140);resolve(val);}
+    function onKey(e){if(e.key==='Escape')close(null);else if(e.key==='Enter'){e.preventDefault();close(input.value);}}
+    ov.querySelector('.ui-confirm-ok').onclick=function(){close(input.value);};
+    ov.querySelector('.ui-confirm-cancel').onclick=function(){close(null);};
+    ov.addEventListener('mousedown',function(e){if(e.target===ov)close(null);});
+    document.addEventListener('keydown',onKey);
+    requestAnimationFrame(function(){ov.classList.add('show');input.focus();input.select();});
+  });
+}
+// Styled message dialog — replaces the native uiAlert(). Fire-and-forget: callers
+// that did `uiAlert(msg);return;` keep working since it returns immediately.
+function uiAlert(message,opts){
+  var o=Object.assign({title:'',okText:'OK',icon:'ti-info-circle',danger:false},opts||{});
+  return new Promise(function(resolve){
+    var prev=document.activeElement;
+    var ov=document.createElement('div');ov.className='ui-confirm-ov';
+    ov.innerHTML='<div class="ui-confirm" role="dialog" aria-modal="true">'
+      +'<div class="ui-confirm-ic'+(o.danger?' danger':'')+'"><i class="ti '+o.icon+'"></i></div>'
+      +(o.title?'<div class="ui-confirm-title">'+esc(o.title)+'</div>':'')
+      +'<div class="ui-confirm-msg">'+esc(String(message==null?'':message))+'</div>'
+      +'<div class="ui-confirm-btns"><button class="btn primary ui-confirm-ok">'+esc(o.okText)+'</button></div>'
+    +'</div>';
+    document.body.appendChild(ov);
+    function close(){ov.classList.remove('show');document.removeEventListener('keydown',onKey);setTimeout(function(){ov.remove();if(prev&&prev.focus)try{prev.focus();}catch(e){}},140);resolve();}
+    function onKey(e){if(e.key==='Escape'||e.key==='Enter')close();}
+    ov.querySelector('.ui-confirm-ok').onclick=close;
+    ov.addEventListener('mousedown',function(e){if(e.target===ov)close();});
     document.addEventListener('keydown',onKey);
     requestAnimationFrame(function(){ov.classList.add('show');var ok=ov.querySelector('.ui-confirm-ok');if(ok)ok.focus();});
   });
@@ -3167,7 +3303,7 @@ function parseSupplier(wb,filename,detected){
 // ── AI Import ────────────────────────────────────────────────────────────────
 function aiImportExcel(file){
   if(!file)return;
-  if(!getApiKey()){alert('Please enter your Anthropic API key in Settings first.');return;}
+  if(!getApiKey()){uiAlert('Please enter your Anthropic API key in Settings first.');return;}
   setStatus(aiLoaderHtml('AI is analysing your Excel file…','aiElapsed_imp'));aiTimerStart('aiElapsed_imp');
   var reader=new FileReader();
   reader.onload=function(e){
@@ -3248,7 +3384,7 @@ function renderAiImportModal(){
     +'</button>';
   }
   var h='<div style="margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap">'
-    +'<span style="background:#E8F5E9;color:var(--good);font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px"><i class="ti ti-check"></i> '+audit.length+' assessment sheet'+(audit.length!==1?'s':'')+' detected</span>'
+    +'<span style="background:var(--good-bg);color:var(--good);font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px"><i class="ti ti-check"></i> '+audit.length+' assessment sheet'+(audit.length!==1?'s':'')+' detected</span>'
     +(skipped.length?'<span style="background:var(--bg2);color:var(--text2);font-size:12px;padding:4px 10px;border-radius:20px"><i class="ti ti-ban"></i> '+skipped.length+' sheet'+(skipped.length!==1?'s':'')+' skipped ('+skipped.map(function(s){return s.sheet+(s.reason?' — '+s.reason:'');}).join(', ')+')</span>':'')
     +'</div>';
   h+='<div style="margin-bottom:6px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--text3)">These sheets are…</div>'
@@ -4430,7 +4566,7 @@ function closeActionModal(){
 
 function saveAction(){
   var title=document.getElementById('actTitle').value.trim();
-  if(!title){alert('Please enter a title.');return;}
+  if(!title){uiAlert('Please enter a title.');return;}
   var editId=document.getElementById('actionEditId').value;
   var selectedPhotos=(_actExistingImages||[]).slice();
   // Stamp the audit this action belongs to — preserved on edit. On create it is
@@ -4695,12 +4831,12 @@ function deleteTplCheckpoint(cat,idx){
 async function commitTemplate(){
   if(!tplDraft)return;
   var name=document.getElementById('tplDraftName')?document.getElementById('tplDraftName').value.trim():tplDraft.name.trim();
-  if(!name){alert('Please enter a template name.');return;}
+  if(!name){uiAlert('Please enter a template name.');return;}
   // Check for empty checkpoints
   var hasEmpty=Object.values(tplDraft.categories).some(function(items){return items.some(function(i){return !i.checkpoint.trim();});});
   if(hasEmpty&&!(await uiConfirm({title:'Save template?',message:'Some checkpoints are empty. You can still save now.',confirmText:'Save',danger:false,icon:'ti-device-floppy'})))return;
   tplDraft.name=name;
-  if(!Object.keys(tplDraft.categories).length){alert('Please add at least one category.');return;}
+  if(!Object.keys(tplDraft.categories).length){uiAlert('Please add at least one category.');return;}
   if(tplDraftIdx>=0){
     templates[tplDraftIdx]=JSON.parse(JSON.stringify(tplDraft));
     toast('Template "'+name+'" updated');
@@ -4744,10 +4880,10 @@ function runAssignTemplateToSuppliers(){
   var name=document.getElementById('planAuditName').value.trim();
   var date=document.getElementById('planAuditDate').value;
   var auditor=document.getElementById('planAuditAuditor').value.trim();
-  if(!name){alert('Please give the assessment a name — it is how assessments are told apart in the report.');document.getElementById('planAuditName').focus();return;}
-  if(!date){alert('Please pick a planned date for the assessment.');document.getElementById('planAuditDate').focus();return;}
+  if(!name){uiAlert('Please give the assessment a name — it is how assessments are told apart in the report.');document.getElementById('planAuditName').focus();return;}
+  if(!date){uiAlert('Please pick a planned date for the assessment.');document.getElementById('planAuditDate').focus();return;}
   var names=Array.prototype.slice.call(document.querySelectorAll('.assign-sup-cb:checked')).map(function(cb){return cb.value;});
-  if(!names.length){alert('Please select at least one supplier.');return;}
+  if(!names.length){uiAlert('Please select at least one supplier.');return;}
   var type=(document.getElementById('planAuditType')||{}).value||'';
   planAuditForSuppliers(idx,names,date,auditor,type,name);
   closePlanAuditModal();
@@ -5350,7 +5486,7 @@ function auImproveNoteLedger(cat,idx){
   var key=auLedgerKey(cat,idx);
   var noteEl=document.getElementById('auLNote_'+key);
   var current=noteEl?noteEl.value.trim():item.notes||'';
-  if(!current){alert('Please enter a note first.');return;}
+  if(!current){uiAlert('Please enter a note first.');return;}
   var btn=document.getElementById('auLAiBtn_'+key);
   var prevEl=document.getElementById('auLAiPrev_'+key);
   if(prevEl)prevEl.style.display='none';
@@ -5391,7 +5527,7 @@ function auImproveGeneralNotes(){
   var r=auRound();if(!r)return;
   var noteEl=document.getElementById('auGnNote');
   var current=noteEl?noteEl.value.trim():(r.generalNotes||'');
-  if(!current){alert('Please enter some notes first.');return;}
+  if(!current){uiAlert('Please enter some notes first.');return;}
   var btn=document.getElementById('auGnAiBtn');
   var prevEl=document.getElementById('auGnAiPrev');if(prevEl)prevEl.style.display='none';
   callClaude(
@@ -5460,7 +5596,7 @@ function auImproveNote(cat,idx){
   if(!item)return;
   var noteEl=document.querySelector('.au-notes');
   var current=noteEl?noteEl.value.trim():item.notes||'';
-  if(!current){alert('Please enter a note first.');return;}
+  if(!current){uiAlert('Please enter a note first.');return;}
   var btn=document.getElementById('auAiNoteBtn');
   var prevEl=document.getElementById('auAiPrev');
   if(prevEl)prevEl.style.display='none';
@@ -5498,7 +5634,7 @@ var _voiceState={active:false,recognition:null,cat:null,idx:null,target:null,mod
 function voiceSupported(){return !!(window.SpeechRecognition||window.webkitSpeechRecognition);}
 function voiceToggle(cat,idx,mode){
   if(_voiceState.active){voiceStop();return;}
-  if(!voiceSupported()){alert('Speech recognition is not supported in this browser. Please use Chrome, Edge, or Safari.');return;}
+  if(!voiceSupported()){uiAlert('Speech recognition is not supported in this browser. Please use Chrome, Edge, or Safari.');return;}
   var SpeechRec=window.SpeechRecognition||window.webkitSpeechRecognition;
   var rec=new SpeechRec();
   rec.lang=lang==='de'?'de-DE':'en-US';
@@ -5524,7 +5660,7 @@ function voiceToggle(cat,idx,mode){
     if(mode==='ledger')growNoteFull(noteEl);
   };
   rec.onerror=function(e){
-    if(e.error==='not-allowed'){alert('Microphone access denied. Please allow microphone access in your browser settings.');}
+    if(e.error==='not-allowed'){uiAlert('Microphone access denied. Please allow microphone access in your browser settings.');}
     voiceStop();
   };
   rec.onend=function(){
@@ -5621,7 +5757,7 @@ var AI_PRESETS={
 
 function aiGenerateTemplate(){
   var key=getApiKey();
-  if(!key){alert('Please enter your Anthropic API key in Settings first.');return;}
+  if(!key){uiAlert('Please enter your Anthropic API key in Settings first.');return;}
   var ex=document.getElementById('aiTplModal');if(ex)ex.remove();
   var m=document.createElement('div');m.id='aiTplModal';
   m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:3000;display:flex;align-items:center;justify-content:center;padding:16px';
@@ -5778,7 +5914,7 @@ function runAiTemplateGen(){
   var ap=approachCfg[approach]||approachCfg.mixed;
   var focusAreas=[];
   document.querySelectorAll('.aiTplFocusCb').forEach(function(cb){if(cb.checked)focusAreas.push(cb.value);});
-  if(!focusAreas.length){alert('Please select at least one focus area.');return;}
+  if(!focusAreas.length){uiAlert('Please select at least one focus area.');return;}
   if(!tplName)tplName=industry+' – '+supType+' Assessment';
 
   var btn=document.querySelector('#aiTplModal button[onclick="runAiTemplateGen()"]');
@@ -5828,7 +5964,7 @@ function runAiTemplateGen(){
   })
   .then(function(r){return r.json();})
   .then(function(data){
-    if(data.error){_aiTplStop();alert('AI Error: '+data.error.message);if(btn)btn.style.display='';if(statusEl)statusEl.style.display='none';return;}
+    if(data.error){_aiTplStop();uiAlert('AI Error: '+data.error.message);if(btn)btn.style.display='';if(statusEl)statusEl.style.display='none';return;}
     var raw=data.content&&data.content[0]?data.content[0].text:'';
     // Extract JSON: find outermost { ... }
     var jsonStart=raw.indexOf('{');
@@ -5841,7 +5977,7 @@ function runAiTemplateGen(){
       try{parsed=JSON.parse(balanceJson(raw));repaired=true;}catch(e2){parsed=null;}
       if(!parsed){
         var trunc=(data.stop_reason==='max_tokens');
-        alert('AI returned invalid JSON. Try again.'+(trunc?'\n\nThe response was too long and got cut off — reduce the number of focus areas or checkpoints, or turn off the scoring rubric, then try again.':'')+'\n\nError: '+e.message+'\n\nPreview:\n'+raw.slice(0,400));
+        uiAlert('AI returned invalid JSON. Try again.'+(trunc?'\n\nThe response was too long and got cut off — reduce the number of focus areas or checkpoints, or turn off the scoring rubric, then try again.':'')+'\n\nError: '+e.message+'\n\nPreview:\n'+raw.slice(0,400));
         _aiTplStop();if(btn)btn.style.display='';if(statusEl)statusEl.style.display='none';return;
       }
     }
@@ -5850,11 +5986,11 @@ function runAiTemplateGen(){
     applyAiGenTemplate(parsed);
     if(repaired)toast('Note: the response was long — the last checkpoint(s) may be incomplete. Please review.','var(--warn)');
   })
-  .catch(function(err){_aiTplStop();alert('Request failed: '+err.message);if(btn)btn.style.display='';if(statusEl)statusEl.style.display='none';});
+  .catch(function(err){_aiTplStop();uiAlert('Request failed: '+err.message);if(btn)btn.style.display='';if(statusEl)statusEl.style.display='none';});
 }
 
 function applyAiGenTemplate(data){
-  if(!data||!data.categories){alert('Invalid template structure from AI.');return;}
+  if(!data||!data.categories){uiAlert('Invalid template structure from AI.');return;}
   tplDraft={name:data.name||'AI Generated Template',categories:{}};
   tplDraftIdx=-1;
   Object.entries(data.categories).forEach(function([cat,items]){
@@ -5951,8 +6087,8 @@ function confirmAddSupplierInfoField(){
 }
 function createBareSupplier(){
   var name=document.getElementById('bareSupName').value.trim();
-  if(!name){alert('Please enter a supplier name.');return;}
-  if(suppliers.find(function(s){return s.name===name;})){alert('A supplier with this name already exists.');return;}
+  if(!name){uiAlert('Please enter a supplier name.');return;}
+  if(suppliers.find(function(s){return s.name===name;})){uiAlert('A supplier with this name already exists.');return;}
   var info={};
   supplierInfoCatalog.forEach(function(f){
     var el=document.getElementById('bareInfo_'+f.id);
@@ -6611,7 +6747,11 @@ function renderDetail(){
             var v=it?it.score:null;
             var bc=v==='N.A.'?'na':v===null?'na':(v>=4?'high':v>=2.5?'mid':'low');
             var note=it&&it.notes?'<div style="font-size:10px;color:var(--text2);margin-top:2px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(it.notes||'')+'">'+esc(it.notes||'')+'</div>':'';
-            return '<td style="text-align:center;vertical-align:top;padding:6px 8px"><span class="badge '+bc+'">'+(v===null?'—':v)+'</span>'+note+'</td>';
+            // Clicking a cell opens the full assessment Score view for that supplier's
+            // checkpoint (full note + evidence) without leaving Analysis.
+            var attrs='style="text-align:center;vertical-align:top;padding:6px 8px"';
+            if(it)attrs='class="cmp-cell" style="text-align:center;vertical-align:top;padding:6px 8px;cursor:pointer" title="Open assessment view" onclick="openCmpCheckpoint(\''+esc(s.name).replace(/'/g,"\\'")+'\',\''+esc(cf).replace(/'/g,"\\'")+'\','+idx+')"';
+            return '<td '+attrs+'><span class="badge '+bc+'">'+(v===null?'—':v)+'</span>'+note+'</td>';
           }).join('')
         +'</tr>';
       });
@@ -6629,6 +6769,68 @@ function renderDetail(){
   el.innerHTML=h;
   destroyChart('detailBar');
 }
+
+// ── Checkpoint detail popup (from the Analysis "Checkpoint Comparison") ────────
+// Renders one supplier's checkpoint exactly like the assessment Score view, but
+// read-only: the note is truncated to a single line in the comparison heatmap,
+// so clicking a cell opens the full note, rubric and evidence in place — without
+// jumping over to the Assessment page.
+function openCmpCheckpoint(supName,cat,idx){
+  var s=suppliers.find(function(x){return x.name===supName;});
+  if(!s||!s.categories||!s.categories[cat])return;
+  var item=s.categories[cat][idx];
+  if(!item)return;
+  var esSn=esc(supName).replace(/'/g,"\\'");
+  var esCat=esc(cat).replace(/'/g,"\\'");
+  var catLen=s.categories[cat].length, posInCat=idx+1;
+  var scoreVal=item.score;
+  var rubricRows=[0,1,2,3,4,5].filter(function(v){return item.rubric&&item.rubric[v]&&String(item.rubric[v]).trim();});
+  var files=item.files||[];
+  var body='<div class="au-focus" style="padding:0;max-height:none;overflow:visible">'
+    +'<div class="au-kicker">'+esc(cat)+' · Checkpoint '+posInCat+' of '+catLen+(item.weight!==undefined&&item.weight!==1?' · Weight '+item.weight:'')+'</div>'
+    +'<h3>'+esc(item.checkpoint)+'</h3>'
+    +'<div class="au-scorepick" style="pointer-events:none">'
+      +[0,1,2,3,4,5].map(function(v){return '<button class="au-sbtn v'+v+(scoreVal===v?' sel':'')+'">'+v+'</button>';}).join('')
+      +'<button class="au-sbtn na'+(scoreVal==='N.A.'?' sel':'')+'">N.A.</button>'
+    +'</div>'
+    +(rubricRows.length
+      ?'<div class="au-rubric">'+rubricRows.map(function(v){
+          return '<div class="au-rr'+(String(scoreVal)===String(v)?' hot':'')+'" style="cursor:default"><span class="rn">'+v+'</span><span>'+esc(item.rubric[v])+'</span></div>';
+        }).join('')+'</div>'
+      :'<div style="font-size:11.5px;color:var(--text3);font-style:italic;margin:12px 0">No scoring rubric defined for this checkpoint.</div>')
+    +'<label style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);display:block;margin:16px 0 5px">Evidence / Notes</label>'
+    +(item.notes&&String(item.notes).trim()
+      ?'<div class="au-notes" style="min-height:0;white-space:pre-wrap">'+esc(item.notes)+'</div>'
+      :'<div style="font-size:12.5px;color:var(--text3);font-style:italic">No note recorded.</div>')
+    +(files.length
+      ?'<label style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);display:block;margin:16px 0 5px">Evidence files <span style="color:var(--text3);font-weight:500">('+files.length+')</span></label>'
+        +'<div class="dropzone-files">'+files.map(function(f,fi){
+          return '<div class="filecard">'
+            +fileThumbHtml(f,'openImgViewer(\''+esSn+'\',\''+esCat+'\','+idx+','+fi+',null)').replace(/width:44px;height:44px/,'width:34px;height:34px')
+            +'<div class="fmeta"><div class="fname" title="'+esc(f.name||'')+'">'+esc(f.name||'')+'</div><div class="fsize">'+(humanFileSize(f.size)||'—')+'</div></div>'
+            +'<a href="'+f.data+'" download="'+esc(f.name||'file')+'" title="Download"><i class="ti ti-download"></i></a>'
+          +'</div>';
+        }).join('')+'</div>'
+      :'')
+  +'</div>';
+  var m=document.getElementById('cmpCheckpointModal');
+  if(!m){
+    m=document.createElement('div');
+    m.id='cmpCheckpointModal';
+    m.style.cssText='display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center';
+    document.body.appendChild(m);
+    m.onclick=function(e){if(e.target===m)closeCmpCheckpoint();};
+  }
+  m.innerHTML='<div style="background:var(--bg);border-radius:var(--rl);padding:24px;width:640px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg)">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px">'
+      +'<div style="font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;min-width:0"><i class="ti ti-building-factory-2" style="color:var(--text3);flex-shrink:0"></i><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(supName)+'</span></div>'
+      +'<button onclick="closeCmpCheckpoint()" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--text2);flex-shrink:0"><i class="ti ti-x"></i></button>'
+    +'</div>'
+    +body
+  +'</div>';
+  m.style.display='flex';
+}
+function closeCmpCheckpoint(){var m=document.getElementById('cmpCheckpointModal');if(m)m.style.display='none';}
 
 // ── Image handling ────────────────────────────────────────────────────────────
 var _imgTarget=null; // {sup, cat, idx}
@@ -9307,7 +9509,7 @@ function handleKpiImport(file){
       });
       renderKpiEntryModal();
       toast(applied+' values imported for '+_kpiEntryPeriod+(unmatched.length?' — unmatched suppliers: '+unmatched.join(', '):''));
-    }catch(err){ alert('Could not read this file: '+err.message); }
+    }catch(err){ uiAlert('Could not read this file: '+err.message); }
   };
   reader.readAsArrayBuffer(file);
 }
@@ -9336,7 +9538,7 @@ function kpiAiImport(file){
       rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:'',raw:false});
       rows=rows.filter(function(r){return r.some(function(c){return String(c||'').trim();});});
       if(rows.length<2)throw new Error('Needs a header row and at least one data row');
-    }catch(err){ alert('Could not read this file: '+err.message); return; }
+    }catch(err){ uiAlert('Could not read this file: '+err.message); return; }
     _kpiAi={rows:rows,header:rows[0].map(function(h){return String(h||'').trim();}),map:null};
     var m=document.getElementById('kpiAiModal');
     document.getElementById('kpiAiBody').innerHTML='<div style="padding:34px;text-align:center;color:var(--text2)"><i class="ti ti-loader" style="font-size:22px;animation:spin 1s linear infinite"></i><div style="margin-top:9px;font-size:13px">Reading the sheet…</div></div>';
@@ -10533,7 +10735,7 @@ function getApiKey(){var el=document.getElementById('apiKey');return el?el.value
 // argument to onResult reports whether the model hit the ceiling.
 function callClaude(userMsg,systemMsg,onResult,onLoading,opts){
   var key=getApiKey();
-  if(!key){alert('Please enter your Anthropic API key in Settings first.');return;}
+  if(!key){uiAlert('Please enter your Anthropic API key in Settings first.');return;}
   if(onLoading)onLoading(true);
   fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
@@ -10543,11 +10745,11 @@ function callClaude(userMsg,systemMsg,onResult,onLoading,opts){
   .then(function(r){return r.json();})
   .then(function(data){
     if(onLoading)onLoading(false);
-    if(data.error){alert('AI Error: '+data.error.message);return;}
+    if(data.error){uiAlert('AI Error: '+data.error.message);return;}
     var text=data.content&&data.content[0]?data.content[0].text:'';
     onResult(text,{truncated:data.stop_reason==='max_tokens',stopReason:data.stop_reason});
   })
-  .catch(function(err){if(onLoading)onLoading(false);alert('AI request failed: '+err.message);});
+  .catch(function(err){if(onLoading)onLoading(false);uiAlert('AI request failed: '+err.message);});
 }
 // Recovers what survived a truncated JSON array: walks the string and keeps
 // every object that actually closed. A cut-off response then costs the last
@@ -10629,7 +10831,7 @@ function aiImproveNote(sn,cat,idx){
   var safeKey=sn.replace(/\W/g,'_')+'_'+cat.replace(/\W/g,'_')+'_'+idx;
   var noteEl=document.querySelector('.notes-input[data-sup="'+sn+'"][data-cat="'+cat+'"][data-idx="'+idx+'"]');
   var current=noteEl?noteEl.value.trim():item.notes||'';
-  if(!current){alert('Please enter a note first.');return;}
+  if(!current){uiAlert('Please enter a note first.');return;}
   var btnId='ai_note_'+safeKey;
   var prevId='ai_prev_'+safeKey;
   var prevTextId='ai_prev_text_'+safeKey;
@@ -10708,8 +10910,8 @@ function findSimilarAction(sn,title,desc){
 
 // ── step 1: pick suppliers ────────────────────────────────────────────────
 function aiSuggestActionsModal(sn){
-  if(!getApiKey()){alert('Please enter your Anthropic API key in Settings first.');return;}
-  if(!suppliers.length){alert('No supplier data available.');return;}
+  if(!getApiKey()){uiAlert('Please enter your Anthropic API key in Settings first.');return;}
+  if(!suppliers.length){uiAlert('No supplier data available.');return;}
   ensureActionRefs();
   _aiActPick.sups={};
   if(sn)_aiActPick.sups[sn]=true;
@@ -11291,7 +11493,7 @@ function _renderCalPlanned(){
 }
 
 function exportICal(){
-  if(!suppliers.length&&!actions.length){alert('No data to export.');return;}
+  if(!suppliers.length&&!actions.length){uiAlert('No data to export.');return;}
   var lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Supplier Loop v9//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:Supplier Assessments'];
 
   function icalDateStr(ds){return(ds||'').replace(/-/g,'');}
@@ -11331,7 +11533,7 @@ function exportAgendaExcel(){
   var s=auSupplier(),r=auRound();
   if(!s||!r)return;
   var items=(r.agenda||[]).slice().sort(function(a,b){return ((a.date||'')+' '+(a.time||'')).localeCompare((b.date||'')+' '+(b.time||''));});
-  if(!items.length){alert('No agenda items to export yet.');return;}
+  if(!items.length){uiAlert('No agenda items to export yet.');return;}
   var rows=[['Date','Time','Topic / Activity','Checklist Category','Notes']];
   items.forEach(function(it){rows.push([it.date||'',it.time||'',it.title||'',it.category||'',it.notes||'']);});
   var ws=XLSX.utils.aoa_to_sheet(rows);
@@ -11514,10 +11716,10 @@ function selectNoneExport(type){
 }
 
 async function exportExcel(){
-  if(!suppliers.length){alert('No data');return;}
-  if(typeof ExcelJS==='undefined'){alert('ExcelJS library not loaded. Please check your internet connection.');return;}
+  if(!suppliers.length){uiAlert('No data');return;}
+  if(typeof ExcelJS==='undefined'){uiAlert('ExcelJS library not loaded. Please check your internet connection.');return;}
   const sel=suppliers.filter(s=>exportSelectedExcel.has(s.name));
-  if(!sel.length){alert('No suppliers selected.');return;}
+  if(!sel.length){uiAlert('No suppliers selected.');return;}
   const cats=allCats();
   const th=THEMES[selectedTheme];
   const project=document.getElementById('projectName').value||'Supplier Assessment';
@@ -11534,12 +11736,19 @@ async function exportExcel(){
     legend:document.getElementById('xopt_legend')?.checked!==false
   };
 
-  // P3 corporate look — navy title bands + lime accent, independent of the tool's
-  // configurable UI theme. Score/tier cells still use the TIERS traffic ramp.
-  const PRIMARY='0D1636';   // P3 navy
-  const ACCENT='C4F230';    // P3 lime
-  const P3BLUE='2E2BF5';    // P3 electric blue
-  const HDR='0D1636';       // table header fill
+  // The workbook follows the report accent chosen in the Export panel — the SAME
+  // colour the PowerPoint report uses — so the two exports match. Title bands,
+  // table headers and sheet tabs take that colour; the thin stripe is a lighter
+  // shade of it (this is the line that used to be a fixed lime green). Text on the
+  // bands flips to black/white for contrast, so a light custom colour stays legible.
+  // Score/tier cells still use the TIERS traffic ramp.
+  const RA=_px(reportBuilder.variant==='custom'&&reportBuilder.customColor?reportBuilder.customColor:RB_VARIANTS[(reportBuilder&&reportBuilder.variant)||'blue'].accent).toUpperCase();
+  function _xlLighten(hex,amt){var h=String(hex).replace('#','');var r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);r=Math.round(r+(255-r)*amt);g=Math.round(g+(255-g)*amt);b=Math.round(b+(255-b)*amt);return [r,g,b].map(function(n){return ('0'+n.toString(16)).slice(-2);}).join('').toUpperCase();}
+  function _xlText(hex){var h=String(hex).replace('#','');var r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);return (0.299*r+0.587*g+0.114*b)/255>0.62?'000000':'FFFFFF';}
+  const PRIMARY=RA;                 // title bands
+  const ACCENT=_xlLighten(RA,0.5);  // thin accent stripe (was fixed lime)
+  const P3BLUE=RA;                  // sheet tab accents
+  const HDR=RA;                     // table header fill
   const LGRAY='F5F6F8';
 
   function scoreHex(pct){
@@ -11561,7 +11770,7 @@ async function exportExcel(){
   function fill(hex){return{type:'pattern',pattern:'solid',fgColor:{argb:'FF'+hex}};}
   function hdrCell(cell,val,bgHex,opts){
     cell.value=val;
-    cell.font=Object.assign({bold:true,size:10,color:{argb:'FFFFFFFF'}},opts&&opts.font||{});
+    cell.font=Object.assign({bold:true,size:10,color:{argb:'FF'+_xlText(bgHex)}},opts&&opts.font||{});
     cell.fill=fill(bgHex);
     cell.alignment=Object.assign({vertical:'middle',horizontal:'center'},opts&&opts.align||{});
     cell.border=bd();
@@ -11576,13 +11785,13 @@ async function exportExcel(){
   function titleBlock(ws,text,sub,cols){
     ws.mergeCells(1,1,1,cols);
     const c=ws.getCell('A1');
-    c.value=text;c.font={bold:true,size:16,color:{argb:'FFFFFFFF'}};
+    c.value=text;c.font={bold:true,size:16,color:{argb:'FF'+_xlText(PRIMARY)}};
     c.fill=fill(PRIMARY);c.alignment={vertical:'middle',horizontal:'left',indent:1};
     ws.getRow(1).height=36;
     if(sub){
       ws.mergeCells(2,1,2,cols);
       const s=ws.getCell('A2');
-      s.value=sub;s.font={size:9,color:{argb:'FFFFFFFF'}};
+      s.value=sub;s.font={size:9,color:{argb:'FF'+_xlText(PRIMARY)}};
       s.fill=fill(PRIMARY);s.alignment={vertical:'middle',horizontal:'left',indent:1};
       ws.getRow(2).height=20;
     }
@@ -11797,11 +12006,11 @@ async function exportExcel(){
       // Title block
       ws.mergeCells(1,1,1,COLS);
       const nc=ws.getCell('A1');nc.value=s.name;
-      nc.font={bold:true,size:15,color:{argb:'FFFFFFFF'}};nc.fill=fill(PRIMARY);
+      nc.font={bold:true,size:15,color:{argb:'FF'+_xlText(PRIMARY)}};nc.fill=fill(PRIMARY);
       nc.alignment={vertical:'middle',horizontal:'left',indent:1};ws.getRow(1).height=32;
 
       ws.mergeCells(2,1,2,3);ws.getCell('A2').value='Overall Score';
-      ws.getCell('A2').font={size:9,color:{argb:'FFFFFFFF'}};ws.getCell('A2').fill=fill(PRIMARY);
+      ws.getCell('A2').font={size:9,color:{argb:'FF'+_xlText(PRIMARY)}};ws.getCell('A2').fill=fill(PRIMARY);
       ws.getCell('A2').alignment={vertical:'middle',horizontal:'left',indent:1};
       ws.mergeCells(2,4,2,COLS);
       const tc=ws.getCell(2,4);tc.value=(tot!==null?tot+'%':'—')+' — '+tierLbl(tot);
@@ -11844,7 +12053,7 @@ async function exportExcel(){
       const detStart=8+catKeys.length;
       ws.mergeCells(detStart,1,detStart,COLS);
       const dh=ws.getCell(detStart,1);dh.value='Checkpoint Detail';
-      dh.font={bold:true,size:11,color:{argb:'FFFFFFFF'}};dh.fill=fill(PRIMARY);
+      dh.font={bold:true,size:11,color:{argb:'FF'+_xlText(PRIMARY)}};dh.fill=fill(PRIMARY);
       dh.alignment={vertical:'middle',horizontal:'left',indent:1};ws.getRow(detStart).height=26;
 
       ['Category','#','Checkpoint','Score','Wt.','Tier','Evidence / Notes'].forEach(function(h,i){
@@ -12055,7 +12264,7 @@ async function exportExcel(){
 
     function sectionHdr(r,txt){
       ws.mergeCells(r,1,r,4);const c=ws.getCell(r,1);c.value=txt;
-      c.font={bold:true,size:11,color:{argb:'FFFFFFFF'}};c.fill=fill(PRIMARY);
+      c.font={bold:true,size:11,color:{argb:'FF'+_xlText(PRIMARY)}};c.fill=fill(PRIMARY);
       c.alignment={vertical:'middle',horizontal:'left',indent:1};ws.getRow(r).height=22;
     }
     let r=4;
@@ -12125,7 +12334,7 @@ async function exportExcel(){
 }
 
 function exportPDF(){
-  if(!suppliers.length){alert('No data');return;}
+  if(!suppliers.length){uiAlert('No data');return;}
   const sel=suppliers.filter(s=>exportSelectedPdf.has(s.name));
   const cats=allCats();const th=THEMES[selectedTheme];
   const today=new Date().toLocaleDateString(lang==='de'?'de-DE':'en-GB');
@@ -13886,13 +14095,13 @@ function _reportScopeTitle(ctx){
 }
 
 async function exportStandardReport(){
-  if(!suppliers.length){alert('No supplier data available.');return;}
+  if(!suppliers.length){uiAlert('No supplier data available.');return;}
   var single=(_reportScope==='single');
   var sel;
   if(single){
     var sn=(document.getElementById('reportSingleSelect')||{}).value||'';
     var one=suppliers.find(function(x){return x.name===sn;});
-    if(!one){alert('Please pick a supplier for the single-supplier report.');return;}
+    if(!one){uiAlert('Please pick a supplier for the single-supplier report.');return;}
     sel=[one];
   } else {
     sel=suppliers.filter(function(s){return exportSelectedPptx.has(s.name);});
@@ -13963,7 +14172,7 @@ async function exportStandardReport(){
 
     await pres.writeFile({fileName:'Report_'+new Date().toISOString().slice(0,10)+'.pptx'});
     toast('Report created');
-  }catch(e){console.error(e);alert('Export failed: '+(e&&e.message?e.message:e));}
+  }catch(e){console.error(e);uiAlert('Export failed: '+(e&&e.message?e.message:e));}
 }
 
 renderThemeGrid();
@@ -13976,6 +14185,215 @@ applyThemeMode();
 applyBrandColors();
 checkSession(); // shows the login gate, or reveals the app + loads cloud data if already signed in
 
+</script>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     SPLIT VIEW  ·  duplicate the current view into two independently
+     navigable halves. Self-contained: wraps showPage(), never touches the
+     single shared data model, so both halves stay perfectly in sync.
+     ════════════════════════════════════════════════════════════════════ -->
+<style id="splitViewCSS">
+.split-toggle{color:var(--text3)!important;padding:7px 10px!important}
+.split-toggle:hover{color:var(--text)!important;background:var(--bg2)!important}
+.split-toggle.on{color:var(--primary)!important;background:var(--bg3)!important}
+#splitRow{display:block}
+#splitGutter{display:none}
+#paneB{display:none}
+body.satsplit #appRoot{overflow:hidden}
+body.satsplit #splitRow{display:flex;flex:1 1 auto;min-height:0;gap:0;padding:10px;align-items:stretch}
+body.satsplit .main,body.satsplit #paneB{flex:1 1 0;min-width:0;max-width:none!important;margin:0!important;overflow:auto;border:1px solid var(--border);border-radius:var(--rl);background:var(--bg);padding:16px 18px;border-top:2px solid transparent}
+body.satsplit #paneB{display:block}
+body.satsplit .pane-focus{border-color:var(--border);border-top-color:var(--primary)!important;box-shadow:var(--shadow-sm)}
+body.satsplit #splitGutter{display:flex;flex:0 0 12px;cursor:col-resize;align-items:center;justify-content:center;background:transparent}
+#splitGutter::before{content:"";width:3px;height:46px;border-radius:3px;background:var(--border2);transition:background .12s,height .12s}
+#splitGutter:hover::before,#splitGutter.dragging::before{background:var(--primary);height:82px}
+body.resizing{cursor:col-resize!important;user-select:none}
+.split-clone{display:block;position:relative;opacity:.5;filter:grayscale(.15)}
+.split-hint{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--primary);background:var(--info-bg);border:1px dashed var(--primary);border-radius:var(--r);padding:8px 12px;margin-bottom:14px;cursor:default}
+/* Each pane carries its OWN sub-navigation so the module's sub-areas
+   (e.g. Actions / Development) stay visible in every half at once. */
+.pane-subnav{position:sticky;top:-16px;z-index:6;display:flex;gap:2px;flex-wrap:wrap;align-items:center;padding:9px 14px;margin:-16px -18px 14px;background:var(--bg2);border-bottom:1px solid var(--border);border-radius:var(--rl) var(--rl) 0 0}
+.pane-focus .pane-subnav{background:color-mix(in srgb,var(--primary) 7%,var(--bg2))}
+body.satsplit #subNav,body.satsplit #navBackBar{display:none!important}
+@media(max-width:900px){.pane-subnav{display:none}.split-toggle{display:none!important}body.satsplit #splitRow{display:block;padding:0}body.satsplit #paneB,body.satsplit #splitGutter{display:none}body.satsplit .main{border:none;border-radius:0;padding:26px 30px;overflow:visible}}
+</style>
+<script>
+(function(){
+  try{
+    var mainEl=document.querySelector('.main');
+    if(!mainEl||!window.showPage)return;
+    var appRoot=document.getElementById('appRoot');
+
+    // ── Build the two-pane scaffold around the existing .main (which stays
+    //    the LEFT pane and keeps owning every .page node) ──────────────────
+    var row=document.createElement('div');row.id='splitRow';
+    mainEl.parentNode.insertBefore(row,mainEl);
+    row.appendChild(mainEl);
+    var gutter=document.createElement('div');gutter.id='splitGutter';
+    var paneB=document.createElement('div');paneB.id='paneB';paneB.className='main';
+    row.appendChild(gutter);row.appendChild(paneB);
+
+    var _split=false,_focus='L',_wL=1,_wR=1;
+    var origShowPage=window.showPage;
+
+    function paneOf(f){return f==='R'?paneB:mainEl;}
+    function activePage(pane){return pane.querySelector('.page.active');}
+    function activeId(pane){var p=activePage(pane);return p?p.id.replace('page-',''):null;}
+    function paintFocus(){
+      mainEl.classList.toggle('pane-focus',_split&&_focus==='L');
+      paneB.classList.toggle('pane-focus',_split&&_focus==='R');
+    }
+    function setFlex(){mainEl.style.flex=_wL+' 1 0';paneB.style.flex=_wR+' 1 0';}
+
+    // The page a pane is currently showing (a live active page, or the page a
+    // preview clone was made from) — used to pick which sub-nav areas to show.
+    function pageIdOfPane(pane){
+      var a=activePage(pane);if(a)return a.id.replace('page-','');
+      return pane.dataset.cloneOf||null;
+    }
+    // Render a pane's OWN sub-nav bar so its module areas stay visible.
+    function renderPaneSubnav(pane,side){
+      var pid=pageIdOfPane(pane);
+      var mod=pid?PAGE_TO_MODULE[pid]:null;
+      var n=mod?NAV[mod]:null;
+      var host=pane.querySelector(':scope > .pane-subnav');
+      if(!n){if(host)host.remove();return;}
+      if(!host){host=document.createElement('div');host.className='pane-subnav';pane.insertBefore(host,pane.firstChild);}
+      var areas=n.areas||[{id:n.page,label:n.label,icon:n.icon||'ti-point'}];
+      var activeArea=PAGE_TO_AREA[pid]||pid;
+      host.innerHTML=areas.map(function(a){return '<button class="subnav-btn'+(a.id===activeArea?' active':'')+'" data-area="'+a.id+'"><i class="ti '+a.icon+'"></i> '+esc(a.label)+'</button>';}).join('');
+      host.querySelectorAll('button').forEach(function(b){
+        b.addEventListener('click',function(){setFocus(side);showPage(b.getAttribute('data-area'));});
+      });
+    }
+    function renderBothSubnavs(){renderPaneSubnav(mainEl,'L');renderPaneSubnav(paneB,'R');}
+
+    function clearCloneFrom(pane){
+      pane.querySelectorAll('.split-clone,.split-hint').forEach(function(n){n.remove();});
+      delete pane.dataset.cloneOf;
+    }
+    function makeClone(pane,srcPage){
+      clearCloneFrom(pane);
+      if(srcPage)pane.dataset.cloneOf=srcPage.id.replace('page-','');
+      var hint=document.createElement('div');hint.className='split-hint';
+      hint.innerHTML='<i class="ti ti-arrow-up"></i> Preview — pick a section above to open it in this half';
+      var clone=document.createElement('div');clone.className='split-clone';
+      clone.setAttribute('aria-hidden','true');
+      clone.style.pointerEvents='none';           // static preview, no misfires onto the live pane
+      clone.innerHTML=srcPage?srcPage.innerHTML:'';
+      // strip ids/names from the frozen preview so it can never collide with the
+      // live pane's controls (getElementById / document-wide selectors).
+      clone.querySelectorAll('[id]').forEach(function(n){n.removeAttribute('id');});
+      clone.querySelectorAll('[name]').forEach(function(n){n.removeAttribute('name');});
+      pane.appendChild(hint);pane.appendChild(clone);
+    }
+
+    function setFocus(f){
+      if(!_split)return;
+      _focus=f;paintFocus();
+      // Reflect the focused pane's current page in the top nav / subnav.
+      var id=activeId(paneOf(f));
+      if(id&&window.syncNav)try{window.syncNav(id);}catch(e){}
+    }
+
+    // ── The routing wrapper. In single mode it is the original verbatim. ──
+    window.showPage=function(id,btn,opts){
+      if(id==='data')id='audit';
+      if(!_split){return origShowPage(id,btn,opts);}
+      var pane=paneOf(_focus),other=paneOf(_focus==='L'?'R':'L');
+      var otherActive=activePage(other);            // keep this one visible afterwards
+      clearCloneFrom(pane);                          // this pane goes live now
+      var pg=document.getElementById('page-'+id);
+      if(pg){
+        if(otherActive===pg)otherActive=null;        // we are stealing it from the other pane
+        if(pg.parentNode!==pane)pane.appendChild(pg); // move ownership into the focused pane
+      }
+      origShowPage(id,btn,opts);                     // deactivates all + activates target + renders it
+      if(otherActive){
+        otherActive.classList.add('active');         // re-reveal the other pane's page
+        if(otherActive.parentNode===pane){           // it must live in the OTHER pane
+          other.appendChild(otherActive);
+        }
+      } else if(!activePage(other)&&!other.querySelector('.split-clone')){
+        makeClone(other,activePage(pane));            // other pane emptied → show a fresh preview
+      }
+      paintFocus();renderBothSubnavs();
+    };
+
+    // ── Toggle ───────────────────────────────────────────────────────────
+    function enterSplit(){
+      if(_split||window.innerWidth<900)return;
+      _split=true;
+      var appDisp=appRoot.style.display;appRoot.dataset.splitPrevDisp=appDisp;
+      appRoot.style.display='flex';appRoot.style.flexDirection='column';appRoot.style.height='100vh';
+      document.body.classList.add('satsplit');
+      makeClone(paneB,activePage(mainEl));            // duplicate the current view into the right half
+      _wL=1;_wR=1;setFlex();
+      _focus='R';paintFocus();setFocus('R');renderBothSubnavs();
+      document.getElementById('splitToggleBtn').classList.add('on');
+    }
+    function exitSplit(){
+      if(!_split)return;
+      _split=false;
+      // remove EVERY preview clone/hint (either pane may hold one) and per-pane
+      // sub-navs; the global sub-nav takes over again
+      document.querySelectorAll('.split-clone,.split-hint,.pane-subnav').forEach(function(n){n.remove();});
+      delete mainEl.dataset.cloneOf;delete paneB.dataset.cloneOf;
+      // hand every page node back to the left pane
+      document.querySelectorAll('#paneB .page').forEach(function(p){mainEl.appendChild(p);});
+      document.body.classList.remove('satsplit');
+      appRoot.style.display=appRoot.dataset.splitPrevDisp||'';
+      appRoot.style.flexDirection='';appRoot.style.height='';
+      mainEl.style.flex='';paneB.style.flex='';
+      mainEl.classList.remove('pane-focus');paneB.classList.remove('pane-focus');
+      document.getElementById('splitToggleBtn').classList.remove('on');
+      // normalise to a single active page
+      var id=activeId(mainEl)||_currentPage||'dashboard';
+      origShowPage(id);
+    }
+    window.toggleSplitView=function(){_split?exitSplit():enterSplit();};
+
+    // click a pane to focus it (so the next nav click retargets that half)
+    mainEl.addEventListener('mousedown',function(){if(_split)setFocus('L');},true);
+    paneB.addEventListener('mousedown',function(){if(_split)setFocus('R');},true);
+
+    // ── Draggable gutter ──────────────────────────────────────────────────
+    var drag=null;
+    gutter.addEventListener('mousedown',function(e){
+      if(!_split)return;e.preventDefault();
+      var lw=mainEl.offsetWidth,rw=paneB.offsetWidth;
+      drag={x:e.clientX,lw:lw,rw:rw,total:lw+rw};
+      gutter.classList.add('dragging');document.body.classList.add('resizing');
+    });
+    window.addEventListener('mousemove',function(e){
+      if(!drag)return;
+      var min=260,dx=e.clientX-drag.x;
+      var nl=Math.max(min,Math.min(drag.total-min,drag.lw+dx));
+      _wL=nl;_wR=drag.total-nl;setFlex();
+    });
+    window.addEventListener('mouseup',function(){
+      if(!drag)return;drag=null;
+      gutter.classList.remove('dragging');document.body.classList.remove('resizing');
+    });
+
+    // collapse back to single view if the window gets too narrow
+    window.addEventListener('resize',function(){if(_split&&window.innerWidth<900)exitSplit();});
+
+    // ── Inject the unobtrusive toggle into the primary nav ────────────────
+    function addToggle(){
+      var nav=document.getElementById('primaryNav');if(!nav)return;
+      if(document.getElementById('splitToggleBtn'))return;
+      var b=document.createElement('button');
+      b.className='nav-btn split-toggle';b.id='splitToggleBtn';
+      b.title='Split view — divide the current view into two halves';
+      b.setAttribute('aria-label','Split view');
+      b.innerHTML='<i class="ti ti-layout-columns"></i>';
+      b.onclick=window.toggleSplitView;
+      nav.appendChild(b);
+    }
+    addToggle();
+  }catch(err){console.error('[split-view] init failed',err);}
+})();
 </script>
 </body>
 </html>
