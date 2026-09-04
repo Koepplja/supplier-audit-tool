@@ -1626,7 +1626,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
         <button class="btn sm" onclick="selectAllExport('pdf')">All</button>
         <button class="btn sm" onclick="selectNoneExport('pdf')">None</button>
       </div>
-      <button class="btn warn" onclick="exportPDF()"><i class="ti ti-file-type-pdf"></i> <span>Download PDF Report</span></button>
+      <button class="btn primary" onclick="exportPDF()"><i class="ti ti-file-type-pdf"></i> <span>Download PDF Report</span></button>
     </div>
 
     <!-- iCal -->
@@ -1653,10 +1653,6 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
       <button class="btn" onclick="document.getElementById('projectInput').click()"><i class="ti ti-folder-open"></i> <span>Load Project</span></button>
       <input type="file" id="projectInput" accept=".json" style="display:none" onchange="loadProject(this.files[0]);this.value=''">
     </div>
-  </div>
-  <div class="card">
-    <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px"><i class="ti ti-file-spreadsheet"></i> Excel Import</div>
-    <p style="font-size:12px;color:var(--text2);margin:0">Importing an Excel checklist or a scored assessment lives with the checklists it produces — under <b>Assessment &rarr; Checklists &rarr; Excel Import</b>.</p>
   </div>
 </div>
 <nav class="mobile-nav" id="mobileNav">
@@ -5229,7 +5225,6 @@ function auConsoleHtml(s,flat,round){
           return '<button class="au-sbtn v'+v+(item.score===v?' sel':'')+'" onclick="auSetScore(\''+esCat+'\','+cur.idx+','+v+')">'+v+'</button>';
         }).join('')
         +'<button class="au-sbtn na'+(item.score==='N.A.'?' sel':'')+'" onclick="auSetScore(\''+esCat+'\','+cur.idx+',\'N.A.\')">N.A.</button>'
-        +'<span class="au-kbd">press 0–5 · N for N.A. · ↑↓ to move</span>'
       +'</div>'
       +(rubricRows.length
         ?'<div class="au-rubric">'+rubricRows.map(function(v){
@@ -8711,7 +8706,6 @@ function supplierDetailsHtml(sn,inAssessment){
     +'<div class="form-grid">'
       +'<div class="field"><label>Assessor</label><input type="text" id="meta_auditor_'+idSafe+'" value="'+esc(s.auditor||'')+'" onchange="saveSupMeta(\''+esSn+'\',\'auditor\',this.value)" placeholder="Name..."></div>'
     +'</div>'
-    +'<p style="font-size:11px;color:var(--text3);margin:10px 0 0">Assessment dates live on the assessments themselves — plan one under <b>Checklists &rarr; Plan Assessment</b>. Report content is edited under <b>Import / Export &rarr; Export</b>.</p>'
   +'</div>';
   // Free-text general notes for THIS assessment — flexible input that also feeds
   // the AI when generating the report content. Same improve-with-AI flow as the
