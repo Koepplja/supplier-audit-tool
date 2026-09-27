@@ -53,30 +53,30 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
 ::-webkit-scrollbar-track{background:transparent}
 .topbar{background:var(--bg);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;flex-wrap:wrap}
 .logo{font-family:Georgia,"Iowan Old Style","Times New Roman",serif;font-size:16px;font-weight:400;display:flex;align-items:center;gap:8px;padding:14px 0;white-space:nowrap}
-.logo i{color:var(--primary);font-size:20px}
+.logo i{color:var(--primary-fg);font-size:20px}
 .nav{display:flex;gap:2px;flex:1;overflow-x:auto;padding:8px 0}
 .nav-btn{padding:7px 14px;border:none;background:none;color:var(--text2);cursor:pointer;font-size:13px;border-radius:var(--r);white-space:nowrap;display:flex;align-items:center;gap:6px;transition:all .15s;font-family:inherit}
 .nav-btn:hover{background:var(--bg2);color:var(--text)}.nav-btn.active{background:var(--bg3);color:var(--text);font-weight:500}
 .nav-sep{width:1px;height:20px;background:var(--border);margin:0 5px;flex-shrink:0}
 .subnav{display:flex;gap:2px;align-items:center;padding:7px 22px;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;flex-wrap:wrap}
 .subnav-btn{padding:6px 12px;border:none;background:none;color:var(--text2);cursor:pointer;font-size:12px;border-radius:var(--r);white-space:nowrap;display:flex;align-items:center;gap:6px;font-family:inherit;transition:all .15s}
-.subnav-btn:hover{background:var(--bg3);color:var(--text)}.subnav-btn.active{background:var(--bg);color:var(--primary);font-weight:600;box-shadow:var(--shadow-sm)}
+.subnav-btn:hover{background:var(--bg3);color:var(--text)}.subnav-btn.active{background:var(--bg);color:var(--primary-fg);font-weight:600;box-shadow:var(--shadow-sm)}
 .main{padding:24px;max-width:1300px;margin:0 auto}
 .page{display:none}.page.active{display:block}
 .section-title{font-family:Georgia,"Iowan Old Style","Times New Roman",serif;font-size:20px;font-weight:400;margin-bottom:16px;display:flex;align-items:center;gap:9px;color:var(--text)}
-.section-title i{color:var(--primary);font-size:17px}
+.section-title i{color:var(--primary-fg);font-size:17px}
 .card{background:var(--bg);border:1px solid var(--border-soft);border-radius:var(--rl);padding:18px;margin-bottom:var(--sp4);box-shadow:var(--shadow-sm)}
 .btn{padding:8px 16px;border:1px solid var(--border2);border-radius:var(--r);background:transparent;color:var(--text);cursor:pointer;font-size:13px;display:inline-flex;align-items:center;gap:6px;transition:all .15s;font-family:inherit}
-.btn:hover{background:var(--bg2)}.btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}.btn.primary:hover{background:var(--primary-dark)}
-.btn.success{background:var(--primary);color:#fff;border-color:var(--primary)}.btn.success:hover{background:var(--primary-dark)}
-.btn.warn{background:var(--warn);color:#fff;border-color:var(--warn)}.btn.warn:hover{filter:brightness(.94)}.btn.sm{padding:5px 10px;font-size:12px}
-.btn.danger{background:var(--crit);color:#fff;border-color:var(--crit)}.btn.danger:hover{filter:brightness(.92);background:var(--crit)}
+.btn:hover{background:var(--bg2)}.btn.primary{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}.btn.primary:hover{background:var(--primary-dark)}
+.btn.success{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}.btn.success:hover{background:var(--primary-dark)}
+.btn.warn{background:var(--warn);color:var(--on-warn);border-color:var(--warn)}.btn.warn:hover{filter:brightness(.94)}.btn.sm{padding:5px 10px;font-size:12px}
+.btn.danger{background:var(--crit);color:var(--on-crit);border-color:var(--crit)}.btn.danger:hover{filter:brightness(.92);background:var(--crit)}
 /* Styled confirm dialog (uiConfirm) */
 .ui-confirm-ov{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(15,20,30,.5);backdrop-filter:blur(2px);opacity:0;transition:opacity .14s}
 .ui-confirm-ov.show{opacity:1}
 .ui-confirm{background:var(--bg);border:1px solid var(--border);border-radius:16px;box-shadow:0 18px 50px rgba(0,0,0,.28);padding:26px 26px 20px;width:400px;max-width:100%;text-align:center;transform:translateY(8px) scale(.98);transition:transform .16s}
 .ui-confirm-ov.show .ui-confirm{transform:none}
-.ui-confirm-ic{width:52px;height:52px;border-radius:14px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:24px;background:color-mix(in srgb,var(--primary) 12%,transparent);color:var(--primary)}
+.ui-confirm-ic{width:52px;height:52px;border-radius:14px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:24px;background:color-mix(in srgb,var(--primary) 12%,transparent);color:var(--primary-fg)}
 .ui-confirm-ic.danger{background:color-mix(in srgb,var(--crit) 13%,transparent);color:var(--crit)}
 .ui-confirm-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:6px}
 .ui-confirm-msg{font-size:13.5px;color:var(--text2);line-height:1.5;white-space:pre-line}
@@ -92,10 +92,10 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
 .project-menu .pm-row:hover{background:var(--bg2)}
 .project-menu .pm-row.cur{background:color-mix(in srgb,var(--primary) 9%,transparent)}
 .project-menu .pm-open{flex:1;min-width:0;display:flex;align-items:center;gap:9px;background:none;border:none;cursor:pointer;padding:9px 10px;text-align:left;color:var(--text);font-family:inherit;font-size:13px}
-.project-menu .pm-open i{color:var(--primary);font-size:16px;flex-shrink:0}
+.project-menu .pm-open i{color:var(--primary-fg);font-size:16px;flex-shrink:0}
 .project-menu .pm-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
 .project-menu .pm-when{font-size:11px;color:var(--text3);white-space:nowrap;flex-shrink:0}
-.project-menu .pm-badge{font-size:10px;font-weight:700;color:var(--primary);background:color-mix(in srgb,var(--primary) 14%,transparent);border-radius:20px;padding:2px 8px;flex-shrink:0}
+.project-menu .pm-badge{font-size:10px;font-weight:700;color:var(--primary-fg);background:color-mix(in srgb,var(--primary) 14%,transparent);border-radius:20px;padding:2px 8px;flex-shrink:0}
 .project-menu .pm-ic{background:none;border:none;cursor:pointer;color:var(--text3);padding:7px;border-radius:7px;flex-shrink:0;display:inline-flex}
 .project-menu .pm-ic:hover{color:var(--text);background:var(--bg3)}
 .project-menu .pm-ic.danger:hover{color:var(--crit);background:color-mix(in srgb,var(--crit) 12%,transparent)}
@@ -112,14 +112,14 @@ select,input[type=text],input[type=number]{padding:7px 10px;border:1px solid var
 .dropzone.drag{border-color:var(--primary);background:color-mix(in srgb,var(--primary) 8%,transparent)}
 .dropzone-empty{text-align:center;padding:20px 12px;color:var(--text2);font-size:12.5px;cursor:pointer}
 .dropzone-empty i{font-size:28px;color:var(--text3);display:block;margin-bottom:8px}
-.dropzone-empty b{color:var(--primary)}
+.dropzone-empty b{color:var(--primary-fg)}
 .dropzone-files{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
 .filecard{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);min-width:0}
 .filecard .fmeta{flex:1;min-width:0}
 .filecard .fname{font-size:12.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .filecard .fsize{font-size:11px;color:var(--text3)}
 .filecard a,.filecard button{background:none;border:none;cursor:pointer;color:var(--text3);padding:3px;font-size:14px;text-decoration:none;flex-shrink:0}
-.filecard a:hover{color:var(--primary)}
+.filecard a:hover{color:var(--primary-fg)}
 .filecard button:hover{color:var(--crit)}
 .dropzone-hint{font-size:11px;color:var(--text3);text-align:center;padding-top:10px;border-top:1px solid var(--border);margin-top:10px}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -140,7 +140,7 @@ select,input[type=text],input[type=number]{padding:7px 10px;border:1px solid var
 .cal-cell.other-month{background:var(--bg2)}.cal-cell.other-month .cal-day-num{opacity:.35}
 .cal-cell.cal-today{background:color-mix(in srgb,var(--accent-ui) 8%,transparent)}
 .cal-day-num{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px;line-height:1}
-.cal-today-badge{background:var(--accent-ui);color:#fff;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.cal-today-badge{background:var(--accent-ui);color:var(--on-primary);border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
 .cal-event{font-size:10px;border-radius:3px;padding:2px 5px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;line-height:1.45;border-left-width:2px;border-left-style:solid}
 .cal-event:hover{filter:brightness(.92)}
 .score-fill{height:100%;border-radius:3px;transition:width .5s}
@@ -178,7 +178,7 @@ select,input[type=text],input[type=number]{padding:7px 10px;border:1px solid var
 .score-input{width:75px;padding:5px 8px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:12px;font-family:inherit}
 .notes-input{width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:12px;font-family:inherit;resize:none;overflow:hidden;line-height:1.4}
 .weight-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border)}
-.weight-row:last-child{border-bottom:none}.weight-label{flex:1;font-size:13px}.weight-val{min-width:36px;text-align:right;font-size:13px;font-weight:600;color:var(--primary)}
+.weight-row:last-child{border-bottom:none}.weight-label{flex:1;font-size:13px}.weight-val{min-width:36px;text-align:right;font-size:13px;font-weight:600;color:var(--primary-fg)}
 input[type=range]{flex:2;accent-color:var(--primary)}
 .info-box{background:var(--info-bg);border:1px solid color-mix(in srgb,var(--primary) 20%,transparent);border-radius:var(--r);padding:12px 14px;font-size:13px;color:var(--info-text);margin-bottom:14px;display:flex;gap:8px;align-items:flex-start}
 .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--text2);margin-bottom:12px}
@@ -186,7 +186,7 @@ input[type=range]{flex:2;accent-color:var(--primary)}
 .empty{text-align:center;padding:52px 32px;color:var(--text2);font-size:13.5px;line-height:1.55}
 /* Badge styling only for the decorative icon (a direct child) — never the icons
    inside buttons/links nested in the empty state. */
-.empty>i{font-size:27px;color:var(--primary);width:62px;height:62px;display:flex;align-items:center;justify-content:center;margin:0 auto 15px;background:color-mix(in srgb,var(--primary) 8%,transparent);border-radius:17px}
+.empty>i{font-size:27px;color:var(--primary-fg);width:62px;height:62px;display:flex;align-items:center;justify-content:center;margin:0 auto 15px;background:color-mix(in srgb,var(--primary) 8%,transparent);border-radius:17px}
 .empty b{color:var(--text);font-weight:600}
 .empty .btn{margin-top:16px}
 .empty .btn i{font-size:15px;width:auto;height:auto;margin:0;background:none;border-radius:0;display:inline-flex}
@@ -194,20 +194,20 @@ input[type=range]{flex:2;accent-color:var(--primary)}
 .workflow-stepper{display:flex;align-items:flex-start;overflow-x:auto;padding-bottom:4px}
 .wf-step{display:flex;flex-direction:column;align-items:center;position:relative;flex:1;min-width:72px;cursor:pointer;padding:0 4px}
 .wf-step:not(:last-child)::after{content:'';position:absolute;top:15px;left:calc(50% + 18px);right:calc(-50% + 18px);height:2px;background:var(--border);z-index:0}
-.wf-step.wf-done:not(:last-child)::after,.wf-step.wf-active:not(:last-child)::after{background:var(--good)}
+.wf-step.wf-done:not(:last-child)::after,.wf-step.wf-active:not(:last-child)::after{background:var(--positive)}
 .wf-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;z-index:1;border:2px solid var(--border);background:var(--bg);color:var(--text2);transition:all .2s}
-.wf-step.wf-done .wf-dot{background:var(--good);border-color:var(--good);color:#fff}
-.wf-step.wf-active .wf-dot{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 13%,transparent)}
-.wf-step.wf-partial .wf-dot{background:var(--warn);border-color:var(--warn);color:#fff}
+.wf-step.wf-done .wf-dot{background:var(--positive);border-color:var(--positive);color:var(--on-primary)}
+.wf-step.wf-active .wf-dot{background:var(--primary);border-color:var(--primary);color:var(--on-primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 13%,transparent)}
+.wf-step.wf-partial .wf-dot{background:var(--warn);border-color:var(--warn);color:var(--on-warn)}
 .wf-label{font-size:10px;margin-top:5px;text-align:center;color:var(--text3);font-weight:500;line-height:1.2}
-.wf-step.wf-done .wf-label{color:var(--good);font-weight:600}
-.wf-step.wf-active .wf-label{color:var(--primary);font-weight:700}
+.wf-step.wf-done .wf-label{color:var(--positive);font-weight:600}
+.wf-step.wf-active .wf-label{color:var(--primary-fg);font-weight:700}
 .wf-step.wf-partial .wf-label{color:var(--warn)}
 /* Supplier progress */
 .sup-progress-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:5px}
 .sup-progress-fill{height:100%;border-radius:2px}
-.sup-audit-btn{margin-top:8px;width:100%;padding:6px;border:1px solid var(--primary);border-radius:6px;background:transparent;color:var(--primary);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .15s}
-.sup-audit-btn:hover{background:var(--primary);color:#fff}
+.sup-audit-btn{margin-top:8px;width:100%;padding:6px;border:1px solid var(--primary);border-radius:6px;background:var(--primary);color:var(--on-primary);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .15s}
+.sup-audit-btn:hover{background:var(--primary-dark);border-color:var(--primary-dark)}
 /* ── Page header band — shared page shell ───────────────────────────────────── */
 /* Unified page header — every .page opens with this exact block so the title
    sits at the same Y, the subtitle (when present) uses the same rhythm, and any
@@ -216,7 +216,7 @@ input[type=range]{flex:2;accent-color:var(--primary)}
 .pagehead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin:0 0 20px;flex-wrap:wrap;min-height:34px}
 .pagehead-eyebrow{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--text3);font-weight:700;margin-bottom:5px}
 .pagehead h2{font-family:Georgia,"Iowan Old Style","Times New Roman",serif;font-size:19px;font-weight:400;letter-spacing:-.01em;margin:0;line-height:1.3;display:flex;align-items:center;gap:9px}
-.pagehead h2 i{color:var(--primary);font-size:17px;flex-shrink:0}
+.pagehead h2 i{color:var(--primary-fg);font-size:17px;flex-shrink:0}
 .pagehead-sub{color:var(--text2);font-size:12.5px;margin-top:5px;line-height:1.4;max-width:70ch}
 .pagehead-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex-shrink:0}
 
@@ -250,7 +250,7 @@ input[type=range]{flex:2;accent-color:var(--primary)}
 .au-cathdr:hover{color:var(--text2)}
 .au-railtools{display:flex;gap:6px;padding:8px 10px;border-bottom:1px solid var(--border);background:var(--bg)}
 .au-railtools button{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:4px;font-size:10.5px;font-weight:600;color:var(--text3);background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:5px 6px;cursor:pointer;font-family:inherit;white-space:nowrap}
-.au-railtools button:hover{color:var(--primary);border-color:var(--primary)}
+.au-railtools button:hover{color:var(--primary-fg);border-color:var(--primary)}
 .au-cathdr .au-chl{display:flex;align-items:center;gap:6px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .au-cathdr .au-chev{font-size:13px;color:var(--text3);flex-shrink:0;transition:transform .15s}
 .au-cathdr.collapsed .au-chev{transform:rotate(-90deg)}
@@ -272,10 +272,10 @@ input[type=range]{flex:2;accent-color:var(--primary)}
 .au-sbtn{width:46px;height:46px;border:1.5px solid var(--border2);border-radius:9px;background:var(--bg);color:var(--text);font-size:16px;font-weight:700;cursor:pointer;font-variant-numeric:tabular-nums;transition:transform .08s,border-color .12s}
 .au-sbtn:hover{transform:translateY(-1px);border-color:var(--primary)}
 .au-sbtn.na{width:auto;padding:0 13px;font-size:12px;color:var(--text2)}
-.au-sbtn.sel.v0,.au-sbtn.sel.v1{background:var(--crit);border-color:var(--crit);color:#fff}
-.au-sbtn.sel.v2,.au-sbtn.sel.v3{background:var(--warn);border-color:var(--warn);color:#fff}
-.au-sbtn.sel.v4,.au-sbtn.sel.v5{background:var(--good);border-color:var(--good);color:#fff}
-.au-sbtn.sel.na{background:var(--text3);border-color:var(--text3);color:#fff}
+.au-sbtn.sel.v0,.au-sbtn.sel.v1{background:var(--crit);border-color:var(--crit);color:var(--on-crit)}
+.au-sbtn.sel.v2,.au-sbtn.sel.v3{background:var(--warn);border-color:var(--warn);color:var(--on-warn)}
+.au-sbtn.sel.v4,.au-sbtn.sel.v5{background:var(--good);border-color:var(--good);color:var(--on-good)}
+.au-sbtn.sel.na{background:var(--text3);border-color:var(--text3);color:var(--on-text3)}
 .au-kbd{font-size:10.5px;color:var(--text3);margin-left:6px}
 .au-rubric{margin:14px 0;border:1px solid var(--border);border-radius:var(--rl);overflow:hidden}
 .au-rr{display:flex;gap:12px;padding:8px 13px;font-size:12px;border-bottom:1px solid var(--border);align-items:flex-start;cursor:pointer}
@@ -283,10 +283,21 @@ input[type=range]{flex:2;accent-color:var(--primary)}
 .au-rr:hover{background:var(--bg2)}
 .au-rr.hot{background:color-mix(in srgb,var(--primary) 9%,transparent)}
 .au-rr .rn{font-weight:700;color:var(--text3);min-width:12px;font-variant-numeric:tabular-nums}
-.au-rr.hot .rn{color:var(--primary)}
+.au-rr.hot .rn{color:var(--primary-fg)}
 .au-notes{width:100%;border:1px solid var(--border2);border-radius:9px;background:var(--bg);color:var(--text);font-family:inherit;font-size:13px;padding:10px 12px;resize:vertical;min-height:70px}
 .cmp-cell{transition:background .12s;border-radius:6px}
 .cmp-cell:hover{background:color-mix(in srgb,var(--primary) 9%,transparent)}
+/* Analysis checkpoint rows open the checkpoint popup, like the heatmap cells */
+.cp-row{cursor:pointer;transition:background .12s}
+.cp-row:hover td{background:color-mix(in srgb,var(--primary) 9%,transparent)}
+/* linked-task indicator (icon + count) and the task list inside the popup */
+.cp-task-ind{display:inline-flex;align-items:center;gap:2px;font-size:11px;font-weight:700;vertical-align:middle;font-variant-numeric:tabular-nums}
+.cp-task-ind i{font-size:13px}
+/* Tasks column in the category analysis: shrink to its content (icon + count) */
+.data-table .cp-task-col{white-space:nowrap;text-align:center;padding-left:6px;padding-right:6px}
+.cp-task-list{display:flex;flex-direction:column;gap:6px}
+.cp-task-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:var(--bg2);transition:border-color .12s}
+.cp-task-row:hover{border-color:var(--primary)}
 .au-foot{display:flex;gap:8px;margin-top:14px;align-items:center;flex-wrap:wrap}
 
 /* Ledger grid (dense table view) */
@@ -306,10 +317,10 @@ input[type=range]{flex:2;accent-color:var(--primary)}
 .au-ltable .criteria-row:last-child{border-bottom:none}
 .au-ltable .criteria-row.hot{background:color-mix(in srgb,var(--primary) 9%,transparent)}
 .au-ltable .criteria-row .cn{font-weight:700;color:var(--text3);min-width:11px;font-variant-numeric:tabular-nums}
-.au-ltable .criteria-row.hot .cn{color:var(--primary)}
+.au-ltable .criteria-row.hot .cn{color:var(--primary-fg)}
 .au-critbtn{flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text3);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:color .12s,border-color .12s}
 .au-critbtn:hover{color:var(--text);border-color:var(--border2)}
-.au-critbtn.on{color:var(--primary);border-color:var(--primary)}
+.au-critbtn.on{color:var(--primary-fg);border-color:var(--primary)}
 .au-critbtn i{font-size:15px;transition:transform .15s}
 .au-critbtn.on i{transform:rotate(180deg)}
 .au-notes-cell{display:flex;align-items:flex-start;gap:4px}
@@ -319,7 +330,7 @@ input[type=range]{flex:2;accent-color:var(--primary)}
 .note-tool .nt-ic{font-size:15px}
 .note-tool:hover{background:var(--bg2);border-color:var(--primary);color:var(--text)}
 .note-tool:disabled{opacity:.6;cursor:default}
-.note-tool.ai{color:var(--primary);border-color:color-mix(in srgb,var(--primary) 40%,transparent);background:color-mix(in srgb,var(--primary) 9%,transparent)}
+.note-tool.ai{color:var(--primary-fg);border-color:color-mix(in srgb,var(--primary) 40%,transparent);background:color-mix(in srgb,var(--primary) 9%,transparent)}
 .note-tool.ai:hover{background:color-mix(in srgb,var(--primary) 16%,transparent);border-color:var(--primary)}
 .note-tool.icon-only{padding:0;width:30px;height:30px;justify-content:center;flex-shrink:0}
 .note-tool.icon-only .nt-ic{font-size:16px}
@@ -332,8 +343,8 @@ input[type="color"].cp-swatch::-moz-color-swatch{border:none;border-radius:calc(
 .au-ai-prev-row td{padding-top:0}
 /* Attach button + inline evidence row in the Table view */
 .au-fbtn{display:inline-flex;align-items:center;gap:3px;padding:4px 8px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text2);cursor:pointer;font-size:13px}
-.au-fbtn:hover{border-color:var(--primary);color:var(--primary)}
-.au-fbtn.has{border-color:var(--primary);color:var(--primary);background:color-mix(in srgb,var(--primary) 8%,transparent)}
+.au-fbtn:hover{border-color:var(--primary);color:var(--primary-fg)}
+.au-fbtn.has{border-color:var(--primary);color:var(--primary-fg);background:color-mix(in srgb,var(--primary) 8%,transparent)}
 .au-fbtn .au-fcount{font-size:10px;font-weight:700;font-variant-numeric:tabular-nums}
 .au-filerow>td{padding:0 12px 12px!important;background:var(--bg2)}
 .au-filerow:hover>td{background:var(--bg2)}
@@ -341,22 +352,22 @@ input[type="color"].cp-swatch::-moz-color-swatch{border:none;border-radius:calc(
 .au-lfiles.drag{border-color:var(--primary);background:var(--bg2)}
 .au-lfiles-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin-bottom:8px}
 .au-lfiles-add{font-size:12px;color:var(--text3);text-align:center;padding:8px;cursor:pointer;border-radius:var(--r)}
-.au-lfiles-add:hover{color:var(--primary);background:var(--bg2)}
-.au-lfiles-add b{color:var(--primary)}
+.au-lfiles-add:hover{color:var(--primary-fg);background:var(--bg2)}
+.au-lfiles-add b{color:var(--primary-fg)}
 .au-ai-prev{border:1px solid color-mix(in srgb,var(--primary) 25%,transparent);border-radius:var(--r);background:color-mix(in srgb,var(--primary) 6%,transparent);padding:9px 11px}
 .au-seg{display:inline-flex;border:1px solid var(--border2);border-radius:7px;overflow:hidden}
 .au-seg button{appearance:none;border:none;border-right:1px solid var(--border);background:var(--bg);color:var(--text2);width:28px;height:28px;font-size:12.5px;font-weight:700;cursor:pointer;font-variant-numeric:tabular-nums;font-family:inherit}
 .au-seg button:last-child{border-right:none}
 .au-seg button:hover{background:var(--bg2)}
-.au-seg button.on0,.au-seg button.on1{background:var(--crit);color:#fff}
-.au-seg button.on2,.au-seg button.on3{background:var(--warn);color:#fff}
-.au-seg button.on4,.au-seg button.on5{background:var(--good);color:#fff}
-.au-seg button.onna{background:var(--text3);color:#fff}
+.au-seg button.on0,.au-seg button.on1{background:var(--crit);color:var(--on-crit)}
+.au-seg button.on2,.au-seg button.on3{background:var(--warn);color:var(--on-warn)}
+.au-seg button.on4,.au-seg button.on5{background:var(--good);color:var(--on-good)}
+.au-seg button.onna{background:var(--text3);color:var(--on-text3)}
 /* Risk factors reuse the assessment's segmented control, but 1–3 means risk
    (low is good) rather than a score, so they get their own state colours. */
-.au-seg button.rlow{background:var(--good);color:#fff}
-.au-seg button.rmed{background:var(--warn);color:#fff}
-.au-seg button.rhigh{background:var(--crit);color:#fff}
+.au-seg button.rlow{background:var(--good);color:var(--on-good)}
+.au-seg button.rmed{background:var(--warn);color:var(--on-warn)}
+.au-seg button.rhigh{background:var(--crit);color:var(--on-crit)}
 .au-ltable tr.grp td{background:var(--bg2);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);padding:5px 12px}
 .au-ltable tr.grp:hover td{background:var(--bg2)}
 .au-ltable .sub{font-size:11px;color:var(--text3);margin-top:2px;line-height:1.35}
@@ -385,17 +396,17 @@ input[type="color"].cp-swatch::-moz-color-swatch{border:none;border-radius:calc(
 .score-btn-row{display:flex;gap:5px;margin-bottom:8px}
 .score-btn{flex:1;height:46px;border:2px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:15px;font-weight:700;cursor:pointer;transition:all .12s;-webkit-tap-highlight-color:transparent}
 .score-btn:hover{border-color:var(--primary)}
-.score-btn.sb-1{background:var(--crit);border-color:var(--crit);color:#fff}
-.score-btn.sb-2{background:var(--warn);border-color:var(--warn);color:#fff}
-.score-btn.sb-3{background:var(--warn);border-color:var(--warn);color:#fff}
-.score-btn.sb-4{background:var(--accent);border-color:var(--accent);color:#fff}
-.score-btn.sb-5{background:var(--good);border-color:var(--good);color:#fff}
+.score-btn.sb-1{background:var(--crit);border-color:var(--crit);color:var(--on-crit)}
+.score-btn.sb-2{background:var(--warn);border-color:var(--warn);color:var(--on-warn)}
+.score-btn.sb-3{background:var(--warn);border-color:var(--warn);color:var(--on-warn)}
+.score-btn.sb-4{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.score-btn.sb-5{background:var(--good);border-color:var(--good);color:var(--on-good)}
 .score-btn.sb-0{background:color-mix(in srgb,var(--crit) 78%,#000);border-color:color-mix(in srgb,var(--crit) 78%,#000);color:#fff}
-.score-btn.sb-na{background:var(--text3);border-color:var(--text3);color:#fff;font-size:11px}
+.score-btn.sb-na{background:var(--text3);border-color:var(--text3);color:var(--on-text3);font-size:11px}
 .aw-note{width:100%;border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:12px;background:var(--bg);color:var(--text);resize:none;box-sizing:border-box;font-family:inherit;margin-top:2px}
 .filter-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
 .filter-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer;transition:all .15s;background:var(--bg)}
-.filter-chip:hover{background:var(--bg2)}.filter-chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.filter-chip:hover{background:var(--bg2)}.filter-chip.active{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
 .filter-chip.red.active{background:var(--crit);border-color:var(--crit)}.filter-chip.yellow.active{background:var(--warn);border-color:var(--warn)}.filter-chip.green.active{background:var(--good);border-color:var(--good)}
 .theme-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:16px}
 .theme-card{border:2px solid var(--border);border-radius:var(--rl);padding:12px 10px;cursor:pointer;transition:all .15s;text-align:center}
@@ -406,9 +417,9 @@ input[type="color"].cp-swatch::-moz-color-swatch{border:none;border-radius:calc(
 .xopt{display:inline-flex;align-items:center;gap:9px;padding:9px 14px;border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);background:var(--bg);transition:border-color .15s,background .15s,color .15s;user-select:none}
 .xopt:hover{border-color:color-mix(in srgb,var(--primary) 40%,var(--border));color:var(--text)}
 .xopt .xopt-ic{font-size:17px;color:var(--text3);transition:color .15s;line-height:1}
-.xopt .xopt-chk{margin-left:1px;font-size:15px;color:var(--primary);opacity:0;transform:scale(.55);transition:opacity .15s,transform .15s;line-height:1}
+.xopt .xopt-chk{margin-left:1px;font-size:15px;color:var(--primary-fg);opacity:0;transform:scale(.55);transition:opacity .15s,transform .15s;line-height:1}
 .xopt.on{background:color-mix(in srgb,var(--primary) 8%,var(--bg));border-color:color-mix(in srgb,var(--primary) 55%,transparent);color:var(--text)}
-.xopt.on .xopt-ic{color:var(--primary)}
+.xopt.on .xopt-ic{color:var(--primary-fg)}
 .xopt.on .xopt-chk{opacity:1;transform:scale(1)}
 .settings-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
 @media(max-width:640px){.settings-grid{grid-template-columns:1fr}}
@@ -425,13 +436,13 @@ input[type="color"].cp-swatch::-moz-color-swatch{border:none;border-radius:calc(
 .thresh-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:13px}
 .thresh-row label{min-width:80px;color:var(--text2)}.thresh-row input[type=number]{width:70px}
 .color-dot{width:14px;height:14px;border-radius:50%;display:inline-block;flex-shrink:0}
-.toast{position:fixed;bottom:20px;right:20px;background:var(--primary);color:#fff;padding:10px 18px;border-radius:var(--r);font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999;display:flex;align-items:center;gap:8px}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--primary);color:var(--on-primary);padding:10px 18px;border-radius:var(--r);font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999;display:flex;align-items:center;gap:8px}
 .toast.show{opacity:1}
 .tabs-row{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:16px}
 .etab{padding:9px 18px;border:none;background:none;cursor:pointer;font-size:13px;color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;font-family:inherit}
 .etab.active{color:var(--text);border-bottom-color:var(--accent-ui);font-weight:500}
 .etab-content{display:none}.etab-content.active{display:block}
-.ai-panel{background:linear-gradient(135deg,var(--primary-dark),var(--primary));border-radius:var(--rl);padding:20px;margin-bottom:16px;color:#fff}
+.ai-panel{background:linear-gradient(135deg,var(--primary-dark),var(--primary));border-radius:var(--rl);padding:20px;margin-bottom:16px;color:var(--on-primary)}
 .ai-panel-title{font-size:15px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .ai-bubble{background:rgba(255,255,255,.12);border-radius:var(--r);padding:14px;font-size:13px;line-height:1.7;margin-top:10px;white-space:pre-wrap}
 .ai-bubble.loading{opacity:.6;font-style:italic}
@@ -547,22 +558,30 @@ input[type="color"].cp-swatch::-moz-color-swatch{border:none;border-radius:calc(
   --font-ui:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',system-ui,sans-serif;
   /* secondary is the gradient partner on AI/primary buttons — it stayed the old
      warm gold (#8a6d3f) and put a brown streak in an otherwise cool UI */
-  --primary:#0055ff;--primary-dark:#0044cc;
+  --primary:#a2f233;--primary-dark:#8fd61f;
+  /* contrast-safe companions of --primary, recomputed at runtime by
+     applyContrastTokens() for whatever primary + mode is active:
+     --on-primary = text/icons ON a primary fill, --primary-fg = primary used AS text */
+  --on-primary:#fff;--primary-fg:var(--primary);
+  /* "done / complete / exact" states follow the brand colour (readable text variant);
+     warn (in progress, attention) and crit (problem) stay fixed traffic-light hues */
+  --positive:var(--primary-fg);
+  --on-good:#fff;--on-warn:#fff;--on-crit:#fff;--on-accent:#fff;--on-text3:#fff;
   /* secondary is the AI-gradient partner (a darker primary) */
   --secondary:color-mix(in srgb,var(--primary),black 20%);
   /* accent-ui/-soft power focus rings, the calendar "today" mark and the swatch ring — all track primary now */
   --accent-ui:var(--primary);--accent-soft:color-mix(in srgb,var(--primary) 16%,transparent);
   /* Tool-wide task-status colours — one source of truth used by the Coverage
-     view, the Gantt and the KPI tiles. "In Progress" tracks the brand primary,
-     so changing the system colour recolours it everywhere at once. */
-  --st-open:#64748b;--st-progress:var(--primary);--st-done:#0d9488;
+     view, the Gantt and the KPI tiles. "Done" tracks the brand primary (--positive),
+     "In Progress" is amber like the assessment status. */
+  --st-open:#64748b;--st-progress:var(--warn);--st-done:var(--positive);
   /* full cool neutral ramp — the old warm sepia surfaces are what made the
      content still read as a paper report next to the graphite bar */
   --bg:#ffffff;--bg2:#f5f6f8;--bg3:#f1f3f6;
   --text:#16202c;--text2:#5a6473;--text3:#8a94a6;
   --border:rgba(22,32,44,.12);--border2:rgba(22,32,44,.20);--border-soft:rgba(22,32,44,.07);
   --info-bg:#e9f1fd;--info-text:#245aad;
-  --bar:#1b2430;--bar-2:#2a3546;--bar-text:#ffffff;--bar-idle:#8a94a6;--bar-active:#5b9bf5;
+  --bar:#0a0e2a;--bar-2:#141b40;--bar-text:#ffffff;--bar-idle:#6f7bb5;--bar-active:#c4f230;
   /* progress/score bar fill — deliberately a NEUTRAL slate, not the accent.
      Accent blue at low opacity read as washed-out and added a fourth hue to
      every row; grey lets the coloured number be the only signal. */
@@ -577,15 +596,16 @@ input[type="color"].cp-swatch::-moz-color-swatch{border:none;border-radius:calc(
   --shadow-lg:0 12px 40px rgba(22,32,44,.16);
 }
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --primary:#4d8bff;--primary-dark:#6ea3ff;
+  --primary:#a2f233;--primary-dark:#b9f566;
   --secondary:color-mix(in srgb,var(--primary),white 22%);
   --accent-ui:var(--primary);--accent-soft:color-mix(in srgb,var(--primary) 24%,transparent);
-  --bg:#171e28;--bg2:#1e2732;--bg3:#0f141b;
-  --text:#e8edf4;--text2:#9aa6b8;--text3:#6b7789;
-  --border:rgba(255,255,255,.10);--border2:rgba(255,255,255,.18);--border-soft:rgba(255,255,255,.06);
-  --info-bg:#16283f;--info-text:#8bb8f7;
-  --bar:#0e131b;--bar-2:#1b2532;--bar-text:#eaf0f8;--bar-idle:#7e8da4;--bar-active:#5b9bf5;
-  --track:#232d3a;--track-fill:#47546a;
+  /* dark surfaces follow the login screen (navy #0a0e2a canvas, #141b40 cards) */
+  --bg:#141b40;--bg2:#1b2452;--bg3:#0a0e2a;
+  --text:#eef1ff;--text2:#9aa4d4;--text3:#6f7bb5;
+  --border:#2a3568;--border2:#3a4784;--border-soft:#1f2854;
+  --info-bg:#16205a;--info-text:#a9b8ff;
+  --bar:#0a0e2a;--bar-2:#141b40;--bar-text:#eef1ff;--bar-idle:#6f7bb5;--bar-active:#c4f230;
+  --track:#1f2854;--track-fill:#4a5590;
   --good:#5CC98D;--good-bg:#16301f;--warn:#E0A83A;--warn-bg:#33280f;--crit:#EF6B6B;--crit-bg:#3a1c1c;
   --shadow-sm:0 1px 2px rgba(0,0,0,.35);
   --shadow-md:0 2px 10px rgba(0,0,0,.45);
@@ -597,35 +617,36 @@ input[type="color"].cp-swatch::-moz-color-swatch{border:none;border-radius:calc(
    silently reverted the whole app to the previous sepia/green design while
    "Auto" (no attribute) stayed graphite. */
 :root[data-theme="light"]{
-  --primary:#0055ff;--primary-dark:#0044cc;
+  --primary:#a2f233;--primary-dark:#8fd61f;
   /* secondary is the AI-gradient partner (a darker primary) */
   --secondary:color-mix(in srgb,var(--primary),black 20%);
   /* accent-ui/-soft power focus rings, the calendar "today" mark and the swatch ring — all track primary now */
   --accent-ui:var(--primary);--accent-soft:color-mix(in srgb,var(--primary) 16%,transparent);
   /* Tool-wide task-status colours — one source of truth used by the Coverage
-     view, the Gantt and the KPI tiles. "In Progress" tracks the brand primary,
-     so changing the system colour recolours it everywhere at once. */
-  --st-open:#64748b;--st-progress:var(--primary);--st-done:#0d9488;
+     view, the Gantt and the KPI tiles. "Done" tracks the brand primary (--positive),
+     "In Progress" is amber like the assessment status. */
+  --st-open:#64748b;--st-progress:var(--warn);--st-done:var(--positive);
   --bg:#ffffff;--bg2:#f5f6f8;--bg3:#f1f3f6;
   --text:#16202c;--text2:#5a6473;--text3:#8a94a6;
   --border:rgba(22,32,44,.12);--border2:rgba(22,32,44,.20);--border-soft:rgba(22,32,44,.07);
   --info-bg:#e9f1fd;--info-text:#245aad;
   --track:#e6e9ee;--track-fill:#aab4c2;
-  --bar:#1b2430;--bar-2:#2a3546;--bar-text:#ffffff;--bar-idle:#8a94a6;--bar-active:#5b9bf5;
+  --bar:#0a0e2a;--bar-2:#141b40;--bar-text:#ffffff;--bar-idle:#6f7bb5;--bar-active:#c4f230;
   --shadow-sm:0 1px 2px rgba(22,32,44,.05);
   --shadow-md:0 2px 8px rgba(22,32,44,.07),0 8px 24px rgba(22,32,44,.05);
   --shadow-lg:0 12px 40px rgba(22,32,44,.16);
 }
 :root[data-theme="dark"]{
-  --primary:#4d8bff;--primary-dark:#6ea3ff;
+  --primary:#a2f233;--primary-dark:#b9f566;
   --secondary:color-mix(in srgb,var(--primary),white 22%);
   --accent-ui:var(--primary);--accent-soft:color-mix(in srgb,var(--primary) 24%,transparent);
-  --bg:#171e28;--bg2:#1e2732;--bg3:#0f141b;
-  --text:#e8edf4;--text2:#9aa6b8;--text3:#6b7789;
-  --border:rgba(255,255,255,.10);--border2:rgba(255,255,255,.18);--border-soft:rgba(255,255,255,.06);
-  --info-bg:#16283f;--info-text:#8bb8f7;
-  --bar:#0e131b;--bar-2:#1b2532;--bar-text:#eaf0f8;--bar-idle:#7e8da4;--bar-active:#5b9bf5;
-  --track:#232d3a;--track-fill:#47546a;
+  /* dark surfaces follow the login screen (navy #0a0e2a canvas, #141b40 cards) */
+  --bg:#141b40;--bg2:#1b2452;--bg3:#0a0e2a;
+  --text:#eef1ff;--text2:#9aa4d4;--text3:#6f7bb5;
+  --border:#2a3568;--border2:#3a4784;--border-soft:#1f2854;
+  --info-bg:#16205a;--info-text:#a9b8ff;
+  --bar:#0a0e2a;--bar-2:#141b40;--bar-text:#eef1ff;--bar-idle:#6f7bb5;--bar-active:#c4f230;
+  --track:#1f2854;--track-fill:#4a5590;
   --good:#5CC98D;--good-bg:#16301f;--warn:#E0A83A;--warn-bg:#33280f;--crit:#EF6B6B;--crit-bg:#3a1c1c;
   --shadow-sm:0 1px 2px rgba(0,0,0,.35);
   --shadow-md:0 2px 10px rgba(0,0,0,.45);
@@ -647,7 +668,7 @@ input[type="color"].cp-swatch::-moz-color-swatch{border:none;border-radius:calc(
 
 /* subnav is the light second tier below the dark bar */
 .subnav{background:var(--bg3);border-bottom:1px solid var(--border)}
-.subnav-btn.active{color:var(--primary)}
+.subnav-btn.active{color:var(--primary-fg)}
 
 /* ── Card + typography refinement ───────────────────────────────────────── */
 .main{padding:26px 30px}
@@ -698,13 +719,21 @@ input[type="color"].cp-swatch::-moz-color-swatch{border:none;border-radius:calc(
 /* Summary ranking — same row language as the category rows, but weighted as the
    headline block: accent edge, eyebrow, rank numbers and a larger figure. */
 .rank-card{border-left:3px solid var(--primary)}
-.rank-eyebrow{font-size:9.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--primary);margin-bottom:3px}
+.rank-eyebrow{font-size:9.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--primary-fg);margin-bottom:3px}
 .rank-sub{font-size:11.5px;color:var(--text3);margin:-6px 0 12px}
 .rank-row{padding:9px 0;border-bottom:1px solid var(--border-soft)}
 .rank-row:last-child{border-bottom:none}
 .rank-no{width:22px;min-width:22px;text-align:right;font-size:11px;font-weight:600;color:var(--text3);font-variant-numeric:tabular-nums}
 .rank-row .cat-name{width:auto;min-width:0;max-width:none;flex:0 1 240px;color:var(--text);font-weight:500}
 .rank-row .cat-pct{font-size:14.5px;font-weight:600;min-width:56px}
+
+/* Analysis: per-category cards side by side instead of stacked full-width */
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:var(--sp4);margin-bottom:var(--sp4)}
+.cat-grid>.card{margin-bottom:0;min-width:0}
+.cat-grid>.card>div:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cat-grid .cat-name{width:auto;min-width:0;max-width:none;flex:0 1 170px}
+.cat-grid .cat-pct{min-width:40px}
+@media(max-width:600px){.cat-grid{grid-template-columns:1fr}}
 
 /* ── Typography: sans everywhere ────────────────────────────────────────────
    The Georgia serif is what makes the content read as an editorial report
@@ -868,7 +897,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
       </span>
     </span>
   </div>
-  <button onclick="switchProject()" title="Switch project" style="display:flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;cursor:pointer;color:var(--text);font-size:12px;font-weight:600;white-space:nowrap"><i class="ti ti-folders" style="color:var(--primary)"></i> <span id="projectSwitchName">—</span> <i class="ti ti-chevron-down" style="font-size:12px;color:var(--text3)"></i></button>
+  <button onclick="switchProject()" title="Switch project" style="display:flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;cursor:pointer;color:var(--text);font-size:12px;font-weight:600;white-space:nowrap"><i class="ti ti-folders" style="color:var(--primary-fg)"></i> <span id="projectSwitchName">—</span> <i class="ti ti-chevron-down" style="font-size:12px;color:var(--text3)"></i></button>
   <nav class="nav" id="primaryNav">
     <button class="nav-btn" data-nav="dashboard" onclick="openNav('dashboard')"><i class="ti ti-layout-dashboard"></i> <span>Dashboard</span></button>
     <button class="nav-btn" data-nav="suppliers" onclick="openNav('suppliers')"><i class="ti ti-building-factory-2"></i> <span>Suppliers</span></button>
@@ -945,7 +974,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
       <!-- Left: template list -->
       <div>
         <button class="btn primary" onclick="startNewTemplate()" style="width:100%;margin-bottom:8px"><i class="ti ti-plus"></i> New Template</button>
-        <button class="btn" onclick="aiGenerateTemplate()" style="width:100%;margin-bottom:12px;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;border:none"><i class="ti ti-sparkles"></i> AI Generate Checklist</button>
+        <button class="btn" onclick="aiGenerateTemplate()" style="width:100%;margin-bottom:12px;background:linear-gradient(135deg,var(--primary),var(--secondary));color:var(--on-primary);border:none"><i class="ti ti-sparkles"></i> AI Generate Checklist</button>
         <div id="tplBuilderList"></div>
       </div>
 
@@ -978,8 +1007,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
         <div style="font-size:12px;color:var(--text2)">Drop .xlsx here or click · Requires standard column names (Checkpoint, Score, Notes)</div>
       </div>
       <div class="upload-zone" onclick="document.getElementById('aiFileInput').click()" style="margin:0;border-color:var(--primary);background:var(--bg2)">
-        <i class="ti ti-sparkles" style="color:var(--primary)"></i>
-        <div style="font-size:14px;font-weight:600;margin-bottom:4px;color:var(--primary)">AI Import <span style="font-size:10px;font-weight:700;background:var(--primary);color:#fff;padding:2px 6px;border-radius:4px;vertical-align:middle">NEW</span></div>
+        <i class="ti ti-sparkles" style="color:var(--primary-fg)"></i>
+        <div style="font-size:14px;font-weight:600;margin-bottom:4px;color:var(--primary-fg)">AI Import <span style="font-size:10px;font-weight:700;background:var(--primary);color:var(--on-primary);padding:2px 6px;border-radius:4px;vertical-align:middle">NEW</span></div>
         <div style="font-size:12px;color:var(--text2)">Any Excel structure · AI detects sheets, skips cover/index tabs, maps columns automatically</div>
       </div>
     </div>
@@ -1058,7 +1087,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
       <button class="btn sm" onclick="kpiEntryPasteHelp()" title="Paste a block of values from Excel"><i class="ti ti-clipboard"></i> Paste</button>
       <button class="btn sm" onclick="downloadKpiTemplate()"><i class="ti ti-file-spreadsheet"></i> Template</button>
       <button class="btn sm" onclick="triggerKpiImport()"><i class="ti ti-upload"></i> Import Excel</button>
-      <button class="btn sm" onclick="triggerKpiAiImport()" style="border-color:var(--primary);color:var(--primary)"><i class="ti ti-sparkles"></i> AI Import</button>
+      <button class="btn sm" onclick="triggerKpiAiImport()" style="border-color:var(--primary);color:var(--primary-fg)"><i class="ti ti-sparkles"></i> AI Import</button>
       <input type="file" id="kpiImportFileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleKpiImport(this.files[0]);this.value=''">
       <input type="file" id="kpiAiImportFileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="kpiAiImport(this.files[0]);this.value=''">
     </div>
@@ -1075,7 +1104,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
 <div id="kpiAiModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1700;align-items:center;justify-content:center;padding:16px">
   <div style="background:var(--bg);border-radius:var(--rl);padding:24px;width:900px;max-width:100%;max-height:92vh;overflow-y:auto;box-shadow:var(--shadow-lg)">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-      <div style="font-size:19px;font-weight:600"><i class="ti ti-sparkles" style="color:var(--primary)"></i> AI Import</div>
+      <div style="font-size:19px;font-weight:600"><i class="ti ti-sparkles" style="color:var(--primary-fg)"></i> AI Import</div>
       <button onclick="closeKpiAiModal()" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--text2)"><i class="ti ti-x"></i></button>
     </div>
     <p style="font-size:12.5px;color:var(--text2);margin-bottom:16px">Check the mapping before anything is written. Nothing is saved until you press Import.</p>
@@ -1135,7 +1164,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
 
 <!-- Single audit — detail view of the Audits list: the scoring console -->
 <div class="page" id="page-audit">
-  <button onclick="auConsoleBack()" style="display:inline-flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;color:var(--primary);font-size:12px;font-weight:600;padding:0 0 8px"><i class="ti ti-arrow-left"></i> All assessments</button>
+  <button onclick="auConsoleBack()" style="display:inline-flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;color:var(--primary-fg);font-size:12px;font-weight:600;padding:0 0 8px"><i class="ti ti-arrow-left"></i> All assessments</button>
   <div class="pagehead">
     <div>
       <h2><i class="ti ti-clipboard-check"></i> <span id="auTitle">Assessment &amp; Score</span></h2>
@@ -1224,11 +1253,11 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
     </div>
     <div class="pagehead-tools">
       <div style="display:flex;border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
-        <button id="actViewList" onclick="setActView('list')" style="padding:6px 12px;font-size:12px;border:none;cursor:pointer;background:var(--primary);color:#fff;display:flex;align-items:center;gap:4px"><i class="ti ti-list"></i> List</button>
+        <button id="actViewList" onclick="setActView('list')" style="padding:6px 12px;font-size:12px;border:none;cursor:pointer;background:var(--primary);color:var(--on-primary);display:flex;align-items:center;gap:4px"><i class="ti ti-list"></i> List</button>
         <button id="actViewGantt" onclick="setActView('gantt')" style="padding:6px 12px;font-size:12px;border:none;cursor:pointer;background:var(--bg);color:var(--text);display:flex;align-items:center;gap:4px"><i class="ti ti-chart-gantt"></i> Gantt</button>
         <button id="actViewCoverage" onclick="setActView('coverage')" style="padding:6px 12px;font-size:12px;border:none;cursor:pointer;background:var(--bg);color:var(--text);display:flex;align-items:center;gap:4px"><i class="ti ti-binary-tree"></i> Coverage</button>
       </div>
-      <button class="btn" onclick="aiSuggestActionsModal()" style="background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;border:none"><i class="ti ti-sparkles"></i> AI Suggestions</button>
+      <button class="btn" onclick="aiSuggestActionsModal()" style="background:linear-gradient(135deg,var(--primary),var(--secondary));color:var(--on-primary);border:none"><i class="ti ti-sparkles"></i> AI Suggestions</button>
       <button class="btn primary" onclick="openActionModal()"><i class="ti ti-plus"></i> New Action</button>
     </div>
   </div>
@@ -1352,7 +1381,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
     </div>
     <div class="pagehead-tools">
       <div style="display:flex;border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
-        <button id="calViewMonth" onclick="setCalView('month')" style="padding:6px 12px;font-size:12px;border:none;cursor:pointer;background:var(--primary);color:#fff">Month</button>
+        <button id="calViewMonth" onclick="setCalView('month')" style="padding:6px 12px;font-size:12px;border:none;cursor:pointer;background:var(--primary);color:var(--on-primary)">Month</button>
         <button id="calViewYear" onclick="setCalView('year')" style="padding:6px 12px;font-size:12px;border:none;cursor:pointer;background:var(--bg);color:var(--text)">Year</button>
       </div>
       <button class="btn sm" onclick="calPrev()"><i class="ti ti-chevron-left"></i></button>
@@ -1399,7 +1428,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px">
-          <button class="btn" onclick="resetBrandColors()" title="Built-in vivid blue"><i class="ti ti-refresh"></i> System default</button>
+          <button class="btn" onclick="resetBrandColors()" title="Built-in lime #a2f233"><i class="ti ti-refresh"></i> System default</button>
           <button class="btn" onclick="saveUserBrandDefault()" title="Remember the current colours as your default"><i class="ti ti-bookmark"></i> Save as my default</button>
           <span id="brandMyDefaultBtns" style="display:inline-flex;gap:8px"></span>
         </div>
@@ -1558,7 +1587,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
     <div class="tabs-row">
       <button class="etab active" onclick="switchExportTab('pptx',this)"><i class="ti ti-presentation"></i> PowerPoint (.pptx)</button>
       <button class="etab" onclick="switchExportTab('excel',this)"><i class="ti ti-file-spreadsheet"></i> Excel (.xlsx)</button>
-      <button class="etab" onclick="switchExportTab('pdf',this)"><i class="ti ti-file-type-pdf"></i> PDF</button>
+      <button class="etab" onclick="switchExportTab('pdf',this)"><i class="ti ti-file-type-docx"></i> Word</button>
     </div>
 
     <div class="etab-content active" id="etab-pptx">
@@ -1620,13 +1649,12 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
     </div>
 
     <div class="etab-content" id="etab-pdf">
-      <div class="info-box"><i class="ti ti-info-circle"></i> <span><span>Downloads an HTML file. Open in browser and print.</span></div>
       <div id="exportSupplierListPdf" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px"></div>
       <div style="display:flex;gap:8px;margin-bottom:16px">
         <button class="btn sm" onclick="selectAllExport('pdf')">All</button>
         <button class="btn sm" onclick="selectNoneExport('pdf')">None</button>
       </div>
-      <button class="btn primary" onclick="exportPDF()"><i class="ti ti-file-type-pdf"></i> <span>Download PDF Report</span></button>
+      <button class="btn primary" onclick="exportWord()"><i class="ti ti-file-type-docx"></i> <span>Download Word Report</span></button>
     </div>
 
     <!-- iCal -->
@@ -1816,7 +1844,7 @@ function applyProjectData(d){
     ?d.tierColorMode
     :((Array.isArray(d.tiers)&&d.tiers.length>=2)?'custom':DEFAULT_TIER_COLOR_MODE);
   selectedTheme=d.selectedTheme||'ElectricBlue';
-  themeMode=(d.themeMode==='light'||d.themeMode==='dark')?d.themeMode:'auto';
+  themeMode=(d.themeMode==='light'||d.themeMode==='dark'||d.themeMode==='auto')?d.themeMode:'dark';
   if(d.brandColors&&typeof d.brandColors==='object'){
     brandColors={primary:d.brandColors.primary||null,secondary:d.brandColors.secondary||null,accent:d.brandColors.accent||null};
   }else{
@@ -1919,7 +1947,7 @@ function renderProjectPicker(list){
     +'</div>';
   }).join(''):'<div style="font-size:13px;color:var(--text2);text-align:center;padding:16px 0">No projects yet — create your first one below.</div>';
   el.innerHTML='<div style="background:var(--bg);border-radius:16px;width:100%;max-width:460px;box-shadow:var(--shadow-lg);border:1px solid var(--border-soft);padding:26px 24px;max-height:88vh;overflow:auto">'
-    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px"><div style="font-size:17px;font-weight:700"><i class="ti ti-folders" style="color:var(--primary)"></i> Your Projects</div>'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px"><div style="font-size:17px;font-weight:700"><i class="ti ti-folders" style="color:var(--primary-fg)"></i> Your Projects</div>'
       +'<button class="btn sm" onclick="authSignOut()" title="Sign out"><i class="ti ti-logout"></i></button></div>'
     +rows
     +'<div style="display:flex;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">'
@@ -2075,11 +2103,11 @@ var LOGO_X = 12.55, LOGO_Y = 0.22, LOGO_W = 0.50, LOGO_H = 0.40;
 
 var selectedTheme='ElectricBlue',lang='en';
 // ── Appearance (live UI theme, separate from the export-branding THEMES above) ──
-var themeMode='auto'; // 'light' | 'dark' | 'auto'
+var themeMode='dark'; // 'light' | 'dark' | 'auto' — new projects start dark
 var DEFAULT_BRAND_COLORS={primary:null,secondary:null,accent:null}; // null = use CSS default for current mode
 // Personal brand default: a per-device preference (localStorage) that sits on
 // top of the built-in system default, so new projects can start in the user's
-// own colours instead of the vivid blue system default.
+// own colours instead of the built-in lime system default.
 function getUserBrandDefault(){try{var s=localStorage.getItem('sat_brandDefault');var o=s?JSON.parse(s):null;return (o&&typeof o==='object')?o:null;}catch(e){return null;}}
 var _ubdInit=getUserBrandDefault();
 var brandColors=_ubdInit?{primary:_ubdInit.primary||null,secondary:_ubdInit.secondary||null,accent:_ubdInit.accent||null}:{primary:null,secondary:null,accent:null};
@@ -2091,11 +2119,92 @@ function applyThemeMode(){
   document.querySelectorAll('#themeModeSwitch button').forEach(function(b){
     var active=b.dataset.mode===themeMode;
     b.style.background=active?'var(--primary)':'transparent';
-    b.style.color=active?'#fff':'var(--text)';
+    b.style.color=active?'var(--on-primary)':'var(--text)';
   });
+  applyContrastTokens();
   updateMetaThemeColor();
 }
-function setThemeMode(m){themeMode=m;applyThemeMode();}
+function setThemeMode(m){themeMode=m;applyThemeMode();repaintForTheme();}
+// Score colours are baked into rendered HTML (tierScreenColor flips per mode),
+// so a light/dark switch has to re-render what is on screen.
+function repaintForTheme(){
+  try{refreshTierVisuals();}catch(e){}
+  try{if(_currentPage)showPage(_currentPage,null,{keepStack:true});}catch(e){}
+}
+
+// ── Contrast guard ─────────────────────────────────────────────────────────
+// Any primary colour × light/dark mode must stay readable. Derived from the
+// ACTIVE --primary and surfaces (WCAG 2 relative luminance):
+//   --on-primary   text on primary fills: white while it reaches 3:1 (AA for
+//                  bold/UI text), otherwise whichever of white/navy is stronger
+//   --primary-fg   primary used as text: nudged toward white (dark mode) or black
+//                  (light mode) until it reaches 4.5:1 on --bg, --bg2 and --bg3
+//   --primary-dark hover fill: shifted AWAY from the text colour so hover never
+//                  loses contrast (the dark-mode default lightened it under white text)
+var ON_PRIMARY_LIGHT='#ffffff',ON_PRIMARY_DARK='#0a0e2a';
+function _cssColorRgb(expr){
+  var p=document.createElement('span');
+  p.style.cssText='position:absolute;visibility:hidden;color:'+expr;
+  document.body.appendChild(p);
+  var c=getComputedStyle(p).color;p.remove();
+  var m=c.match(/rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)/);
+  if(m)return [+m[1],+m[2],+m[3]];
+  m=c.match(/color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)/); // color-mix() results
+  if(m)return [m[1]*255,m[2]*255,m[3]*255];
+  return null;
+}
+function _lum(rgb){
+  var a=rgb.map(function(v){v/=255;return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4);});
+  return 0.2126*a[0]+0.7152*a[1]+0.0722*a[2];
+}
+function _contrast(a,b){var x=_lum(a),y=_lum(b);return (Math.max(x,y)+0.05)/(Math.min(x,y)+0.05);}
+function _mixRgb(a,b,t){return [0,1,2].map(function(i){return a[i]+(b[i]-a[i])*t;});}
+function _rgbHex(rgb){return '#'+rgb.map(function(v){return ('0'+Math.round(v).toString(16)).slice(-2);}).join('');}
+// Readable text colour for ANY fill (tier badges, Gantt bars, calendar days…):
+// white while it reaches 3:1, otherwise whichever of white/navy is stronger.
+// Same rule as --on-primary. Cached per colour string; CSS vars get re-read.
+var _textOnCache={};
+function _textOnRgb(c){var W=[255,255,255],K=[10,14,42];return _contrast(c,W)>=3||_contrast(c,W)>=_contrast(c,K)?ON_PRIMARY_LIGHT:ON_PRIMARY_DARK;}
+function textOn(color){
+  if(!color)return ON_PRIMARY_LIGHT;
+  var key=String(color).trim().toLowerCase();
+  var hex=key.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/);
+  if(hex){
+    if(_textOnCache[key])return _textOnCache[key];
+    var h=hex[1].length===3?hex[1].replace(/./g,'$&$&'):hex[1];
+    return _textOnCache[key]=_textOnRgb([0,2,4].map(function(i){return parseInt(h.substr(i,2),16);}));
+  }
+  var rgb=document.body?_cssColorRgb(color):null;
+  return rgb?_textOnRgb(rgb):ON_PRIMARY_LIGHT;
+}
+function applyContrastTokens(){
+  if(!document.body)return;
+  var root=document.documentElement;
+  // clear previous overrides so we read the stylesheet's values for this mode
+  ['--on-primary','--primary-fg','--primary-dark'].forEach(function(k){root.style.removeProperty(k);});
+  // status fills (score buttons, rating segments…) get light in dark mode —
+  // derive their text colour the same way: --on-good, --on-warn, --on-crit …
+  ['good','warn','crit','accent','text3'].forEach(function(k){
+    var c=_cssColorRgb('var(--'+k+')');
+    root.style.setProperty('--on-'+k,c?_textOnRgb(c):ON_PRIMARY_LIGHT);
+  });
+  var pri=_cssColorRgb('var(--primary)');
+  var bgs=['--bg','--bg2','--bg3'].map(function(k){return _cssColorRgb('var('+k+')');}).filter(Boolean);
+  if(!pri||!bgs.length)return;
+  var W=[255,255,255],K=_cssColorRgb(ON_PRIMARY_DARK)||[10,14,42];
+  var textOnFill=_contrast(pri,W)>=3||_contrast(pri,W)>=_contrast(pri,K)?W:K;
+  root.style.setProperty('--on-primary',textOnFill===W?ON_PRIMARY_LIGHT:ON_PRIMARY_DARK);
+  // hover: darken under white text, lighten under navy text
+  root.style.setProperty('--primary-dark',_rgbHex(_mixRgb(pri,textOnFill===W?[0,0,0]:W,0.15)));
+  var darkUi=_lum(bgs[0])<0.2,toward=darkUi?W:[0,0,0],fg=pri;
+  for(var t=0;t<=1.0001;t+=0.05){
+    fg=_mixRgb(pri,toward,t);
+    if(bgs.every(function(b){return _contrast(fg,b)>=4.5;}))break;
+  }
+  root.style.setProperty('--primary-fg',_rgbHex(fg));
+}
+// "Auto" mode follows the OS — recompute when the OS switches light/dark
+try{window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){applyContrastTokens();if(themeMode==='auto')repaintForTheme();});}catch(e){}
 
 function applyBrandColors(){
   var root=document.documentElement;
@@ -2104,6 +2213,7 @@ function applyBrandColors(){
     else root.style.removeProperty('--'+k);
   });
   renderAppearanceInputs();
+  applyContrastTokens();
   updateMetaThemeColor();
   // When the tier palette follows the brand colour, re-derive it now so the
   // score thresholds track the new system colour everywhere.
@@ -2146,7 +2256,7 @@ function renderBrandDefaultButtons(){
     :'';
 }
 // System-colour presets — 5 to choose from, like the report accent picker.
-var BRAND_SWATCHES=['#0055FF','#00A38A','#6544FE','#E5484D','#0F172A'];
+var BRAND_SWATCHES=['#A2F233','#0055FF','#6544FE','#E5484D','#0F172A']; // [0] = system default (lime)
 function _hexEq(a,b){return String(a||'').trim().toLowerCase()===String(b||'').trim().toLowerCase();}
 // Resolve any CSS colour (incl. var(--x) chains) to a #rrggbb hex, so a native
 // <input type=color> — which only accepts hex — can start on the live colour.
@@ -2188,7 +2298,7 @@ function renderAppearanceInputs(){
     var el=document.getElementById('brandPick_'+k);if(!el)return;
     // Show the chosen system swatch, not the mode-shifted computed value — otherwise
     // "System default" highlights a custom tile in dark mode (where --primary resolves to
-    // the lighter #4d8bff) instead of the blue preset the user actually reset to.
+    // a mode-shifted value) instead of the preset the user actually reset to.
     var cur=(brandColors[k]||BRAND_SWATCHES[0]).trim();
     el.innerHTML=_colorPicker(cur,"setBrandColor('"+k+"',%C%)",null,32);
   });
@@ -2332,7 +2442,7 @@ async function deleteAuditRound(supName,roundId){
 // it. This single object replaced the old loose `supplier.nextAudit` date field:
 // the next audit date is now simply the earliest open planned audit.
 var AUDIT_STATUS={planned:'Planned',in_progress:'In progress',completed:'Completed'};
-var AUDIT_STATUS_COLOR={planned:'var(--text2)',in_progress:'var(--warn)',completed:'var(--good)'};
+var AUDIT_STATUS_COLOR={planned:'var(--text2)',in_progress:'var(--warn)',completed:'var(--positive)'};
 
 function roundStats(r){
   var items=[];
@@ -2395,7 +2505,7 @@ function nextPlannedAudit(s){
 // Planning is a single action with several entry points (Audits list, supplier
 // profile, calendar) — they all open the same dialog.
 function goToAssignChecklist(presetSupplier){
-  if(!document.getElementById('page-audits').classList.contains('active'))showPage('audits');
+  // Opens over the current page — Cancel must leave the user exactly where they were.
   openPlanAuditModal(presetSupplier);
 }
 
@@ -2766,7 +2876,38 @@ function getTier(pct){
   for(var i=0;i<TIERS.length;i++){if(pct>=TIERS[i].min)return TIERS[i];}
   return TIERS[TIERS.length-1];
 }
-function sc(pct){var tier=getTier(pct);return tier?tier.color:'#888';}
+function sc(pct){return tierScreenColor(getTier(pct));}
+// ── Tier colours on SCREEN vs. on PAPER ─────────────────────────────────────
+// TIERS[].color/.hex stay the canonical colours — saved with the project and
+// used by the PDF/PPT/Excel exports, which always print on white. Emphasis
+// there means "darker = worse". On a dark UI that logic has to flip: the
+// alarming end must be the BRIGHTEST, most saturated colour and the good end
+// recedes toward the background. tierScreenColor() derives that mirrored
+// variant for the dark UI; in light mode it returns the canonical colour.
+var TIER_TRAFFIC_DARK=['#5CC98D','#E0A83A','#F08A4B','#EF6B6B']; // same hues, lifted for dark surfaces
+var _tierScreenCache={};
+function _isDarkUi(){var bg=_cssVarHex('--bg');if(!bg)return false;var c=_hexToRgb(bg);return _lum([c.r,c.g,c.b])<0.2;}
+function tierScreenColor(tier){
+  if(!tier)return '#888';
+  if(!_isDarkUi())return tier.color;
+  var n=TIERS.length,idx=TIERS.indexOf(tier),t=(n>1&&idx>=0)?idx/(n-1):0; // 0 = best tier
+  var base=_cssVarHex('--primary')||'#a2f233',bg=_cssVarHex('--bg')||'#141b40';
+  var key=[tierColorMode,base,bg,tier.color,idx,n].join('|');
+  if(_tierScreenCache[key])return _tierScreenCache[key];
+  var c;
+  if(tierColorMode==='system'){
+    // good = brand colour sunk toward the background, bad = full brand colour, slightly lifted
+    c=_mixHex(_mixHex(base,bg,0.45),_mixHex(base,'#ffffff',0.12),t);
+  }else if(tierColorMode==='traffic'){
+    c=_rampSample(TIER_TRAFFIC_DARK,t);
+  }else{
+    c=tier.color; // custom: the user's own colours, only contrast-guarded below
+  }
+  // readability floor: score values are text — keep ≥3:1 against the card surface
+  var B=_hexToRgb(bg),Bv=[B.r,B.g,B.b];
+  for(var k=0;k<20;k++){var C=_hexToRgb(c);if(_contrast([C.r,C.g,C.b],Bv)>=3)break;c=_mixHex(c,'#ffffff',0.08);}
+  return _tierScreenCache[key]=c;
+}
 // Canvas (Chart.js) can't resolve CSS custom properties or color-mix() the way
 // DOM/CSS painting does — there's no element context, so `var(--primary)` and
 // `color-mix(in srgb, var(--primary) 13%, transparent)` silently fail to parse
@@ -3161,7 +3302,9 @@ var NAV_LABEL={import:'Suppliers',new:'Checklists',audits:'Assessments',audit:'A
 function _pageState(id){
   if(id==='monitoring'||id==='kpis')return {sel:_monSel};
   if(id==='steering')return {sel:_steerSel};
-  if(id==='detail'){var e=document.getElementById('detailSupSelect');return {sel:e?e.value:''};}
+  if(id==='detail'){var e=document.getElementById('detailSupSelect'),cf=document.getElementById('detailCatFilter');
+    // cp = the checkpoint popup that was open when the user jumped to a task
+    return {sel:e?e.value:'',cat:cf?cf.value:'',cp:_cpReturn};}
   if(id==='compare'){var c=document.getElementById('cmpSupSelect');return {sel:c?c.value:''};}
   return {};
 }
@@ -3169,7 +3312,15 @@ function _restoreState(id,st){
   if(!st)return;
   if(id==='monitoring'||id==='kpis'){if(st.sel)_monSel=st.sel;return;}
   if(id==='steering'){if(st.sel)_steerSel=st.sel;return;}
-  if(id==='detail'){var e=document.getElementById('detailSupSelect');if(e&&st.sel!==undefined){e.value=st.sel;renderDetail();}return;}
+  if(id==='detail'){
+    var e=document.getElementById('detailSupSelect');
+    if(e&&st.sel!==undefined){e.value=st.sel;renderDetail();}
+    // category options depend on the supplier, so set the filter after the first render
+    var cf=document.getElementById('detailCatFilter');
+    if(cf&&st.cat){cf.value=st.cat;renderDetail();}
+    if(st.cp)openCmpCheckpoint(st.cp.sup,st.cp.cat,st.cp.idx);
+    return;
+  }
   if(id==='compare'){var c=document.getElementById('cmpSupSelect');if(c&&st.sel!==undefined){c.value=st.sel;renderComparePage();}return;}
 }
 // Use this instead of showPage() for any in-content link that crosses modules.
@@ -3374,7 +3525,7 @@ function renderAiImportModal(){
   // Layout chooser
   function segBtn(val,label,sub){
     var on=(st.layout===val);
-    return '<button onclick="setAiImportLayout(\''+val+'\')" style="flex:1;text-align:left;padding:10px 12px;border:none;cursor:pointer;background:'+(on?'var(--primary)':'var(--bg)')+';color:'+(on?'#fff':'var(--text)')+'">'
+    return '<button onclick="setAiImportLayout(\''+val+'\')" style="flex:1;text-align:left;padding:10px 12px;border:none;cursor:pointer;background:'+(on?'var(--primary)':'var(--bg)')+';color:'+(on?'var(--on-primary)':'var(--text)')+'">'
       +'<div style="font-size:12.5px;font-weight:700">'+label+'</div>'
       +'<div style="font-size:10.5px;opacity:.85;margin-top:1px">'+sub+'</div>'
     +'</button>';
@@ -3458,7 +3609,7 @@ function renderAiImportModal(){
   mo.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:3000;display:flex;align-items:flex-end;justify-content:center;padding:16px';
   mo.innerHTML='<div style="background:var(--bg);border-radius:16px 16px 12px 12px;width:100%;max-width:780px;max-height:90vh;display:flex;flex-direction:column;box-shadow:var(--shadow-lg)">'
     +'<div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0">'
-      +'<div style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700"><i class="ti ti-sparkles" style="color:var(--primary)"></i>AI Import — '+esc(filename)+'</div>'
+      +'<div style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700"><i class="ti ti-sparkles" style="color:var(--primary-fg)"></i>AI Import — '+esc(filename)+'</div>'
       +'<button onclick="document.getElementById(\'aiModal\').remove()" style="background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px"><i class="ti ti-x"></i></button>'
     +'</div>'
     +'<div style="padding:20px;overflow-y:auto">'+h+'</div>'
@@ -3586,7 +3737,7 @@ function ensureTemplateFromImport(name, cats){
 
 // ── Actions ───────────────────────────────────────────────────────────────────
 var ACT_PRIO_COLOR={High:'var(--crit)',Medium:'var(--warn)',Low:'var(--good)'};
-var ACT_STATUS_COLOR={Open:'var(--crit)','In Progress':'var(--warn)',Done:'var(--good)'};
+var ACT_STATUS_COLOR={Open:'var(--crit)','In Progress':'var(--warn)',Done:'var(--positive)'};
 
 function priorityFromScore(score){
   if(score===null||score==='N.A.')return 'Medium';
@@ -3775,7 +3926,7 @@ function renderActions(){
         +'<td style="font-weight:500;max-width:340px">'
           +'<div style="display:flex;align-items:flex-start;gap:6px">'
             +'<span>'+esc(a.title)+'</span>'
-            +(a.images&&a.images.length?'<span onclick="event.stopPropagation();openActionImgViewer('+a.id+',0)" title="View photos" style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;background:color-mix(in srgb,var(--primary) 9%,transparent);color:var(--primary);cursor:pointer;flex-shrink:0"><i class="ti ti-camera" style="font-size:11px"></i>'+a.images.length+'</span>':'')
+            +(a.images&&a.images.length?'<span onclick="event.stopPropagation();openActionImgViewer('+a.id+',0)" title="View photos" style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;background:color-mix(in srgb,var(--primary) 9%,transparent);color:var(--primary-fg);cursor:pointer;flex-shrink:0"><i class="ti ti-camera" style="font-size:11px"></i>'+a.images.length+'</span>':'')
           +'</div>'
           +(a.checkpoint?'<div style="font-size:11px;color:var(--text2);margin-top:2px;line-height:1.4">↳ '+esc(a.checkpoint)+((a.extraCheckpoints&&a.extraCheckpoints.length)?' <span style="color:var(--text3)">+'+a.extraCheckpoints.length+' more</span>':'')+'</div>':'')
         +'</td>'
@@ -3803,7 +3954,7 @@ function _renderBulkToolbar(filtered){
   var total=filtered?filtered.length:0;
   var allSel=total>0&&n>=total;
   bar.style.display='flex';
-  bar.innerHTML='<span style="font-size:13px;font-weight:600;color:var(--primary)">'+n+' selected</span>'
+  bar.innerHTML='<span style="font-size:13px;font-weight:600;color:var(--primary-fg)">'+n+' selected</span>'
     +'<div style="display:flex;gap:6px;margin-left:auto;flex-wrap:wrap;align-items:center">'
       +'<label style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--text2)">Set status'
         +'<select onchange="setSelectedStatus(this.value);this.selectedIndex=0" style="font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);cursor:pointer">'
@@ -4136,7 +4287,7 @@ function setActView(v){
   }
   if(v!=='list'){_selActions.clear();var bb=document.getElementById('actBulkBar');if(bb)bb.style.display='none';}
   [['actViewList','list'],['actViewGantt','gantt'],['actViewCoverage','coverage']].forEach(function(e){
-    var b=document.getElementById(e[0]);if(b){b.style.background=v===e[1]?'var(--primary)':'var(--bg)';b.style.color=v===e[1]?'#fff':'var(--text)';}
+    var b=document.getElementById(e[0]);if(b){b.style.background=v===e[1]?'var(--primary)':'var(--bg)';b.style.color=v===e[1]?'var(--on-primary)':'var(--text)';}
   });
   document.getElementById('actionsContent').style.display=v==='list'?'':'none';
   document.getElementById('actionsGantt').style.display=v==='gantt'?'':'none';
@@ -4487,7 +4638,7 @@ function renderGantt(){
         +months.map(function(m,mi){var lp=(months.slice(0,mi).reduce(function(s,x){return s+x.days;},0)/totalDays*100).toFixed(2);return mi>0?'<div style="position:absolute;left:'+lp+'%;top:0;bottom:0;width:1px;background:var(--border);opacity:.5"></div>':''}).join('')
         // Bar
         +'<div style="position:absolute;left:'+left+'%;width:'+barW+'%;top:50%;transform:translateY(-50%);height:'+BAR_H+'px;background:'+col+';border-radius:5px;display:flex;align-items:center;padding:0 8px;box-sizing:border-box;z-index:2" title="'+esc(a.title)+'  '+dateRange+'">'
-          +'<span style="font-size:10px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600">'+(isOD?'⚠ ':'')+esc(a.status)+'</span>'
+          +'<span style="font-size:10px;color:'+textOn(col)+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600">'+(isOD?'⚠ ':'')+esc(a.status)+'</span>'
         +'</div>'
       +'</div>'
     +'</div>';
@@ -4527,7 +4678,7 @@ function renderGantt(){
             // Today badge in header
             +(todayPct>=0&&todayPct<=100
               ?'<div style="position:absolute;left:'+todayPct+'%;top:0;bottom:0;z-index:3;pointer-events:none">'
-                +'<div style="position:absolute;top:4px;left:-20px;background:'+TODAY_COLOR+';color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:3px;white-space:nowrap">Today</div>'
+                +'<div style="position:absolute;top:4px;left:-20px;background:'+TODAY_COLOR+';color:'+textOn(TODAY_COLOR)+';font-size:9px;font-weight:700;padding:2px 5px;border-radius:3px;white-space:nowrap">Today</div>'
                 +'<div style="position:absolute;top:22px;left:-1px;width:2px;bottom:0;background:'+TODAY_COLOR+'"></div>'
               +'</div>'
               :'')
@@ -4558,6 +4709,9 @@ function renderGantt(){
 
 function closeActionModal(){
   document.getElementById('actionModal').style.display='none';
+  // Opened from a checkpoint (Analysis)? Closing or saving returns there and
+  // reopens that checkpoint — the Actions page was only a detour.
+  if(_taskFromCp){_taskFromCp=false;if(_navStack.length)navBack();}
 }
 
 function saveAction(){
@@ -4696,7 +4850,7 @@ function renderTplEditor(){
       h+='<div style="border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden">'
         // Category header
         +'<div style="background:var(--bg2);padding:10px 12px;display:flex;align-items:center;gap:8px">'
-          +'<i class="ti ti-folder" style="color:var(--primary);font-size:15px"></i>'
+          +'<i class="ti ti-folder" style="color:var(--primary-fg);font-size:15px"></i>'
           +'<input type="text" value="'+esc(cat)+'" onchange="renameTplCat(\''+esc(cat)+'\',this.value)" style="flex:1;border:none;background:transparent;font-size:13px;font-weight:600;color:var(--text);outline:none;min-width:0" placeholder="Category name">'
           +'<span style="font-size:11px;color:var(--text3);white-space:nowrap">'+items.length+' checkpoints</span>'
           +'<label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text3);white-space:nowrap" title="Category weight in overall score (0 = excluded)">'
@@ -4715,19 +4869,19 @@ function renderTplEditor(){
               +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:6px">'
                 +'<span style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px">Scoring Rubric</span>'
                 +'<div style="display:flex;gap:6px">'
-                  +'<button id="rubric_gen_'+ci+'_'+ii+'" onclick="aiSuggestRubric(\''+esc(cat)+'\','+ii+')" style="background:var(--primary);color:#fff;border:none;cursor:pointer;font-size:11px;padding:3px 8px;border-radius:4px;display:flex;align-items:center;gap:4px"><i class="ti ti-sparkles"></i> Generate with AI</button>'
+                  +'<button id="rubric_gen_'+ci+'_'+ii+'" onclick="aiSuggestRubric(\''+esc(cat)+'\','+ii+')" style="background:var(--primary);color:var(--on-primary);border:none;cursor:pointer;font-size:11px;padding:3px 8px;border-radius:4px;display:flex;align-items:center;gap:4px"><i class="ti ti-sparkles"></i> Generate with AI</button>'
                   +'<button onclick="removeTplRubric(\''+esc(cat)+'\','+ii+')" style="background:none;border:none;cursor:pointer;color:var(--crit);font-size:11px;padding:3px 6px;border-radius:4px">Remove</button>'
                 +'</div>'
               +'</div>'
               +[0,1,2,3,4,5].map(function(s){
                 return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">'
-                  +'<span style="font-size:11px;font-weight:700;color:var(--primary);min-width:14px;text-align:right">'+s+'</span>'
+                  +'<span style="font-size:11px;font-weight:700;color:var(--primary-fg);min-width:14px;text-align:right">'+s+'</span>'
                   +'<input type="text" value="'+esc((item.rubric[s])||'')+'" onchange="updateTplRubric(\''+esc(cat)+'\','+ii+','+s+',this.value)" placeholder="Description for score '+s+'..." style="flex:1;border:1px solid var(--border);background:var(--bg);font-size:11px;color:var(--text);padding:3px 7px;border-radius:4px">'
                   +'</div>';
               }).join('')
               +'</div>'
             :'<div style="padding:8px;background:var(--bg2);border-radius:6px;margin-top:4px;margin-bottom:4px;text-align:center">'
-              +'<button onclick="addTplRubric(\''+esc(cat)+'\','+ii+')" style="background:none;border:none;cursor:pointer;color:var(--primary);font-size:12px;display:inline-flex;align-items:center;gap:4px"><i class="ti ti-plus"></i> Add scoring rubric (0–5)</button>'
+              +'<button onclick="addTplRubric(\''+esc(cat)+'\','+ii+')" style="background:none;border:none;cursor:pointer;color:var(--primary-fg);font-size:12px;display:inline-flex;align-items:center;gap:4px"><i class="ti ti-plus"></i> Add scoring rubric (0–5)</button>'
               +'</div>';
           return '<div style="border-bottom:1px solid var(--border)">'
             +'<div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0">'
@@ -4742,7 +4896,7 @@ function renderTplEditor(){
             +'</div>'
             +'</div>';
         }).join('')
-        +'<button onclick="addTplCheckpoint(\''+esc(cat)+'\')" style="background:none;border:none;cursor:pointer;color:var(--primary);font-size:12px;padding:6px 0;display:flex;align-items:center;gap:4px;margin-top:4px"><i class="ti ti-plus"></i> Add checkpoint</button>'
+        +'<button onclick="addTplCheckpoint(\''+esc(cat)+'\')" style="background:none;border:none;cursor:pointer;color:var(--primary-fg);font-size:12px;padding:6px 0;display:flex;align-items:center;gap:4px;margin-top:4px"><i class="ti ti-plus"></i> Add checkpoint</button>'
         +'</div>'
         +'</div>';
     });
@@ -4883,8 +5037,11 @@ function runAssignTemplateToSuppliers(){
   var type=(document.getElementById('planAuditType')||{}).value||'';
   planAuditForSuppliers(idx,names,date,auditor,type,name);
   closePlanAuditModal();
-  if(document.getElementById('page-audits').classList.contains('active'))renderAuditsList();
-  else showPage('audits');
+  // Stay where the user planned from: re-render the current page (and an open
+  // supplier profile) so the new assessment shows up in place — no page jump.
+  if(_currentPage)showPage(_currentPage,null,{keepStack:true});
+  var pm=document.getElementById('supplierProfileModal');
+  if(pm&&pm.style.display!=='none'&&_profileSn)openSupplierProfile(_profileSn);
 }
 
 function renderTemplatePreview(){
@@ -5094,7 +5251,7 @@ function auRender(){
   // view toggle state
   ['console','ledger','details','agenda'].forEach(function(v){
     var b=document.getElementById('auView'+v.charAt(0).toUpperCase()+v.slice(1));
-    if(b){b.style.background=_auState.view===v?'var(--primary)':'var(--bg)';b.style.color=_auState.view===v?'#fff':'var(--text)';}
+    if(b){b.style.background=_auState.view===v?'var(--primary)':'var(--bg)';b.style.color=_auState.view===v?'var(--on-primary)':'var(--text)';}
   });
   // The "Show criteria" toggle lives inside the Table view now (see auLedgerHtml),
   // so the shared header is identical across all views — switching no longer
@@ -5241,7 +5398,7 @@ function auConsoleHtml(s,flat,round){
       +'</div>'
       +'<textarea class="au-notes" placeholder="What did you observe? Which evidence was shown?" oninput="auSetNote(\''+esCat+'\','+cur.idx+',this.value)">'+esc(item.notes||'')+'</textarea>'
       +'<div id="auAiPrev" style="display:none;margin-top:6px;border:1px solid color-mix(in srgb,var(--primary) 25%,transparent);border-radius:var(--r);background:color-mix(in srgb,var(--primary) 6%,transparent);padding:9px 11px">'
-        +'<div style="font-size:10px;font-weight:700;color:var(--primary);margin-bottom:5px;display:flex;align-items:center;gap:4px;text-transform:uppercase;letter-spacing:.5px"><i class="ti ti-sparkles"></i> AI Suggestion — Review before accepting</div>'
+        +'<div style="font-size:10px;font-weight:700;color:var(--primary-fg);margin-bottom:5px;display:flex;align-items:center;gap:4px;text-transform:uppercase;letter-spacing:.5px"><i class="ti ti-sparkles"></i> AI Suggestion — Review before accepting</div>'
         +'<div id="auAiPrevText" style="font-size:12.5px;color:var(--text);line-height:1.5;margin-bottom:8px;white-space:pre-wrap"></div>'
         +'<div style="display:flex;gap:6px">'
           +'<button onclick="auAcceptAiNote(\''+esCat+'\','+cur.idx+')" style="background:var(--good);color:#fff;border:none;cursor:pointer;padding:5px 12px;border-radius:6px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:4px"><i class="ti ti-check"></i> Accept</button>'
@@ -5260,7 +5417,7 @@ function auConsoleHtml(s,flat,round){
                 +'<button onclick="deleteFile(\'checkpoint\',\''+esSn+'\',\''+esCat+'\','+cur.idx+','+fi+','+round.id+')" title="Delete"><i class="ti ti-trash"></i></button>'
               +'</div>';
             }).join('')
-          +'</div><div class="dropzone-hint">Drop more files here, or <b style="cursor:pointer;color:var(--primary)" onclick="triggerFileUpload(\''+esSn+'\',\''+esCat+'\','+cur.idx+','+round.id+')">browse</b></div>'
+          +'</div><div class="dropzone-hint">Drop more files here, or <b style="cursor:pointer;color:var(--primary-fg)" onclick="triggerFileUpload(\''+esSn+'\',\''+esCat+'\','+cur.idx+','+round.id+')">browse</b></div>'
           :'<div class="dropzone-empty" onclick="triggerFileUpload(\''+esSn+'\',\''+esCat+'\','+cur.idx+','+round.id+')">'
             +'<i class="ti ti-cloud-upload"></i>Drop evidence here or <b>browse</b>'
             +'<div style="font-size:11px;color:var(--text3);margin-top:4px">Photos, certificates, reports — any file type</div>'
@@ -5416,7 +5573,7 @@ function auLedgerHtml(s,round){
               +'<button class="note-tool ai icon-only" id="auLAiBtn_'+key+'" onclick="auImproveNoteLedger(\''+esCat+'\','+idx+')" title="Improve note with AI" aria-label="Improve note with AI"><i class="ti ti-wand nt-ic"></i></button>'
             +'</div>'
             +'<div id="auLAiPrev_'+key+'" class="au-ai-prev" style="display:none;margin-top:6px">'
-              +'<div style="font-size:10px;font-weight:700;color:var(--primary);margin-bottom:5px;display:flex;align-items:center;gap:4px;text-transform:uppercase;letter-spacing:.5px"><i class="ti ti-sparkles"></i> AI Suggestion</div>'
+              +'<div style="font-size:10px;font-weight:700;color:var(--primary-fg);margin-bottom:5px;display:flex;align-items:center;gap:4px;text-transform:uppercase;letter-spacing:.5px"><i class="ti ti-sparkles"></i> AI Suggestion</div>'
               +'<div id="auLAiText_'+key+'" style="font-size:12.5px;color:var(--text);line-height:1.5;margin-bottom:8px;white-space:pre-wrap"></div>'
               +'<div style="display:flex;gap:6px">'
                 +'<button onclick="auAcceptAiNoteLedger(\''+esCat+'\','+idx+')" style="background:var(--good);color:#fff;border:none;cursor:pointer;padding:4px 10px;border-radius:6px;font-size:11.5px;font-weight:600;display:flex;align-items:center;gap:4px"><i class="ti ti-check"></i> Accept</button>'
@@ -5768,7 +5925,7 @@ function aiGenerateTemplate(){
 
   m.innerHTML='<div style="background:var(--bg);border-radius:16px;width:100%;max-width:600px;max-height:92vh;overflow-y:auto;box-shadow:var(--shadow-lg)">'
     +'<div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;position:sticky;top:0;background:var(--bg);z-index:1">'
-      +'<div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-sparkles" style="color:#fff;font-size:17px"></i></div>'
+      +'<div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-sparkles" style="color:var(--on-primary);font-size:17px"></i></div>'
       +'<div><div style="font-size:15px;font-weight:700;color:var(--text)">AI Checklist Generator</div>'
         +'<div style="font-size:11px;color:var(--text2)">Define criteria — AI creates a complete assessment template</div></div>'
       +'<button onclick="document.getElementById(\'aiTplModal\').remove()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px"><i class="ti ti-x"></i></button>'
@@ -5828,7 +5985,7 @@ function aiGenerateTemplate(){
       +'<div><label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">Additional Context <span style="font-weight:400;color:var(--text3)">(optional)</span></label>'
       +'<textarea id="aiTpl_context" rows="2" placeholder="e.g. LkSG compliance, IATF 16949, high-volume serial production, single-source risk…" style="width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text);resize:vertical;box-sizing:border-box"></textarea></div>'
 
-      +'<button onclick="runAiTemplateGen()" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;border:none;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">'
+      +'<button onclick="runAiTemplateGen()" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--primary),var(--secondary));color:var(--on-primary);border:none;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">'
         +'<i class="ti ti-sparkles"></i> Generate Checklist'
       +'</button>'
       +'<div id="aiTpl_status" style="display:none;padding:14px 12px;color:var(--text2);font-size:13px">'
@@ -6216,7 +6373,7 @@ function renderDashboard(){
   var actNavBtn='document.querySelectorAll(\'.nav-btn\')[4]';
   var h='<div class="db-kpi-row">'
     +'<div class="db-kpi" onclick="showPage(\'import\',document.querySelector(\'.nav-btn\'))" style="cursor:pointer">'
-      +'<div class="db-kpi-icon" style="background:color-mix(in srgb,var(--primary) 13%,transparent)"><i class="ti ti-users" style="color:var(--primary)"></i></div>'
+      +'<div class="db-kpi-icon" style="background:color-mix(in srgb,var(--primary) 13%,transparent)"><i class="ti ti-users" style="color:var(--primary-fg)"></i></div>'
       +'<div><div class="db-kpi-val">'+suppliers.length+'</div><div class="db-kpi-lbl">Suppliers</div></div>'
     +'</div>'
     +'<div class="db-kpi">'
@@ -6241,7 +6398,7 @@ function renderDashboard(){
   // Left — Supplier Score Cards
   h+='<div class="card" style="padding:16px 18px">'
     +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
-      +'<span style="font-size:13px;font-weight:700"><i class="ti ti-trophy" style="color:var(--primary);margin-right:6px"></i>Supplier Scores</span>'
+      +'<span style="font-size:13px;font-weight:700"><i class="ti ti-trophy" style="color:var(--primary-fg);margin-right:6px"></i>Supplier Scores</span>'
       +'<span style="font-size:11px;color:var(--text3)">click to drill down</span>'
     +'</div>'
     +'<div style="display:flex;flex-direction:column;gap:7px">';
@@ -6251,7 +6408,7 @@ function renderDashboard(){
     var pct=item.pct,prog=item.prog,s=item.s;
     var col=pct!==null?sc(pct):'var(--text3)';
     var tier=pct!==null?(TIERS.find(function(t){return pct>=t.min;})||TIERS[TIERS.length-1]):null;
-    var progCol=prog.pct===100?'var(--good)':prog.pct>0?'var(--warn)':'var(--border)';
+    var progCol=prog.pct===100?'var(--positive)':prog.pct>0?'var(--warn)':'var(--border)';
     h+='<div class="db-row-card" onclick="openSupplierDrilldown(\''+esc(s.name)+'\')">'
       // One line: rank · name · neutral bar · number · tier. The two-line version
       // (name stacked above its bar) made every row twice as tall and left the
@@ -6267,7 +6424,7 @@ function renderDashboard(){
   });
   h+='</div>';
   if(sorted.length>SCORE_CAP){
-    h+='<button onclick="toggleDbShowAllScores()" style="width:100%;margin-top:10px;font-size:12px;font-weight:600;padding:7px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--primary);cursor:pointer">'
+    h+='<button onclick="toggleDbShowAllScores()" style="width:100%;margin-top:10px;font-size:12px;font-weight:600;padding:7px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--primary-fg);cursor:pointer">'
       +(_dbShowAllScores?'<i class="ti ti-chevron-up"></i> Show top '+SCORE_CAP+' only':'<i class="ti ti-chevron-down"></i> Show all '+sorted.length+' suppliers')
     +'</button>';
   }
@@ -6282,8 +6439,8 @@ function renderDashboard(){
     // Actions card
     +'<div class="card" style="padding:16px 18px">'
       +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
-        +'<span style="font-size:13px;font-weight:700"><i class="ti ti-list-check" style="color:var(--primary);margin-right:6px"></i>Actions</span>'
-        +'<button onclick="showPage(\'actions\','+actNavBtn+')" style="font-size:11px;color:var(--primary);background:none;border:none;cursor:pointer;font-weight:700">View all →</button>'
+        +'<span style="font-size:13px;font-weight:700"><i class="ti ti-list-check" style="color:var(--primary-fg);margin-right:6px"></i>Actions</span>'
+        +'<button onclick="showPage(\'actions\','+actNavBtn+')" style="font-size:11px;color:var(--primary-fg);background:none;border:none;cursor:pointer;font-weight:700">View all →</button>'
       +'</div>'
       // Neutral counters: Open / In Progress / Done are workflow STATES, not
       // pass/fail statuses — tinting them red/amber/green implied an open action
@@ -6319,13 +6476,13 @@ function renderDashboard(){
       var shown=covList.slice(0,COV_CAP);
       var out='<div class="card" style="padding:16px 18px">'
         +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'
-          +'<span style="font-size:13px;font-weight:700"><i class="ti ti-clipboard-list" style="color:var(--primary);margin-right:6px"></i>Assessment Coverage</span>'
+          +'<span style="font-size:13px;font-weight:700"><i class="ti ti-clipboard-list" style="color:var(--primary-fg);margin-right:6px"></i>Assessment Coverage</span>'
           +'<span style="font-size:11px;color:var(--text3)">'+doneCnt+'/'+covList.length+' complete</span>'
         +'</div>'
         +'<div style="display:flex;flex-direction:column;gap:8px">';
       shown.forEach(function(x){
         var s=x.s,prog=x.prog;
-        var col=prog.pct===100?'var(--good)':prog.pct>0?'var(--warn)':'var(--text3)';
+        var col=prog.pct===100?'var(--positive)':prog.pct>0?'var(--warn)':'var(--text3)';
         out+='<div style="display:flex;align-items:center;gap:8px">'
           +'<div style="font-size:12px;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+esc(s.name)+'">'+esc(s.name)+'</div>'
           +dotScale(prog.pct/100,10,'var(--track-fill)',7,11)
@@ -6341,7 +6498,7 @@ function renderDashboard(){
       });
       out+='</div>';
       if(covList.length>COV_CAP){
-        out+='<button onclick="showPage(\'import\',document.querySelector(\'.nav-btn\'))" style="width:100%;margin-top:10px;font-size:11px;font-weight:600;padding:6px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--primary);cursor:pointer">View all '+covList.length+' on Project page →</button>';
+        out+='<button onclick="showPage(\'import\',document.querySelector(\'.nav-btn\'))" style="width:100%;margin-top:10px;font-size:11px;font-weight:600;padding:6px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--primary-fg);cursor:pointer">View all '+covList.length+' on Project page →</button>';
       }
       return out+'</div>';
     })()
@@ -6354,7 +6511,7 @@ function renderDashboard(){
     // Category performance bars
     h+='<div class="card" style="padding:16px 18px">'
       +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
-        +'<span style="font-size:13px;font-weight:700"><i class="ti ti-chart-bar" style="color:var(--primary);margin-right:6px"></i>Category Performance</span>'
+        +'<span style="font-size:13px;font-weight:700"><i class="ti ti-chart-bar" style="color:var(--primary-fg);margin-right:6px"></i>Category Performance</span>'
         +'<span style="font-size:11px;color:var(--text3)">avg across all suppliers</span>'
       +'</div>'
       +'<div style="display:flex;flex-direction:column;gap:10px">';
@@ -6380,7 +6537,7 @@ function renderDashboard(){
       var defaultRad=!_dbRadarFilter.length;
       h+='<div class="card" style="padding:16px 18px">'
         +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">'
-          +'<span style="font-size:13px;font-weight:700"><i class="ti ti-chart-radar" style="color:var(--primary);margin-right:6px"></i>Radar Overview</span>'
+          +'<span style="font-size:13px;font-weight:700"><i class="ti ti-chart-radar" style="color:var(--primary-fg);margin-right:6px"></i>Radar Overview</span>'
           +'<span style="display:flex;gap:5px">'
             +'<button onclick="dbRadarTop5()" style="font-size:10px;font-weight:600;padding:2px 8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text2);cursor:pointer">Top 5</button>'
             +(_dbRadarFilter.length?'<button onclick="dbRadarClear()" style="font-size:10px;font-weight:600;padding:2px 8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text2);cursor:pointer">Reset</button>':'')
@@ -6408,7 +6565,7 @@ function renderDashboard(){
     var cellPad=hmCompact?'4px 6px':'7px 8px';
     h+='<div class="card" style="padding:16px 18px;margin-bottom:4px">'
       +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:6px">'
-        +'<span style="font-size:13px;font-weight:700"><i class="ti ti-table" style="color:var(--primary);margin-right:6px"></i>Supplier × Category Heat Map</span>'
+        +'<span style="font-size:13px;font-weight:700"><i class="ti ti-table" style="color:var(--primary-fg);margin-right:6px"></i>Supplier × Category Heat Map</span>'
         +'<span style="font-size:11px;color:var(--text3)">'+(hmCompact?'color = score tier · hover a cell for the value':'click any cell to drill down')+'</span>'
       +'</div>'
       +'<div style="overflow:auto;max-height:560px;border:1px solid var(--border);border-radius:8px">'
@@ -6552,7 +6709,7 @@ function renderOverview(){
     var s='<div class="legend">';
     TIERS.forEach(function(t,i){
       var r=i===0?'&#8805;'+t.min+'%':i===TIERS.length-1?'&lt;'+TIERS[i-1].min+'%':t.min+'-'+(TIERS[i-1].min-1)+'%';
-      s+='<span class="legend-item"><span class="legend-dot" style="background:'+t.color+'"></span>'+r+' '+t.label+'</span>';
+      s+='<span class="legend-item"><span class="legend-dot" style="background:'+tierScreenColor(t)+'"></span>'+r+' '+t.label+'</span>';
     });
     return s+'</div>';
   }())
@@ -6648,7 +6805,7 @@ function renderDetail(){
     Object.entries(supCats).forEach(function(e2){
       var cat=e2[0];var items=e2[1];if(!items||!items.length)return;
       var hasAnyPhoto=items.some(function(it){return it.images&&it.images.length;});
-      h+='<div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:10px">'+esc(cat)+'</div><div style="overflow-x:auto"><table class="data-table"><thead><tr><th>#</th><th>Checkpoint</th><th>Score</th><th>Evidence / Notes</th>'+(hasAnyPhoto?'<th>Photos</th>':'')+'</tr></thead><tbody>';
+      h+='<div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:10px">'+esc(cat)+'</div><div style="overflow-x:auto"><table class="data-table"><colgroup><col class="col-no"><col class="col-cp"><col style="width:130px"><col class="col-notes">'+(hasAnyPhoto?'<col class="col-photos">':'')+'<col style="width:62px"></colgroup><thead><tr><th>#</th><th>Checkpoint</th><th>Score</th><th>Evidence / Notes</th>'+(hasAnyPhoto?'<th>Photos</th>':'')+'<th class="cp-task-col">Tasks</th></tr></thead><tbody>';
       items.forEach(function(item,idx){
         var p2=item.score;
         var bc=p2==='N.A.'||p2===null?'na':(p2>=4?'high':p2>=2.5?'mid':'low');
@@ -6657,13 +6814,15 @@ function renderDetail(){
           ?(imgs.length
             ?'<td style="white-space:nowrap;vertical-align:middle">'
               +imgs.map(function(im,ii){
-                return '<img src="'+im.data+'" onclick="openImgViewer(\''+esc(sn)+'\',\''+esc(cat)+'\','+idx+','+ii+')" style="width:36px;height:36px;object-fit:cover;border-radius:4px;cursor:pointer;border:1px solid var(--border);margin-right:3px" title="'+esc(im.name||'Photo')+'">';
+                return '<img src="'+im.data+'" onclick="event.stopPropagation();openImgViewer(\''+esc(sn)+'\',\''+esc(cat)+'\','+idx+','+ii+')" style="width:36px;height:36px;object-fit:cover;border-radius:4px;cursor:pointer;border:1px solid var(--border);margin-right:3px" title="'+esc(im.name||'Photo')+'">';
               }).join('')
             +'</td>'
             :'<td style="color:var(--text3);font-size:11px;text-align:center">—</td>')
           :'';
-        h+='<tr>'
-          +'<td style="color:var(--text3)">'+item.no+'</td>'
+        var cpTasks=tasksForCheckpoint(sn,cat,item.checkpoint);
+        // whole row opens the same read-only checkpoint popup as the heatmap
+        h+='<tr class="cp-row" title="Open checkpoint details" data-sup="'+esc(sn)+'" data-cat="'+esc(cat)+'" data-idx="'+idx+'" onclick="openCmpCheckpoint(this.dataset.sup,this.dataset.cat,+this.dataset.idx)">'
+          +'<td style="color:var(--text3)">'+((item.no!=null&&item.no!=='')?esc(String(item.no)):(idx+1))+'</td>'
           +'<td>'+esc(item.checkpoint)+'</td>'
           // Five cells for a five-point scale — the scale itself is visible, so
           // you read "3 of 5" without needing the denominator spelled out.
@@ -6671,6 +6830,7 @@ function renderDetail(){
             +'<span style="font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums;color:'+(p2===null||p2==='N.A.'?'var(--text3)':sc(Number(p2)/5*100))+'">'+(p2===null?'--':p2)+'</span></div></td>'
           +'<td style="font-size:12px;color:var(--text2)">'+esc(item.notes||'')+'</td>'
           +photoCell
+          +'<td class="cp-task-col">'+(cpTasks.length?cpTaskIndicator(cpTasks):'<span style="color:var(--text3)">—</span>')+'</td>'
         +'</tr>';
       });
       h+='</tbody></table></div></div>';
@@ -6723,7 +6883,7 @@ function renderDetail(){
       // Cap the side-by-side columns so the table stays readable at scale (sorted is already ranked by score in cf)
       var CMP_CAP=12;
       var cmpSups=sorted.slice(0,CMP_CAP);
-      h+='<div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:12px">Checkpoint Comparison — <span style="color:var(--primary)">'+esc(cf)+'</span>'
+      h+='<div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:12px">Checkpoint Comparison — <span style="color:var(--primary-fg)">'+esc(cf)+'</span>'
         +(sorted.length>CMP_CAP?'<span style="font-size:11px;font-weight:400;color:var(--text3);margin-left:8px">top '+CMP_CAP+' of '+sorted.length+' by score</span>':'')+'</div>'
         +'<div style="overflow-x:auto"><table class="data-table" style="table-layout:auto"><thead><tr>'
         +'<th style="min-width:28px">#</th>'
@@ -6754,11 +6914,15 @@ function renderDetail(){
     }
   } else {
     // ── Per-category supplier bars (multi-category view) ───────────────────
+    // Side by side in a grid: one full-width card per category was a lot of
+    // area (and very long bars) for five numbers each.
+    h+='<div class="cat-grid">';
     catsToShow.forEach(function(cat){
-      h+='<div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:10px">'+esc(cat)+'</div>';
-      sorted.forEach(function(sv){var p=calcScore(sv,cat);h+='<div class="cat-row" style="cursor:pointer" data-sup-name="'+esc(sv.name)+'" onclick="quickOpenSup(this.dataset.supName)"><div class="cat-name">'+esc(sv.name)+'</div>'+tierScale(p,8)+'<div class="cat-pct" style="color:'+sc(p)+'">'+(p!==null?p+'%':'--')+'</div></div>';});
+      h+='<div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:10px" title="'+esc(cat)+'">'+esc(cat)+'</div>';
+      sorted.forEach(function(sv){var p=calcScore(sv,cat);h+='<div class="cat-row" style="cursor:pointer" data-sup-name="'+esc(sv.name)+'" onclick="quickOpenSup(this.dataset.supName)"><div class="cat-name" title="'+esc(sv.name)+'">'+esc(sv.name)+'</div>'+tierScale(p,8)+'<div class="cat-pct" style="color:'+sc(p)+'">'+(p!==null?p+'%':'--')+'</div></div>';});
       h+='</div>';
     });
+    h+='</div>';
   }
 
   el.innerHTML=h;
@@ -6807,6 +6971,7 @@ function openCmpCheckpoint(supName,cat,idx){
           +'</div>';
         }).join('')+'</div>'
       :'')
+    +cpTasksHtml(supName,cat,idx,tasksForCheckpoint(supName,cat,item.checkpoint))
   +'</div>';
   var m=document.getElementById('cmpCheckpointModal');
   if(!m){
@@ -6826,6 +6991,64 @@ function openCmpCheckpoint(supName,cat,idx){
   m.style.display='flex';
 }
 function closeCmpCheckpoint(){var m=document.getElementById('cmpCheckpointModal');if(m)m.style.display='none';}
+
+// ── Checkpoint ↔ task links (Analysis table, heatmap, checkpoint popup) ───────
+// Tasks reference checkpoints by supplier + category + checkpoint TEXT
+// (actCheckpointLinks). Text is matched loosely — numbering/punctuation
+// stripped — the same way the coverage diagram does, so a renumbered
+// checkpoint still finds its task.
+function _cpNorm(t){return String(t==null?'':t).toLowerCase().replace(/^\s*\d+[.)]?\s*/,'').replace(/[\s.,;:]+/g,' ').trim();}
+function tasksForCheckpoint(sup,cat,cp){
+  var n=_cpNorm(cp);
+  if(!n)return [];
+  return (actions||[]).filter(function(a){
+    if(a.supplier!==sup)return false;
+    return actCheckpointLinks(a).some(function(l){
+      return (!l.category||l.category===cat)&&(l.checkpoint===cp||_cpNorm(l.checkpoint)===n);
+    });
+  });
+}
+// Compact indicator: task icon + count, coloured by the most urgent state
+// (overdue → crit, open → primary, all done → good).
+function cpTaskIndicator(tasks){
+  if(!tasks.length)return '';
+  var today=new Date();today.setHours(0,0,0,0);
+  var open=tasks.filter(function(a){return a.status!=='Done';});
+  var overdue=open.some(function(a){return a.dueDate&&new Date(a.dueDate)<today;});
+  var col=overdue?'var(--crit)':open.length?'var(--primary-fg)':'var(--good)';
+  var tip=tasks.length+' linked task'+(tasks.length>1?'s':'')+(open.length?' · '+open.length+' open':' · all done')+(overdue?' · overdue':'');
+  return '<span class="cp-task-ind" title="'+tip+'" style="color:'+col+'"><i class="ti ti-subtask"></i>'+tasks.length+'</span>';
+}
+function cpTasksHtml(sup,cat,idx,tasks){
+  var head='<label style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);display:block;margin:18px 0 6px">Linked tasks'
+    +(tasks.length?' <span style="font-weight:500">('+tasks.length+')</span>':'')+'</label>';
+  if(!tasks.length)return head+'<div style="font-size:12.5px;color:var(--text3);font-style:italic">No task linked to this checkpoint.</div>';
+  var today=new Date();today.setHours(0,0,0,0);
+  var esSn=esc(sup).replace(/'/g,"\\'"),esCat=esc(cat).replace(/'/g,"\\'");
+  return head+'<div class="cp-task-list">'+tasks.map(function(a){
+    var due=a.dueDate?new Date(a.dueDate):null;
+    var od=due&&a.status!=='Done'&&due<today;
+    var stc=ACT_STATUS_COLOR[a.status]||'var(--text3)';
+    return '<div class="cp-task-row" onclick="jumpToTaskFromCheckpoint('+a.id+',\''+esSn+'\',\''+esCat+'\','+idx+')" title="Open this task">'
+      +'<span style="font-size:11px;font-weight:600;color:var(--text3);font-variant-numeric:tabular-nums;white-space:nowrap">'+esc(a.ref||'—')+'</span>'
+      +'<span style="flex:1;min-width:0;font-size:12.5px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(a.title||'')+'</span>'
+      +'<span style="font-size:11px;font-weight:600;color:'+stc+';white-space:nowrap">'+esc(a.status||'')+'</span>'
+      +'<span style="font-size:11px;white-space:nowrap;color:'+(od?'var(--crit)':'var(--text2)')+'">'+(due?due.toLocaleDateString('de-DE')+(od?' ⚠':''):'—')+'</span>'
+      +'<i class="ti ti-arrow-right" style="color:var(--text3)"></i>'
+    +'</div>';
+  }).join('')+'</div>';
+}
+// Jump from a checkpoint popup to the task — navTo() records the Analysis view
+// including WHICH checkpoint was open, so "Back to Analysis" reopens it.
+var _cpReturn=null,_taskFromCp=false;
+function jumpToTaskFromCheckpoint(id,sup,cat,idx){
+  _cpReturn={sup:sup,cat:cat,idx:idx};
+  closeCmpCheckpoint();
+  navTo('actions');
+  _cpReturn=null;
+  openActionModal(id);
+  _taskFromCp=true;
+}
 
 // ── Image handling ────────────────────────────────────────────────────────────
 var _imgTarget=null; // {sup, cat, idx}
@@ -7097,9 +7320,11 @@ function supplierInfoFieldsHtml(sn){
   }).join('');
 }
 
+var _profileSn=null; // supplier whose profile modal is open — refreshed after planning from it
 function openSupplierProfile(sn){
   var s=suppliers.find(function(x){return x.name===sn;});
   if(!s)return;
+  _profileSn=sn;
   var m=document.getElementById('supplierProfileModal');
   if(!m){
     m=document.createElement('div');
@@ -7199,7 +7424,7 @@ function auditTimelineHtml(sn){
   return '<div class="card" style="margin-bottom:14px">'
     +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:10px;flex-wrap:wrap">'
       +'<div style="font-size:13px;font-weight:600;color:var(--text2)"><i class="ti ti-history"></i> Assessment History</div>'
-      +'<button class="btn sm" onclick="closeSupplierProfile();goToAssignChecklist(\''+esSn+'\')"><i class="ti ti-calendar-plus"></i> Plan assessment</button>'
+      +'<button class="btn sm" onclick="goToAssignChecklist(\''+esSn+'\')"><i class="ti ti-calendar-plus"></i> Plan assessment</button>'
     +'</div>'
     +rows
   +'</div>';
@@ -7835,8 +8060,8 @@ function mapCalPreviewHtml(m,i){
   var pins=(m.anchors||[]).map(function(p,a){
     return '<div onmousedown="mapAnchorDragStart(event,'+i+','+a+')" '
       +'style="position:absolute;left:'+(p.fx*100)+'%;top:'+(p.fy*100)+'%;transform:translate(-50%,-100%);cursor:grab;z-index:3;text-align:center;white-space:nowrap">'
-      +'<div style="font-size:9px;font-weight:700;color:var(--primary);text-shadow:0 0 2px #fff,0 0 2px #fff">'+esc(p.name)+'</div>'
-      +'<i class="ti ti-map-pin-filled" style="font-size:18px;color:var(--primary);filter:drop-shadow(0 0 1.5px #fff)"></i>'
+      +'<div style="font-size:9px;font-weight:700;color:var(--primary-fg);text-shadow:0 0 2px #fff,0 0 2px #fff">'+esc(p.name)+'</div>'
+      +'<i class="ti ti-map-pin-filled" style="font-size:18px;color:var(--primary-fg);filter:drop-shadow(0 0 1.5px #fff)"></i>'
     +'</div>';
   }).join('');
   // The crop rectangle (report region) drawn on the sheet, so it stays visible
@@ -8043,19 +8268,34 @@ function rptCiteList(cids){
 //     mid-word.
 // It only ever SHORTENS (the AI is still asked to respect the limit); this is
 // the safety net for when the model overshoots.
+// Matches a trailing checkpoint citation — "(#4)", "(#4, #7)", "(#4, 7)".
+var _RPT_CITE=/\s*\((?:#\s*\d+)(?:\s*,\s*#?\s*\d+)*\)\s*$/;
+// Clamp a generated bullet to `max` characters WITHOUT losing its citation.
+// The reference is the part that lets a reader trace a finding back to the
+// checkpoint — and it sits exactly where a naive cut lands. Cutting at `max`
+// used to either chop it off or, worse, detect the half-open "(" and delete the
+// whole reference, which is why bullets came out truncated with no #id. So the
+// citation is detached first, the SENTENCE is shortened to make room, and the
+// citation is put back on the end.
 function _rptClamp(text,max){
   text=String(text==null?'':text).trim();
   if(text.length<=max)return text;
-  var cut=text.slice(0,max);
-  var opens=(cut.match(/\(/g)||[]).length, closes=(cut.match(/\)/g)||[]).length;
-  if(opens>closes){
-    var lp=cut.lastIndexOf('(');
-    if(lp>0)cut=cut.slice(0,lp);
-  } else {
-    var ls=cut.lastIndexOf(' ');
-    if(ls>max*0.6)cut=cut.slice(0,ls);
+  var cite='',m=text.match(_RPT_CITE);
+  if(m){cite=' '+m[0].trim();text=text.slice(0,m.index).trim();}
+  var room=Math.max(12,max-cite.length);
+  if(text.length>room){
+    var cut=text.slice(0,room);
+    var opens=(cut.match(/\(/g)||[]).length, closes=(cut.match(/\)/g)||[]).length;
+    if(opens>closes){
+      var lp=cut.lastIndexOf('(');
+      if(lp>0)cut=cut.slice(0,lp);
+    } else {
+      var ls=cut.lastIndexOf(' ');
+      if(ls>room*0.6)cut=cut.slice(0,ls);
+    }
+    text=cut.replace(/[\s,;:(]+$/,'').trim();
   }
-  return cut.replace(/[\s,;:(]+$/,'').trim();
+  return (text+cite).trim();
 }
 // Every scored checkpoint of one category, with its ID — the input the
 // generator classifies and the set the "used once" check runs against.
@@ -8249,7 +8489,7 @@ function rptContentEditorHtml(r){
       if(items.length>spec.maxItems)
         h+='<div style="font-size:11px;color:var(--warn);padding:2px 0 6px"><i class="ti ti-alert-triangle"></i> Only the first '+spec.maxItems+' fit on the slide — the rest are dropped when the report is built.</div>';
       if(items.length<spec.maxItems)
-        h+='<button onclick="addRptItem(\''+k+'\')" style="background:none;border:none;cursor:pointer;color:var(--primary);font-size:12px;display:inline-flex;align-items:center;gap:4px"><i class="ti ti-plus"></i> Add point</button>';
+        h+='<button onclick="addRptItem(\''+k+'\')" style="background:none;border:none;cursor:pointer;color:var(--primary-fg);font-size:12px;display:inline-flex;align-items:center;gap:4px"><i class="ti ti-plus"></i> Add point</button>';
     }
     h+='</div>';
   });
@@ -8379,7 +8619,7 @@ function rptDetailEditorHtml(r){
               +'</div>'
             +'</div>';
           });
-          h+='<button onclick="addDetailBullet(\''+esCat+'\','+si+',\''+g+'\')" style="background:none;border:none;cursor:pointer;color:var(--primary);font-size:11.5px;display:inline-flex;align-items:center;gap:4px"><i class="ti ti-plus"></i> Add</button>'
+          h+='<button onclick="addDetailBullet(\''+esCat+'\','+si+',\''+g+'\')" style="background:none;border:none;cursor:pointer;color:var(--primary-fg);font-size:11.5px;display:inline-flex;align-items:center;gap:4px"><i class="ti ti-plus"></i> Add</button>'
           +'</div>';
         });
         h+='</div>';
@@ -8413,7 +8653,7 @@ function rptCiteAuditHtml(r,cat){
   var unknown=Object.keys(seen).map(Number).filter(function(n){
     return !scored.some(function(c){return c.cid===n;});});
   if(!dup.length&&!missing.length&&!unknown.length)
-    return '<div style="font-size:11px;color:var(--good);padding-top:4px"><i class="ti ti-check"></i> All '+scored.length+' scored checkpoints cited exactly once.</div>';
+    return '<div style="font-size:11px;color:var(--positive);padding-top:4px"><i class="ti ti-check"></i> All '+scored.length+' scored checkpoints cited exactly once.</div>';
   var line=function(icon,col,txt){return '<div style="font-size:11px;color:'+col+';padding-top:3px"><i class="ti ti-'+icon+'"></i> '+txt+'</div>';};
   var h='';
   if(dup.length)    h+=line('alert-triangle','var(--crit)','Cited more than once: '+dup.map(function(n){return '#'+n;}).join(', '));
@@ -8720,7 +8960,7 @@ function supplierDetailsHtml(sn,inAssessment){
       +'<textarea id="auGnNote" oninput="auSaveGeneralNotes(this.value);growNoteFull(this)" placeholder="Add general information about this assessment…" '
         +'style="width:100%;box-sizing:border-box;min-height:96px;padding:9px 11px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;resize:vertical;font-family:inherit">'+esc(gnRound.generalNotes||'')+'</textarea>'
       +'<div class="au-ai-prev" id="auGnAiPrev" style="display:none;margin-top:10px">'
-        +'<div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--primary);margin-bottom:5px"><i class="ti ti-sparkles"></i> AI suggestion</div>'
+        +'<div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--primary-fg);margin-bottom:5px"><i class="ti ti-sparkles"></i> AI suggestion</div>'
         +'<div id="auGnAiText" style="font-size:12.5px;line-height:1.55;color:var(--text);white-space:pre-wrap"></div>'
         +'<div style="display:flex;gap:8px;margin-top:9px">'
           +'<button class="btn sm primary" onclick="auAcceptGeneralNotes()"><i class="ti ti-check"></i> Accept</button>'
@@ -8753,7 +8993,7 @@ function supplierPinButtonHtml(sn){
   var label,icon,col;
   if(!g){label='No position';icon='map-pin-off';col='var(--text3)';}
   else if(g.derived){label='Country centre';icon='map-pin';col='var(--warn)';}
-  else {label=g.lat.toFixed(2)+' / '+g.lon.toFixed(2);icon='map-pin-filled';col='var(--good)';}
+  else {label=g.lat.toFixed(2)+' / '+g.lon.toFixed(2);icon='map-pin-filled';col='var(--positive)';}
   // Which sheet the slide will actually print is worth stating here: with
   // several sheets loaded it is the difference between a European close-up and
   // a pin lost on the world map, and it is otherwise only visible on export.
@@ -8937,7 +9177,7 @@ function rmSetAxis(i,v){ if(riskModel.factors[i]){riskModel.factors[i].axis=(v==
 // A per-group add button, so a custom factor lands on the RIGHT axis directly
 // instead of always arriving as a risk factor to be reassigned afterwards.
 function rmAddBtn(axis,label){
-  return '<button onclick="rmAddFactor(\''+axis+'\')" style="background:none;border:none;cursor:pointer;color:var(--primary);font-size:12px;margin:2px 0 4px;display:inline-flex;align-items:center;gap:4px"><i class="ti ti-plus"></i> '+esc(label)+'</button>';
+  return '<button onclick="rmAddFactor(\''+axis+'\')" style="background:none;border:none;cursor:pointer;color:var(--primary-fg);font-size:12px;margin:2px 0 4px;display:inline-flex;align-items:center;gap:4px"><i class="ti ti-plus"></i> '+esc(label)+'</button>';
 }
 function rmAddFactor(axis){
   riskModel.factors.push({id:'rf_'+Date.now(),name:'',weight:1,axis:(axis==='crit'?'crit':'risk')});
@@ -9834,9 +10074,9 @@ function renderMonitoring(){
   var sel=suppliers.find(function(x){return x.name===_monSel;});
   var selScore=calcScore(sel,null);
   var selTier=supplierRiskTier(sel);
-  var selCls=selTier?{class:selTier.label,color:selTier.color,risk:selTier.risk}:{class:'—',color:'var(--text3)',risk:''};
+  var selCls=selTier?{class:selTier.label,color:tierScreenColor(selTier),risk:selTier.risk}:{class:'—',color:'var(--text3)',risk:''};
   var selDelta=auditScoreDelta(sel);
-  var deltaHtml=selDelta==null?'':' <span style="font-size:11px;font-weight:600;color:'+(selDelta<0?'var(--crit)':selDelta>0?'var(--good)':'var(--text3)')+'">('+(selDelta>0?'+':'')+selDelta+'pts vs. last assessment)</span>';
+  var deltaHtml=selDelta==null?'':' <span style="font-size:11px;font-weight:600;color:'+(selDelta<0?'var(--crit)':selDelta>0?'var(--positive)':'var(--text3)')+'">('+(selDelta>0?'+':'')+selDelta+'pts vs. last assessment)</span>';
   var opts=suppliers.map(function(s){return '<option'+(s.name===_monSel?' selected':'')+'>'+esc(s.name)+'</option>';}).join('');
   var RISK_LVL=[{v:1,cls:'rlow',t:'Low'},{v:2,cls:'rmed',t:'Medium'},{v:3,cls:'rhigh',t:'High'}];
   // Criticality factors first (they build the X axis), then risk factors — so the
@@ -9968,8 +10208,8 @@ function renderKpis(){
   var opts=suppliers.map(function(s){return '<option'+(s.name===_monSel?' selected':'')+'>'+esc(s.name)+'</option>';}).join('');
   var bar='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px">'
     +'<div style="display:flex;border:1px solid var(--border);border-radius:var(--r);overflow:hidden">'
-      +'<button onclick="setKpiScope(\'one\')" style="padding:6px 12px;font-size:12px;border:none;cursor:pointer;font-family:inherit;background:'+(_kpiScope==='one'?'var(--primary)':'var(--bg)')+';color:'+(_kpiScope==='one'?'#fff':'var(--text)')+'">One supplier</button>'
-      +'<button onclick="setKpiScope(\'all\')" style="padding:6px 12px;font-size:12px;border:none;cursor:pointer;font-family:inherit;background:'+(_kpiScope==='all'?'var(--primary)':'var(--bg)')+';color:'+(_kpiScope==='all'?'#fff':'var(--text)')+'">All suppliers</button>'
+      +'<button onclick="setKpiScope(\'one\')" style="padding:6px 12px;font-size:12px;border:none;cursor:pointer;font-family:inherit;background:'+(_kpiScope==='one'?'var(--primary)':'var(--bg)')+';color:'+(_kpiScope==='one'?'var(--on-primary)':'var(--text)')+'">One supplier</button>'
+      +'<button onclick="setKpiScope(\'all\')" style="padding:6px 12px;font-size:12px;border:none;cursor:pointer;font-family:inherit;background:'+(_kpiScope==='all'?'var(--primary)':'var(--bg)')+';color:'+(_kpiScope==='all'?'var(--on-primary)':'var(--text)')+'">All suppliers</button>'
     +'</div>'
     +(_kpiScope==='one'?'<select onchange="kpiSelectByName(this.value)" style="'+_monIst()+';min-width:220px;font-weight:600">'+opts+'</select>':'')
   +'</div>';
@@ -9991,7 +10231,7 @@ function _kpiSyncViewButtons(active){
     var b=document.getElementById(e[0]);if(!b)return;
     var on=(e[1]===active);
     b.style.background=on?'var(--primary)':'var(--bg)';
-    b.style.color=on?'#fff':'var(--text)';
+    b.style.color=on?'var(--on-primary)':'var(--text)';
   });
 }
 
@@ -10371,13 +10611,13 @@ function renderSteering(){
   // focus areas and show a done/total count, without any new linking field.
   var supActions=actions.filter(function(a){return a.supplier===sel.name;});
   function actLine(a){
-    var col=a.status==='Done'?'var(--good)':a.status==='In Progress'?'var(--warn)':'var(--text3)';
+    var col=a.status==='Done'?'var(--positive)':a.status==='In Progress'?'var(--warn)':'var(--text3)';
     return '<div style="display:flex;justify-content:space-between;gap:8px;padding:4px 0 4px 12px;border-bottom:1px solid var(--border)">'
       +'<span style="font-size:12px">'+esc(a.title||'(untitled)')+'</span>'
       +'<span style="font-size:11px;white-space:nowrap;color:'+col+'">'+esc(a.status||'')+(a.dueDate?' · '+a.dueDate:'')+'</span></div>';
   }
   function progPill(done,total){
-    var col=total===0?'var(--text3)':done>=total?'var(--good)':'var(--warn)';
+    var col=total===0?'var(--text3)':done>=total?'var(--positive)':'var(--warn)';
     return '<span style="font-size:10px;font-weight:700;padding:1px 8px;border-radius:8px;background:color-mix(in srgb,'+col+' 15%,transparent);color:'+col+'">'+done+'/'+total+' done</span>';
   }
   var usedActs=new Set();
@@ -10406,7 +10646,7 @@ function renderSteering(){
   el.innerHTML=
     '<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-bottom:16px">'
       +'<div class="card"><div style="font-size:13px;font-weight:700;margin-bottom:2px"><i class="ti ti-route"></i> Portfolio Strategy</div>'
-        +'<div style="font-size:11px;color:var(--text3);margin-bottom:10px">Derived automatically: risk class (assessment) × criticality. Set criticality in <a onclick="showPage(\'monitoring\')" style="color:var(--primary);cursor:pointer;text-decoration:underline">Monitoring → Portfolio</a>.</div>'
+        +'<div style="font-size:11px;color:var(--text3);margin-bottom:10px">Derived automatically: risk class (assessment) × criticality. Set criticality in <a onclick="showPage(\'monitoring\')" style="color:var(--primary-fg);cursor:pointer;text-decoration:underline">Monitoring → Portfolio</a>.</div>'
         +stratHtml+'</div>'
       +'<div class="card"><div style="font-size:13px;font-weight:700;margin-bottom:10px"><i class="ti ti-clock-exclamation"></i> Overdue Milestones</div>'+overdueHtml+'</div>'
     +'</div>'
@@ -10429,7 +10669,7 @@ function renderSteering(){
         +'<div>'
           +'<div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:2px">MILESTONES</div>'
           +'<div style="font-size:11px;color:var(--text3);margin-bottom:8px">Strategic waypoints — the outcomes to reach, not day-to-day tasks.</div>'+milestones
-          +'<button onclick="addMilestone()" style="background:none;border:none;cursor:pointer;color:var(--primary);font-size:12px;display:inline-flex;align-items:center;gap:4px;margin-top:2px"><i class="ti ti-plus"></i> Add milestone</button>'
+          +'<button onclick="addMilestone()" style="background:none;border:none;cursor:pointer;color:var(--primary-fg);font-size:12px;display:inline-flex;align-items:center;gap:4px;margin-top:2px"><i class="ti ti-plus"></i> Add milestone</button>'
         +'</div>'
       +'</div>'
     +'</div>';
@@ -10498,10 +10738,11 @@ function updateBadgeColors(){
   var style=document.getElementById('dynamic-badge-css');
   if(!style){style=document.createElement('style');style.id='dynamic-badge-css';document.head.appendChild(style);}
   // Use tier colors: tier[0]=high(green), tier[1]=mid-high(orange), tier[2]=mid-low(yellow), tier[3]=low(red)
-  var t0=TIERS[0],t3=TIERS[TIERS.length-1],t1=TIERS[1]||t0;
-  style.textContent='.badge.high{background:'+t0.color+'22;color:'+t0.color+'}'
-    +'.badge.mid{background:'+t1.color+'22;color:'+t1.color+'}'
-    +'.badge.low{background:'+t3.color+'22;color:'+t3.color+'}';
+  // screen colours (mirrored for dark mode), not the print colours
+  var t0=tierScreenColor(TIERS[0]),t3=tierScreenColor(TIERS[TIERS.length-1]),t1=tierScreenColor(TIERS[1]||TIERS[0]);
+  style.textContent='.badge.high{background:'+t0+'22;color:'+t0+'}'
+    +'.badge.mid{background:'+t1+'22;color:'+t1+'}'
+    +'.badge.low{background:'+t3+'22;color:'+t3+'}';
 }
 
 // ── Tier palette helpers ───────────────────────────────────────────────────
@@ -10568,7 +10809,7 @@ function renderTiersEditor(){
   var seg='';
   modes.forEach(function(m,mi){
     var on=tierColorMode===m[0];
-    seg+='<button type="button" onclick="setTierColorMode(\''+m[0]+'\')" style="padding:6px 14px;border:none;cursor:pointer;font-size:12px;font-family:inherit;font-weight:'+(on?'600':'500')+';background:'+(on?'var(--primary)':'transparent')+';color:'+(on?'#fff':'var(--text)')+(mi>0?';border-left:1px solid var(--border)':'')+'">'+m[1]+'</button>';
+    seg+='<button type="button" onclick="setTierColorMode(\''+m[0]+'\')" style="padding:6px 14px;border:none;cursor:pointer;font-size:12px;font-family:inherit;font-weight:'+(on?'600':'500')+';background:'+(on?'var(--primary)':'transparent')+';color:'+(on?'var(--on-primary)':'var(--text)')+(mi>0?';border-left:1px solid var(--border)':'')+'">'+m[1]+'</button>';
   });
   var h='<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px">'
       +'<span style="font-size:12px;font-weight:600;color:var(--text2)">Color palette</span>'
@@ -10594,7 +10835,7 @@ function renderTiersEditor(){
       +'<td style="padding:7px 8px"><div style="display:flex;gap:6px;align-items:center">'+_colorPicker(tier.color,'setTierColorAt('+i+',%C%)',[],26)+'</div></td>'
       +'<td style="padding:7px 8px"><input type="text" value="'+esc(tier.label)+'" id="tier_lbl_'+i+'" placeholder="e.g. Very Good" style="width:110px;padding:4px 8px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:12px" oninput="previewTier('+i+')"></td>'
       +'<td style="padding:7px 8px"><input type="text" value="'+esc(tier.risk)+'" id="tier_risk_'+i+'" placeholder="e.g. Low risk" style="width:220px;padding:4px 8px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:12px"></td>'
-      +'<td style="padding:7px 8px"><span id="tier_prev_'+i+'" style="background:'+tier.color+';color:#fff;padding:3px 12px;border-radius:12px;font-size:11px;font-weight:700;white-space:nowrap">'+esc(tier.label)+'</span></td>'
+      +'<td style="padding:7px 8px"><span id="tier_prev_'+i+'" style="background:'+tier.color+';color:'+textOn(tier.color)+';padding:3px 12px;border-radius:12px;font-size:11px;font-weight:700;white-space:nowrap">'+esc(tier.label)+'</span></td>'
       +'<td style="padding:7px 4px;text-align:center">'
         +(TIERS.length>2?'<button onclick="deleteTier('+i+')" title="Delete tier" style="background:none;border:none;cursor:pointer;color:var(--crit);padding:3px;border-radius:4px" onmouseover="this.style.background=\'color-mix(in srgb,var(--crit) 12%,transparent)\'" onmouseout="this.style.background=\'none\'"><i class="ti ti-trash" style="font-size:14px"></i></button>':'')
       +'</td>'
@@ -10611,7 +10852,7 @@ function renderTiersEditor(){
 function previewTier(i){
   var lbl=document.getElementById('tier_lbl_'+i);
   var prev=document.getElementById('tier_prev_'+i);
-  if(lbl&&prev){prev.textContent=lbl.value;if(TIERS[i])prev.style.background=TIERS[i].color;}
+  if(lbl&&prev){prev.textContent=lbl.value;if(TIERS[i]){prev.style.background=TIERS[i].color;prev.style.color=textOn(TIERS[i].color);}}
 }
 // Pick a tier colour from the shared swatch picker. A manual colour choice means
 // the palette is now "custom"; the change commits to the app on Apply, like the
@@ -10771,7 +11012,7 @@ function jsonArraySalvage(text){
 // ── Shared AI loading indicator — consistent look across ALL AI features ──
 function aiLoaderHtml(msg,id){
   return '<div style="padding:18px 16px;color:var(--text2);font-size:13px">'
-    +'<div style="display:flex;align-items:center;justify-content:center;gap:8px"><i class="ti ti-loader" style="animation:spin 1s linear infinite;font-size:18px;color:var(--primary)"></i><span>'+esc(msg||'AI is working…')+' <span id="'+(id||'aiElapsed')+'" style="color:var(--text3);font-weight:600">0s</span></span></div>'
+    +'<div style="display:flex;align-items:center;justify-content:center;gap:8px"><i class="ti ti-loader" style="animation:spin 1s linear infinite;font-size:18px;color:var(--primary-fg)"></i><span>'+esc(msg||'AI is working…')+' <span id="'+(id||'aiElapsed')+'" style="color:var(--text3);font-weight:600">0s</span></span></div>'
     +'<div class="indet-bar"><div></div></div>'
   +'</div>';
 }
@@ -10786,7 +11027,7 @@ function showAiModal(title,content){
   m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:3000;display:flex;align-items:flex-end;justify-content:center;padding:16px';
   m.innerHTML='<div style="background:var(--bg);border-radius:16px 16px 12px 12px;width:100%;max-width:680px;max-height:85vh;display:flex;flex-direction:column;box-shadow:var(--shadow-lg)">'
     +'<div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)">'
-      +'<div style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:var(--text)"><i class="ti ti-sparkles" style="color:var(--primary)"></i>'+title+'</div>'
+      +'<div style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:var(--text)"><i class="ti ti-sparkles" style="color:var(--primary-fg)"></i>'+title+'</div>'
       +'<button onclick="document.getElementById(\'aiModal\').remove()" style="background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px"><i class="ti ti-x"></i></button>'
     +'</div>'
     +'<div style="padding:20px;overflow-y:auto;white-space:pre-wrap;font-size:13px;line-height:1.6;color:var(--text)">'+content+'</div>'
@@ -10941,7 +11182,7 @@ function _renderAiActPicker(){
   var n=Object.keys(_aiActPick.sups).filter(function(k){return _aiActPick.sups[k];}).length;
   m.innerHTML='<div style="background:var(--bg);border-radius:16px 16px 12px 12px;width:100%;max-width:800px;max-height:85vh;display:flex;flex-direction:column;box-shadow:var(--shadow-lg)">'
     +'<div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)">'
-      +'<div style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700"><i class="ti ti-sparkles" style="color:var(--primary)"></i> AI Action Suggestions</div>'
+      +'<div style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700"><i class="ti ti-sparkles" style="color:var(--primary-fg)"></i> AI Action Suggestions</div>'
       +'<button onclick="document.getElementById(\'aiActModal\').remove()" style="background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px"><i class="ti ti-x"></i></button>'
     +'</div>'
     +'<div style="padding:16px 20px;overflow-y:auto">'
@@ -10960,7 +11201,7 @@ function _renderAiActPicker(){
     +'<div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px">'
       +'<button class="btn" onclick="document.getElementById(\'aiActModal\').remove()">Cancel</button>'
       +'<button class="btn" id="aiActGoBtn" onclick="_aiActRunSelected()" '+(n?'':'disabled')
-        +' style="background:var(--primary);color:#fff;border:none'+(n?'':';opacity:.5')+'">'
+        +' style="background:var(--primary);color:var(--on-primary);border:none'+(n?'':';opacity:.5')+'">'
         +'<i class="ti ti-sparkles"></i> Generate for '+n+' supplier'+(n===1?'':'s')+'</button>'
     +'</div>'
   +'</div>';
@@ -11069,7 +11310,7 @@ function _showAiActLoading(){
   m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:3000;display:flex;align-items:flex-end;justify-content:center;padding:16px';
   m.innerHTML='<div style="background:var(--bg);border-radius:16px 16px 12px 12px;width:100%;max-width:800px;max-height:85vh;display:flex;flex-direction:column;box-shadow:var(--shadow-lg)">'
     +'<div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)">'
-      +'<div style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:var(--text)"><i class="ti ti-sparkles" style="color:var(--primary)"></i> AI Action Suggestions</div>'
+      +'<div style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:var(--text)"><i class="ti ti-sparkles" style="color:var(--primary-fg)"></i> AI Action Suggestions</div>'
       +'<button onclick="document.getElementById(\'aiActModal\').remove()" style="background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px"><i class="ti ti-x"></i></button>'
     +'</div>'
     +aiLoaderHtml('Analysing audit data and generating action recommendations…','aiElapsed_act')
@@ -11109,7 +11350,7 @@ function _showAiActSuggestionsRender(problems){
     var added=_aiAddedIds.has(i);
     var pc=ACT_PRIO_COLOR[s.priority]||'#888888';
     var tier=getTier(calcScore(suppliers.find(function(x){return x.name===s.supplier;})||{categories:{}},s.category||null));
-    var tierCol=tier?tier.color:'#888';
+    var tierCol=tierScreenColor(tier);
     // A near-duplicate is surfaced, not suppressed: the model only sees the
     // recorded actions as text, so the check here is the one that actually
     // holds, and the decision stays with the user.
@@ -11141,7 +11382,7 @@ function _showAiActSuggestionsRender(problems){
         +'<div style="flex-shrink:0;display:flex;align-items:center">'
           +(added
             ?'<span style="color:var(--good);font-size:12px;font-weight:600;display:flex;align-items:center;gap:4px"><i class="ti ti-circle-check" style="font-size:18px"></i> Added</span>'
-            :'<button onclick="addSuggestedAction('+i+')" style="background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;border:none;cursor:pointer;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px;white-space:nowrap"><i class="ti ti-plus"></i> Add</button>'
+            :'<button onclick="addSuggestedAction('+i+')" style="background:linear-gradient(135deg,var(--primary),var(--secondary));color:var(--on-primary);border:none;cursor:pointer;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px;white-space:nowrap"><i class="ti ti-plus"></i> Add</button>'
           )
         +'</div>'
       +'</div>'
@@ -11154,7 +11395,7 @@ function _showAiActSuggestionsRender(problems){
     // Header
     +'<div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0">'
       +'<div style="display:flex;align-items:center;gap:8px">'
-        +'<i class="ti ti-sparkles" style="color:var(--primary);font-size:18px"></i>'
+        +'<i class="ti ti-sparkles" style="color:var(--primary-fg);font-size:18px"></i>'
         +'<span style="font-size:15px;font-weight:700;color:var(--text)">AI Action Suggestions</span>'
         +'<span style="font-size:12px;color:var(--text3)">'+sugg.length+' proposals · '+(_aiAddedIds.size)+' added</span>'
       +'</div>'
@@ -11269,8 +11510,8 @@ function calGoToday(){_calYear=new Date().getFullYear();_calMonth=new Date().get
 
 function _updateCalViewButtons(){
   var mb=document.getElementById('calViewMonth'),yb=document.getElementById('calViewYear');
-  if(mb){mb.style.background=_calView==='month'?'var(--primary)':'var(--bg)';mb.style.color=_calView==='month'?'#fff':'var(--text)';}
-  if(yb){yb.style.background=_calView==='year'?'var(--primary)':'var(--bg)';yb.style.color=_calView==='year'?'#fff':'var(--text)';}
+  if(mb){mb.style.background=_calView==='month'?'var(--primary)':'var(--bg)';mb.style.color=_calView==='month'?'var(--on-primary)':'var(--text)';}
+  if(yb){yb.style.background=_calView==='year'?'var(--primary)':'var(--bg)';yb.style.color=_calView==='year'?'var(--on-primary)':'var(--text)';}
 }
 function setCalView(v){_calView=v;_updateCalViewButtons();renderCalendar();}
 function calOpenMonth(m){_calMonth=m;_calView='month';_updateCalViewButtons();renderCalendar();}
@@ -11413,7 +11654,7 @@ function _calYearHtml(evMap,today){
       var evs=evMap[ds]||[];
       var isToday=(_calYear===today.getFullYear()&&m===today.getMonth()&&d===today.getDate());
       var st='font-size:9px;text-align:center;padding:2px 0;border-radius:3px;cursor:pointer;';
-      if(evs.length)st+='background:'+_calEvts[evs[0]].color+';color:#fff;font-weight:700;';
+      if(evs.length)st+='background:'+_calEvts[evs[0]].color+';color:'+textOn(_calEvts[evs[0]].color)+';font-weight:700;';
       else st+='color:var(--text2);';
       if(isToday)st+='outline:2px solid var(--accent-ui);outline-offset:-2px;';
       var tip=evs.length?(evs.length+' event'+(evs.length>1?'s':'')):'';
@@ -12327,101 +12568,501 @@ async function exportExcel(){
   toast('Excel working file exported — '+wb.worksheets.length+' sheets');
 }
 
-function exportPDF(){
+// ══════════════════════════════════════════════════════════════════════════
+// PDF REPORT
+// A print-first HTML document (browser "Save as PDF") built on the SAME rules as
+// the PowerPoint and Excel reports so all three match:
+//   · accent colour from reportBuilder / RB_VARIANTS (identical to PPTX + XLSX)
+//   · TIERS traffic ramp for the portfolio matrix cells (like the XLSX dashboard)
+//   · single-hue accent tier bars + score dots on the supplier pages (like PPTX)
+//   · module order mirrors RPT_MODULES: cover -> agenda -> portfolio ->
+//     per supplier (summary -> narrative -> findings -> action plan)
+//   · one fixed content grid + fixed table layouts, so every column, rule and
+//     panel edge lines up down the whole document ("bündig").
+// Vector text, selectable, exact alignment — no rasterising.
+// ══════════════════════════════════════════════════════════════════════════
+async function exportWord(){
   if(!suppliers.length){uiAlert('No data');return;}
-  const sel=suppliers.filter(s=>exportSelectedPdf.has(s.name));
-  const cats=allCats();const th=THEMES[selectedTheme];
-  const today=new Date().toLocaleDateString(lang==='de'?'de-DE':'en-GB');
-  const project=document.getElementById('projectName').value||'Supplier Assessment Report';
-  const auditor=document.getElementById('auditorName').value||'';
-  const company=document.getElementById('companyName').value||'';
-  let body='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+project+'</title><style>'
-    +'@page{size:A4 landscape;margin:12mm}@media print{.np{display:none}.pb{page-break-after:always}}'
-    +'body{font-family:Arial,sans-serif;color:#333;font-size:10px}'
-    +'.cover{background:#'+th.primary+';color:#fff;padding:40px;min-height:80mm}'
-    +'.cover h1{font-size:26px;margin-bottom:8px}.cover p{opacity:.8}'
-    +'.ab{background:#'+th.accent+';height:10px}'
-    +'table{width:100%;border-collapse:collapse;margin:8px 0;font-size:9px}'
-    +'th{background:#'+th.primary+';color:#fff;padding:5px 7px;text-align:left}'
-    +'td{padding:4px 7px;border-bottom:1px solid #eee}tr:nth-child(even) td{background:#f9f9f9}'
-    +'.sh{color:#0F6E56;font-weight:bold}.sm{color:#854F0B;font-weight:bold}.sl{color:#A32D2D;font-weight:bold}'
-    +'h2{color:#'+th.primary+';font-size:13px;margin:14px 0 5px;border-bottom:2px solid #'+th.primary+';padding-bottom:3px}'
-    +'h3{font-size:11px;margin:10px 0 3px;color:#555}'
-    +'.bw{background:#eee;height:7px;border-radius:3px;display:inline-block;width:90px;vertical-align:middle}'
-    +'.bf{height:7px;border-radius:3px;display:inline-block}.pb{page-break-after:always;height:0}'
-    +'.np{position:fixed;top:10px;right:10px;display:flex;gap:8px;z-index:999}'
-    +'.np button{padding:8px 16px;cursor:pointer;border:none;border-radius:5px;font-size:12px}'
-    +'</style></head><body>'
-    +'<div class="np"><button style="background:#'+th.primary+';color:#fff" onclick="window.print()">Drucken / Als PDF</button><button style="background:#eee" onclick="window.close()">Schliessen</button></div>'
-    +'<div class="cover"><h1>'+esc(project)+'</h1><p>'+esc(company)+(auditor?' - '+esc(auditor):'')+'  -  '+today+'</p><p style="margin-top:6px">'+sel.length+' categories · '+cats.length+'</p></div>'
-    +'<div class="ab"></div>'
-    +'<h2>'+'Summary'+'</h2>'
-    +'<table><thead><tr><th>'+'Suppliers'+'</th>'+cats.map(c=>'<th>'+esc(c)+'</th>').join('')+'<th>'+'Total'+'</th></tr></thead><tbody>';
-  [...sel].sort((a,b)=>(calcScore(b)||0)-(calcScore(a)||0)).forEach(s=>{
-    const tot=calcScore(s);const tc=tot>=threshGreen?'sh':tot>=threshYellow?'sm':'sl';
-    body+='<tr><td><strong>'+esc(s.name)+'</strong></td>'+cats.map(c=>{const p=calcScore(s,c);const cc=p>=threshGreen?'sh':p>=threshYellow?'sm':'sl';return'<td class="'+cc+'">'+(p!==null?p+'%':'--')+'</td>';}).join('')+'<td class="'+tc+'">'+(tot!==null?tot+'%':'--')+'</td></tr>';
-  });
-  body+='</tbody></table>';
-  sel.forEach(s=>{
-    const tot=calcScore(s);
-    body+='<div class="pb"></div><h2>'+esc(s.name)+' — Total Score: <span style="color:'+sc(tot)+'">'+(tot!==null?tot+'%':'--')+'</span></h2>';
-    body+='<table><thead><tr><th>'+'Categories'+'</th><th>'+'Score'+'</th><th>Progress</th></tr></thead><tbody>';
-    Object.keys(s.categories).forEach(cat=>{const p=calcScore(s,cat);const cc=p>=threshGreen?'sh':p>=threshYellow?'sm':'sl';const bc=p>=threshGreen?'#1D9E75':p>=threshYellow?'#EF9F27':'#E24B4A';body+='<tr><td>'+cat+'</td><td class="'+cc+'">'+(p!==null?p+'%':'--')+'</td><td><div class="bw"><div class="bf" style="width:'+(p||0)+'%;background:'+bc+'"></div></div></td></tr>';});
-    body+='</tbody></table>';
-    Object.entries(s.categories).forEach(([cat,items])=>{
-      body+='<h3>'+cat+'</h3><table><thead><tr><th>#</th><th>'+'Checkpoint'+'</th><th>'+'Score'+'</th><th>'+'Evidence / Notes'+'</th></tr></thead><tbody>';
-      items.forEach(item=>{const p=item.score;const cc=p==='N.A.'||p===null?'':p>=4?'sh':p>=2.5?'sm':'sl';body+='<tr><td style="color:#999">'+item.no+'</td><td>'+esc(item.checkpoint)+'</td><td class="'+cc+'">'+(p===null?'--':p)+'</td><td style="color:#666">'+esc(item.notes||'')+'</td></tr>';});
-      body+='</tbody></table>';
+  var sel=suppliers.filter(function(s){return exportSelectedPdf.has(s.name);});
+  if(!sel.length)sel=suppliers.slice();
+  var portfolio=sel.length>1;
+
+  // Accent from the SAME source the PowerPoint + Excel reports read.
+  var A='#'+_px(reportBuilder.variant==='custom'&&reportBuilder.customColor
+                 ?reportBuilder.customColor
+                 :RB_VARIANTS[(reportBuilder&&reportBuilder.variant)||'blue'].accent);
+  var C={dark:'#16202C',textDark:'#464646',textMid:'#333333',line:'#DDDDDD',foot:'#8A8F98',bg2:'#F2F4F7'};
+  var company =(document.getElementById('companyName').value)||'P3 Group';
+  var project =(document.getElementById('projectName').value)||'Supplier Assessment Report';
+  var assessor=(document.getElementById('auditorName').value)||'';
+  var today=new Date().toLocaleDateString(lang==='de'?'de-DE':'en-GB');
+
+  // Word opens HTML documents, but its layout engine has no flexbox/grid and no
+  // absolute positioning — so everything here is built from TABLES and solid
+  // colour fills, which Word renders (and keeps fully editable) reliably. Same
+  // rules as the PowerPoint + Excel reports: accent from reportBuilder, TIERS
+  // colours on the matrix, accent score bars/dots, module order from RPT_MODULES.
+  // No full-page cover band, so there are never trailing blank pages.
+  function mix(hex,amt){var h=hex.replace('#','');var r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),b=parseInt(h.substr(4,2),16);r=Math.round(r+(255-r)*amt);g=Math.round(g+(255-g)*amt);b=Math.round(b+(255-b)*amt);return '#'+[r,g,b].map(function(n){return ('0'+n.toString(16)).slice(-2);}).join('');}
+  function tierOf(pct){return pct==null?null:(TIERS.find(function(t){return pct>=t.min;})||TIERS[TIERS.length-1]);}
+  function tierColor(pct){var t=tierOf(pct);return t?t.color:'#888';}
+  function tierLbl(pct){var t=tierOf(pct);return t?t.label:'—';}
+  function pctTxt(p){return p!=null?p+'%':'—';}
+  function txtOn(hex){var h=hex.replace('#','');return (0.299*parseInt(h.substr(0,2),16)+0.587*parseInt(h.substr(2,2),16)+0.114*parseInt(h.substr(4,2),16))/255>0.62?'#000000':'#FFFFFF';}
+
+  // Score bar as a two-cell table (Word honours cell width % and background).
+  function bar(pct){
+    var v=pct==null||isNaN(pct)?0:Math.max(0,Math.min(100,Math.round(pct))),c='';
+    if(v>0)c+='<td width="'+v+'%" style="background:'+A+';font-size:1px;line-height:1px;height:8px">&nbsp;</td>';
+    if(v<100)c+='<td width="'+(100-v)+'%" style="background:#EDEFF2;font-size:1px;line-height:1px;height:8px">&nbsp;</td>';
+    return '<table width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;table-layout:fixed"><tr>'+c+'</tr></table>';
+  }
+  // 0–5 score as five small coloured cells (a one-row table).
+  function dots(score){
+    var f=(score==null||score==='N.A.'||isNaN(Number(score)))?-1:Number(score),c='';
+    for(var i=0;i<5;i++)c+='<td width="11" style="width:11px;height:9px;font-size:1px;line-height:1px;background:'+(i<f?A:'#E6E9EE')+';border:1px solid #FFFFFF">&nbsp;</td>';
+    return '<table cellspacing="0" cellpadding="0" style="border-collapse:collapse;display:inline-block"><tr>'+c+'</tr></table>';
+  }
+  function panel(t){return '<p class=plabel>'+esc(String(t).toUpperCase())+'</p>';}
+  function chrome(kick,title){return '<p class=kick>'+esc(kick)+'</p><p class=ctitle>'+esc(title)+'</p>';}
+  var PB='<br clear=all style="mso-special-character:line-break;page-break-before:always">';
+  // Table margins are unreliable in Word, so the rule carries its own space via
+  // gap() paragraphs rather than a margin that may be dropped.
+  function accentRule(){return gap(7)+'<table cellspacing="0" cellpadding="0" style="border-collapse:collapse"><tr><td width="180" style="height:3px;background:'+A+';font-size:1px;line-height:1px">&nbsp;</td></tr></table>'+gap(4);}
+  // Vertical breathing room between blocks. An empty <div> with only a height
+  // COLLAPSES in Word (it has no line box), which is why the document still read
+  // as squeezed even with spacers in the markup. A paragraph with an exact
+  // line-height is the one construct Word reliably turns into real space.
+  function gap(pt){return '<p style="margin:0;font-size:1pt;mso-line-height-rule:exactly;line-height:'+pt+'pt">&nbsp;</p>';}
+
+  // ── Pre-render radars (Chart.js -> PNG, one per supplier) ─────────────────
+  var radar={};
+  for(var ri=0;ri<sel.length;ri++){
+    var sp=sel[ri],rcs=Object.keys(sp.categories||{});
+    if(rcs.length<3)continue;
+    var vals=rcs.map(function(c){return calcScore(sp,c)||0;});
+    var avg=null;
+    if(portfolio){
+      avg=rcs.map(function(c){
+        var vs=sel.filter(function(o){return o!==sp;}).map(function(o){return calcScore(o,c);}).filter(function(v){return v!=null;});
+        return vs.length?Math.round(vs.reduce(function(a,b){return a+b;},0)/vs.length):0;
+      });
+    }
+    radar[sp.name]='data:'+await renderRadarToPng(rcs,vals,_px(A),avg,shortName(sp.name,34));
+  }
+
+  var P=[];
+
+  // ── Cover — a title block (no full-page band ⇒ no trailing blank page) ──────
+  P.push('<p class=eyebrow>SUPPLIER ASSESSMENT</p>'
+    +'<h1 class=h1>'+esc(project)+'</h1>'
+    +accentRule()
+    +'<p class=meta>'+[esc(company),assessor?'Assessor: '+esc(assessor):'',today].filter(Boolean).join(' &nbsp;·&nbsp; ')+'</p>'
+    +'<p class=sub>'+sel.length+' supplier'+(sel.length===1?'':'s')+' assessed</p>');
+
+  // ── Agenda ─────────────────────────────────────────────────────────────────
+  var agenda=[],no=1;
+  if(portfolio)agenda.push({n:no++,label:'Portfolio Overview',note:sel.length+' suppliers'});
+  sel.forEach(function(s){agenda.push({n:no++,label:s.name,note:pctTxt(calcScore(s,null))});});
+  P.push(PB+chrome(portfolio?'Portfolio Report':'Supplier Report','Agenda')
+    +'<table width="100%" class=agenda cellspacing="0" cellpadding="0" style="border-collapse:collapse">'
+    +agenda.map(function(it){
+      return '<tr><td width="34" class=anum>'+(String(it.n).length<2?'0'+it.n:it.n)+'</td>'
+        +'<td class=alabel>'+esc(it.label)+'</td>'
+        +'<td width="110" class=anote>'+esc(it.note||'')+'</td></tr>';
+    }).join('')+'</table>');
+
+  // ── Portfolio overview (multi-supplier only) ───────────────────────────────
+  if(portfolio){
+    var allC=allCats();
+    var ranked=sel.map(function(s){return {s:s,score:calcScore(s,null)};})
+      .filter(function(r){return r.score!=null;}).sort(function(a,b){return b.score-a.score;});
+    var avgAll=ranked.length?Math.round(ranked.reduce(function(a,r){return a+r.score;},0)/ranked.length):null;
+    var lo=ranked.length?ranked[ranked.length-1].score:null, hi=ranked.length?ranked[0].score:null;
+
+    var stats='<table width="100%" cellspacing="0" cellpadding="0"><tr valign=top>'
+      +'<td width="33%"><p class=statl>SUPPLIERS ASSESSED</p><p class=statv>'+ranked.length+'</p></td>'
+      +'<td width="33%"><p class=statl>AVERAGE</p><p class=statv style="color:'+A+'">'+pctTxt(avgAll)+'</p></td>'
+      +'<td width="34%"><p class=statl>SPREAD</p><p class=statv>'+(lo!=null?lo+'–'+hi+'%':'—')+'</p></td>'
+      +'</tr></table>';
+
+    // Comparison matrix — TIERS traffic colours per cell, like the Excel dashboard.
+    // Names are never shortened: headers and supplier names WRAP instead, so no
+    // category or supplier is ever readable only as "Quality Assur…".
+    // Widths must sum to EXACTLY 100 so the grid stays flush: Total/Tier are
+    // fixed, the categories take an integer share, and the supplier column
+    // absorbs the remainder rather than leaving a ragged 5% gap.
+    var mtxN=Math.max(allC.length,1);
+    var mtxCatW=Math.max(6,Math.floor((81-20)/mtxN));
+    var mtxSupW=81-mtxCatW*mtxN;
+    if(mtxSupW<14){mtxCatW=Math.max(5,mtxCatW-1);mtxSupW=81-mtxCatW*mtxN;}
+    // ── Heat tile ───────────────────────────────────────────────────────────
+    // The colour lives on a NESTED one-cell table, never on the grid cell itself.
+    // A coloured <td> is painted over the full row height, which grows whenever a
+    // supplier name wraps — and Word then draws the white separator at content
+    // height instead, leaving the stray colour strip. An uncoloured outer cell
+    // cannot produce that: its padding is the (white) gap, and the tile is exactly
+    // as tall as its own number.
+    //
+    // The shade is derived from the REPORT ACCENT, so the matrix belongs to the
+    // same palette as every heading, bar and chart in the document instead of
+    // pulling in a second, unrelated colour ramp. Best tier = lightest tint,
+    // worst tier = full accent, so weak suppliers carry the most weight.
+    function tierTint(pct){
+      var t=tierOf(pct); if(!t)return null;
+      var best=TIERS.slice().sort(function(a,b){return b.min-a.min;});
+      var i=best.indexOf(t), n=Math.max(best.length-1,1);
+      return mix(A,0.62-(i<0?0:i/n)*0.62);
+    }
+    function tile(p,strong){
+      var inner;
+      if(p==null){
+        inner='<td class="mct na">&#8212;</td>';
+      } else {
+        var bg=tierTint(p);
+        inner='<td class=mct style="background:'+bg+';color:'+txtOn(bg)+'">'+(strong?'<b>'+p+'%</b>':p+'%')+'</td>';
+      }
+      return '<td class=mcw><table width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse"><tr>'+inner+'</tr></table></td>';
+    }
+
+    // Plain collapsed table; the grid cells carry no colour of their own.
+    var matrix=panel('Comparison — score by category')
+      +'<table width="100%" class=mtx cellspacing="0" cellpadding="0" style="border-collapse:collapse">'
+      +'<tr><td class="mh l" width="'+mtxSupW+'%">Supplier</td>'
+        +allC.map(function(c){return '<td class=mh width="'+mtxCatW+'%">'+esc(c)+'</td>';}).join('')
+        +'<td class=mh width="8%">Total</td><td class=mh width="11%">Tier</td></tr>'
+      +ranked.map(function(r){
+        return '<tr><td class="ml sup">'+esc(r.s.name)+'</td>'
+          +allC.map(function(c){return tile(calcScore(r.s,c),false);}).join('')
+          +tile(r.score,true)
+          +'<td class=mt>'+esc(tierLbl(r.score))+'</td></tr>';
+      }).join('')+'</table>';
+
+    // Risk matrix — class (rows) × criticality (cols), mirrors rptRiskMatrix.
+    var tiers=riskTiersWorstFirst();
+    var showCrit=(typeof critFactors==='function'&&critFactors().length>0)
+      &&sel.some(function(s){return critBucket(s)!=null;});
+    var rmcols=showCrit?[{v:1,l:'Low'},{v:2,l:'Medium'},{v:3,l:'High'}]:[{v:null,l:''}];
+    var cellData=function(t,cv){
+      return sel.map(function(s){return {name:s.name,score:calcScore(s,null),tier:supplierRiskTier(s),crit:critBucket(s)};})
+        .filter(function(d){return d.score!=null&&d.tier&&d.tier.label===t.label&&(showCrit?((d.crit||1)===cv):true);})
+        .sort(function(a,b){return a.score-b.score;});
+    };
+    var nT=tiers.length,nC=rmcols.length;
+    var rm=panel('Risk matrix'+(showCrit?' — class vs. criticality':''))
+      +'<table width="100%" class=rm cellspacing="0" cellpadding="0" style="border-collapse:collapse">';
+    if(showCrit)rm+='<tr><td class=rmcorner width="20%">&nbsp;</td>'+rmcols.map(function(c){return '<td class=rmcolh>'+esc(c.l)+'</td>';}).join('')+'</tr>';
+    tiers.forEach(function(t,rIdx){
+      var nxt=tiers[rIdx+1];
+      var band=nxt?(t.min>0?t.min+'–'+(nxt.min-1)+'%':'< '+nxt.min+'%'):('≥ '+t.min+'%');
+      rm+='<tr valign=top><td class=rmrowh width="20%"><b>'+esc(t.label)+'</b><br><span>'+band+'</span></td>';
+      rmcols.forEach(function(c,cIdx){
+        var sev=(1-rIdx/Math.max(nT-1,1))*0.6+(nC>1?(cIdx/(nC-1)):0.5)*0.4;
+        var chips=cellData(t,c.v);
+        rm+='<td class=rmcell style="background:'+mix(A,1-(0.04+sev*0.22))+'">'
+          // Each chip stays ONE continuous box (name + score share a background);
+          // the chips are separated by a spacer paragraph rather than a table
+          // margin, which Word ignores.
+          +(chips.length
+            ?chips.map(function(d){
+               return '<table width="100%" class=chip cellspacing="0" cellpadding="0" style="border-collapse:collapse">'
+                 +'<tr valign=top><td class=chipn>'+esc(d.name)+'</td>'
+                 +'<td class=chips width="40" style="color:'+A+'">'+d.score+'%</td></tr></table>';
+             }).join(gap(4))
+            :'&nbsp;')
+          +'</td>';
+      });
+      rm+='</tr>';
     });
+    rm+='</table>'+(showCrit?'<p class=rmaxis>'+esc(axisLabel('x'))+' &#8594;</p>':'');
+
+    P.push(PB+chrome('Section 01','Portfolio Overview')+stats+gap(22)+matrix+gap(26)+rm);
+  }
+
+  // ── Per-supplier chapters ──────────────────────────────────────────────────
+  sel.forEach(function(s,si){
+    var round=(typeof reportingAudit==='function')?reportingAudit(s):null;
+    var scoreCats=Object.keys(s.categories||{});
+    var tot=calcScore(s,null);
+
+    // Divider (title block, page break before) — no full-height band.
+    P.push(PB+'<p class=eyebrow>SUPPLIER '+(portfolio?(si+1):'')+'</p>'
+      +'<h1 class=h1>'+esc(s.name)+'</h1>'+accentRule()
+      +'<p class=meta>'+(tot!=null?'Overall score '+tot+'%':'Not yet scored')+'</p>');
+
+    // ── Management Summary: score + risk ladder | radar | facts + categories
+    var locField=(supplierInfoCatalog||[]).find(function(fd){return /location|standort|ort|address/i.test(fd.label||'');});
+    var facts=[
+      ['Supplier',s.name],
+      ['Location',(locField&&s.supplierInfo&&s.supplierInfo[locField.id])||'—'],
+      ['Assessor',(round&&round.auditor)||'—'],
+      ['Date',(round&&(round.completedAt||round.plannedDate))||'—']
+    ];
+    var ladder='<table width="100%" class=ladder cellspacing="0" cellpadding="0" style="border-collapse:collapse">'
+      +riskTiersWorstFirst().slice().reverse().map(function(t){
+        var on=tierOf(tot)&&tierOf(tot).label===t.label;
+        return '<tr valign=middle><td width="16" class=ladsw style="background:'+mix(A,on?0.10:0.84)+'">&nbsp;</td>'
+          +'<td class=ladl style="'+(on?'font-weight:bold;color:'+C.textDark:'')+'">'+esc(t.label)+'</td>'
+          +'<td width="52" class=ladm>&#8805; '+t.min+'%</td></tr>';
+      }).join('')+'</table>';
+    // Category scores get the FULL page width under the three-column block. In a
+    // narrow side column a name like "Production & Process Control" wrapped over
+    // four lines and the bar shrank to a stub — full width gives the labels one
+    // line and the bars a readable length.
+    var catTbl='<table width="100%" class=cats cellspacing="0" cellpadding="0" style="border-collapse:collapse;table-layout:fixed">'
+      +scoreCats.map(function(c){var p=calcScore(s,c);
+        return '<tr valign=middle><td width="42%" class=cn>'+esc(c)+'</td>'
+          +'<td width="46%" class=cb>'+bar(p)+'</td>'
+          +'<td width="12%" class=cp>'+pctTxt(p)+'</td></tr>';
+      }).join('')+'</table>';
+    var factsTbl='<table width="100%" class=facts cellspacing="0" cellpadding="0" style="border-collapse:collapse">'
+      +facts.map(function(f){return '<tr valign=top><td width="68" class=fl>'+esc(f[0])+'</td><td class=fv>'+esc(f[1])+'</td></tr>';}).join('')+'</table>';
+
+    // Three columns with real 6% gutters. The radar is sized to FIT its column
+    // (38% of ~510pt ≈ 194pt): a wider image would force Word to stretch that
+    // column and squeeze the other two.
+    P.push(PB+chrome(s.name,'Management Summary')
+      +'<table width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;table-layout:fixed"><tr valign=top>'
+        +'<td width="24%">'+panel('Overall score')
+          +'<p class=big style="color:'+C.dark+'">'+pctTxt(tot)+'</p>'
+          +'<div class=msbar>'+bar(tot)+'</div>'
+          +'<p class=tierlbl>'+esc(tierLbl(tot))+'</p>'
+          +gap(20)+panel('Risk assessment')+ladder+'</td>'
+        +'<td width="6%">&nbsp;</td>'
+        +'<td width="38%" align=center>'+panel('Evaluation')
+          +(radar[s.name]?'<img src="'+radar[s.name]+'" width="240" height="240" style="width:240px;height:240px" alt="Category radar">':'<p class=muted>Radar needs at least three categories.</p>')+'</td>'
+        +'<td width="6%">&nbsp;</td>'
+        +'<td width="26%">'+panel('Assessment information')+factsTbl+'</td>'
+      +'</tr></table>'
+      +gap(26)
+      +panel('Category score')+catTbl);
+
+    // ── Narrative (Management Summary II) — stored, reviewed report content
+    var rcx=round?ensureReportContent(round):null;
+    function prose(key){var t=rcx&&rcx[key]&&String(rcx[key]).trim();
+      return panel(RPT_CONTENT[key].label)+'<p class="prose'+(t?'':' muted')+'">'+(t?esc(t):'Not generated yet.')+'</p>';}
+    function blist(key){var l=(rcx&&rcx[key]||[]).filter(function(t){return t&&String(t).trim();});
+      return panel(RPT_CONTENT[key].label)+(l.length?'<ul class=blist>'+l.map(function(t){return '<li>'+esc(t)+'</li>';}).join('')+'</ul>':'<p class="prose muted">—</p>');}
+    function two(a,b){return '<table width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;table-layout:fixed"><tr valign=top><td width="46%">'+a+'</td><td width="8%">&nbsp;</td><td width="46%">'+b+'</td></tr></table>';}
+    if(rcx){
+      P.push(PB+chrome(s.name,'Management Summary')
+        +prose('summary')+gap(22)
+        +two(blist('strengths'),blist('constraints'))+gap(22)
+        +two(blist('actions'),prose('outlook')));
+    }
+
+    // ── Findings by category: narrative sub-groups + checkpoint scores table
+    scoreCats.forEach(function(cat){
+      var items=(s.categories[cat]||[]);
+      if(!items.length)return;
+      var p=calcScore(s,cat);
+      var d=round?ensureCategoryDetail(round,cat):null;
+      var subsHtml='';
+      if(d){
+        (d.subs||[]).forEach(function(sub){
+          var st=(sub.strengths||[]).filter(function(t){return t&&t.trim();});
+          var wk=(sub.weaknesses||[]).filter(function(t){return t&&t.trim();});
+          if(!st.length&&!wk.length)return;
+          var sc1='<p class=subl style="color:'+A+'">STRENGTHS</p>'+(st.length?'<ul class=blist>'+st.map(function(t){return '<li>'+esc(t)+'</li>';}).join('')+'</ul>':'<p class="prose muted">—</p>');
+          var sc2='<p class=subl style="color:'+A+'">CONSTRAINTS</p>'+(wk.length?'<ul class=blist>'+wk.map(function(t){return '<li>'+esc(t)+'</li>';}).join('')+'</ul>':'<p class="prose muted">—</p>');
+          subsHtml+='<p class=subh>'+esc(sub.name||'Findings')+'</p>'
+            +'<table width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;table-layout:fixed"><tr valign=top><td width="46%">'+sc1+'</td><td width="8%">&nbsp;</td><td width="46%">'+sc2+'</td></tr></table>'
+            +gap(14);
+        });
+      }
+      var rows=items.map(function(it){
+        // Dots and the numeric score sit in their own 2-cell table so Word always
+        // keeps them on one line (an inline-block table can drop to the next row).
+        var scoreCell='<table cellspacing="0" cellpadding="0" style="border-collapse:collapse"><tr valign=middle>'
+          +'<td style="padding:0">'+dots(it.score)+'</td>'
+          +'<td style="padding:0 0 0 7pt"><span class=sv>'+(it.score==null?'—':(it.score==='N.A.'?'N.A.':it.score))+'</span></td>'
+          +'</tr></table>';
+        return '<tr valign=top><td class="ct num" width="6%">'+esc(String(it.no))+'</td>'
+          +'<td class="ct cptxt" width="42%">'+esc(it.checkpoint)+'</td>'
+          +'<td class=ct width="19%">'+scoreCell+'</td>'
+          +'<td class="ct note" width="33%">'+esc(it.notes||'')+'</td></tr>';
+      }).join('');
+      P.push(PB+chrome('Findings · '+cat,cat)
+        +'<table width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;border-bottom:.75pt solid '+C.line+'"><tr valign=middle>'
+          +'<td class=chname>'+esc(cat)+'</td><td width="150" class=chbar>'+bar(p)+'</td><td width="56" class=chpct style="color:'+A+'">'+pctTxt(p)+'</td></tr></table>'
+        +gap(16)
+        +(subsHtml?panel('Findings and insights')+subsHtml+gap(18):'')
+        +'<table width="100%" class=cptbl cellspacing="0" cellpadding="0" style="border-collapse:collapse">'
+        +'<tr><td class=th width="6%">#</td><td class=th width="42%">Checkpoint</td><td class=th width="19%">Score</td><td class=th width="33%">Evidence / Notes</td></tr>'
+        +rows+'</table>');
+    });
+
+    // ── Action Plan — the same rows/ordering as the PowerPoint action modules
+    var acts=(typeof rptActionsFor==='function')?rptActionsFor(s):[];
+    if(acts.length){
+      var arows=acts.map(function(a){
+        var overdue=a.status!=='Done'&&a.dueDate&&new Date(a.dueDate)<new Date();
+        return '<tr valign=top><td class="at aref" width="6%">'+esc(a.ref||'')+'</td>'
+          +'<td class="at atitle" width="25%">'+esc(actionLabel(a))+'</td>'
+          +'<td class=at width="13%">'+esc(a.category||'—')+'</td>'
+          +'<td class=at width="12%">'+esc(a.responsible||'—')+'</td>'
+          +'<td class=at width="9%" style="'+(a.priority==='High'?'color:'+A+';font-weight:bold':'')+'">'+esc(a.priority||'—')+'</td>'
+          +'<td class=at width="11%">'+esc(a.startDate||'—')+'</td>'
+          +'<td class=at width="11%" style="'+(overdue?'font-weight:bold;color:'+C.textMid:'')+'">'+esc(a.dueDate||'—')+'</td>'
+          +'<td class=at width="13%">'+esc(a.status||'Open')+'</td></tr>';
+      }).join('');
+      P.push(PB+chrome(s.name,'Action Plan')
+        +'<table width="100%" class=atbl cellspacing="0" cellpadding="0" style="border-collapse:collapse">'
+        +'<tr><td class=th width="6%">ID</td><td class=th width="25%">Action</td><td class=th width="13%">Area</td><td class=th width="12%">Owner</td><td class=th width="9%">Priority</td><td class=th width="11%">Start</td><td class=th width="11%">Due</td><td class=th width="13%">Status</td></tr>'
+        +arows+'</table>');
+    }
   });
-  body+='</body></html>';
-  const blob=new Blob([body],{type:'text/html;charset=utf-8'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;
-  a.download='Supplier_Assessment_Report_'+new Date().toISOString().slice(0,10)+'.html';
-  a.click();
-  URL.revokeObjectURL(url);
-  toast('PDF downloaded - open in browser and print');
+
+  // ── Assemble the Word document ─────────────────────────────────────────────
+  // Word HTML: pt units, class selectors, table-based layout. @page "Section1"
+  // gives A4 portrait with real margins; no full-page elements ⇒ no blank pages.
+  // Spacing is deliberately generous throughout: the earlier build read as
+  // "squeezed" because every cell sat on 2–4pt of padding. Row padding, panel
+  // gaps and line-heights below are roughly doubled, and nothing is clipped —
+  // every cell wraps instead of truncating.
+  var css=''
+    +'@page Section1{size:595.3pt 841.9pt;margin:1.7cm 1.5cm 1.7cm 1.5cm;mso-page-orientation:portrait}'
+    +'div.Section1{page:Section1}'
+    +'body{font-family:Arial,"Segoe UI",sans-serif;font-size:10pt;line-height:1.45;color:'+C.textDark+'}'
+    +'p{margin:0 0 5pt}'
+    +'td{word-wrap:break-word}'
+    +'h1.h1{font-size:25pt;font-weight:bold;color:'+C.dark+';margin:0;line-height:1.2}'
+    +'p.eyebrow{font-size:9pt;letter-spacing:2.4pt;color:'+C.textMid+';margin:0 0 7pt}'
+    +'p.meta{font-size:10.5pt;color:'+C.textMid+';margin:10pt 0 3pt}'
+    +'p.sub{font-size:9.5pt;color:'+C.foot+';margin:0 0 6pt}'
+    +'p.kick{font-size:8.5pt;color:'+C.textMid+';margin:0}'
+    +'p.ctitle{font-size:15pt;font-weight:bold;color:'+A+';margin:2pt 0 16pt}'
+    +'p.plabel{font-size:8pt;font-weight:bold;letter-spacing:.9pt;color:'+C.foot+';border-bottom:.75pt solid '+C.line+';padding-bottom:4pt;margin:0 0 11pt}'
+    // agenda — roomy rows
+    +'table.agenda td{border-bottom:.75pt solid '+C.line+';padding:11pt 0;vertical-align:middle}'
+    +'td.anum{font-size:13pt;font-weight:bold;color:'+A+'}'
+    +'td.alabel{font-size:11.5pt;font-weight:bold;color:'+C.textDark+'}'
+    +'td.anote{font-size:9.5pt;color:'+C.foot+';text-align:right}'
+    // portfolio stats
+    +'p.statl{font-size:8pt;letter-spacing:.7pt;color:'+C.foot+';margin:0 0 3pt}'
+    +'p.statv{font-size:22pt;font-weight:bold;color:'+C.dark+';margin:0 0 4pt}'
+    // comparison matrix — headers WRAP (never truncated), taller cells
+    // No grid cell carries a background or a border — the colour sits on the
+    // nested tile (.mct). That is what makes the stray colour strip impossible:
+    // there is no full-row-height coloured surface for Word to mis-clip.
+    +'table.mtx{background:#FFFFFF}'
+    +'.mtx tr{page-break-inside:avoid}'
+    +'.mtx td{border:0;background:#FFFFFF;text-align:center;font-size:9pt;vertical-align:middle}'
+    +'.mtx td.mcw{padding:2pt}'
+    +'.mtx td.mct{border:0;padding:8pt 3pt;text-align:center;font-size:9pt;font-weight:bold;line-height:1.2}'
+    +'.mtx td.mct.na{background:'+C.bg2+';color:'+C.foot+';font-weight:normal}'
+    +'.mtx td.mh{font-size:8pt;font-weight:bold;color:'+C.foot+';padding:0 4pt 7pt;vertical-align:bottom;line-height:1.25}'
+    +'.mtx td.mh.l{text-align:left}'
+    +'.mtx td.ml{text-align:left}'
+    +'.mtx td.sup{font-size:9pt;font-weight:bold;color:'+C.textDark+';text-align:left;padding:8pt 10pt 8pt 0;line-height:1.3}'
+    +'.mtx td.mt{font-size:8.5pt;color:'+C.textMid+';text-align:left;padding-left:8pt;line-height:1.3}'
+    // risk matrix — full names, airy cells
+    // Same rule as the comparison matrix: uniform border WIDTH on every cell
+    // (only the colour differs, white where no line should show), so Word cannot
+    // mis-place a separator on a tall row and leave a tinted sliver behind.
+    +'table.rm{background:#FFFFFF}'
+    +'.rm tr{page-break-inside:avoid}'
+    +'.rm td{border:.75pt solid '+C.line+';padding:8pt;font-size:8.5pt;vertical-align:top}'
+    +'.rm td.rmcorner{border:.75pt solid #FFFFFF}'
+    +'.rm td.rmcolh{font-size:8.5pt;font-weight:bold;letter-spacing:.6pt;color:'+C.foot+';text-align:center;border:.75pt solid #FFFFFF;padding:0 0 7pt}'
+    +'.rm td.rmrowh{border:.75pt solid #FFFFFF;text-align:right;padding:8pt 10pt 8pt 0}'
+    +'.rm td.rmrowh b{font-size:9.5pt;color:'+C.textDark+'}.rm td.rmrowh span{font-size:8pt;color:'+C.foot+'}'
+    +'table.chip td{border:0;padding:5pt 7pt;background:#FFFFFF}'
+    +'table.chip td.chipn{font-size:8.5pt;color:'+C.textDark+';line-height:1.3}'
+    +'table.chip td.chips{font-size:8.5pt;font-weight:bold;text-align:right}'
+    +'p.rmaxis{font-size:8.5pt;font-weight:bold;letter-spacing:.6pt;color:'+C.foot+';text-align:center;margin:9pt 0 0}'
+    // management summary — the block that read as cramped
+    +'p.big{font-size:32pt;font-weight:bold;text-align:center;margin:10pt 0 12pt;line-height:1}'
+    +'div.msbar{margin:0 0 2pt}'
+    +'p.tierlbl{font-size:9.5pt;font-weight:bold;color:'+C.textMid+';text-align:center;margin:9pt 0 0}'
+    +'table.ladder td{padding:6pt 0}'
+    +'td.ladsw{font-size:1px;line-height:1px;height:14px}'
+    +'td.ladl{font-size:9pt;color:'+C.textMid+';padding-left:8pt}'
+    +'td.ladm{font-size:8pt;color:'+C.foot+';text-align:right}'
+    +'table.facts td{border-bottom:.5pt solid '+C.line+';padding:7pt 0;line-height:1.35}'
+    +'td.fl{font-size:8.5pt;color:'+C.textMid+'}'
+    +'td.fv{font-size:8.5pt;font-weight:bold;color:'+C.textDark+'}'
+    +'table.cats td{padding:7pt 0}'
+    +'td.cn{font-size:9pt;color:'+C.textDark+';line-height:1.3;padding-right:8pt}'
+    +'td.cb{padding:7pt 8pt}'
+    +'td.cp{font-size:9pt;font-weight:bold;color:'+C.dark+';text-align:right}'
+    // narrative — readable prose, breathing bullets
+    +'p.prose{font-size:10pt;color:'+C.textDark+';margin:0 0 6pt;line-height:1.55}'
+    +'p.prose.muted,p.muted{color:'+C.foot+';font-style:italic}'
+    +'ul.blist{margin:0 0 6pt 0;padding-left:16pt}'
+    +'ul.blist li{font-size:9.5pt;color:'+C.textDark+';margin:0 0 7pt;line-height:1.5}'
+    +'p.subh{font-size:10pt;font-weight:bold;color:'+C.textDark+';border-bottom:.5pt solid '+C.line+';padding-bottom:4pt;margin:14pt 0 9pt}'
+    +'p.subl{font-size:8pt;font-weight:bold;letter-spacing:.6pt;margin:0 0 5pt}'
+    // findings header + tables
+    +'td.chname{font-size:12.5pt;font-weight:bold;color:'+C.textDark+';padding:0 0 7pt;line-height:1.3}'
+    +'td.chbar{padding:0 10pt 7pt}'
+    +'td.chpct{font-size:12.5pt;font-weight:bold;text-align:right;padding:0 0 7pt}'
+    +'.cptbl td.th,.atbl td.th{font-size:8pt;font-weight:bold;letter-spacing:.5pt;color:'+C.foot+';border-bottom:.75pt solid '+C.line+';padding:0 7pt 6pt;text-align:left;vertical-align:bottom}'
+    +'.cptbl td.ct,.atbl td.at{font-size:9pt;padding:9pt 7pt;border-bottom:.5pt solid '+C.line+';vertical-align:top;line-height:1.45}'
+    +'.cptbl td.num{color:'+C.foot+'}'
+    +'.cptbl td.note{color:'+C.textMid+'}'
+    +'.cptbl span.sv{font-weight:bold;color:'+C.textMid+';font-size:8.5pt}'
+    +'.atbl td.aref{font-weight:bold;color:'+C.foot+'}';
+
+  var head='﻿<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>'+esc(project)+'</title>'
+    +'<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom><w:DoNotOptimizeForBrowser/></w:WordDocument></xml><![endif]-->'
+    +'<style>'+css+'</style></head><body><div class=Section1>';
+  var doc=head+P.join('')+'</div></body></html>';
+
+  var blob=new Blob([doc],{type:'application/msword'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.download='Supplier_Report_'+new Date().toISOString().slice(0,10)+'.doc';
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(function(){URL.revokeObjectURL(url);},1500);
+  toast(lang==='de'?'Word-Report heruntergeladen':'Word report downloaded');
 }
 
+// Radar as a PNG for the Word report. Rendered at 2.5x (1500px) with every font
+// and radius scaled to match, so the picture stays sharp when Word prints it at
+// ~4in wide — a 600px bitmap visibly softened on paper. Generous layout padding
+// keeps long spoke labels ("Production & Process Control") off the canvas edge.
 function renderRadarToPng(labels, dataVals, hexColor, avgVals, supplierLabel){
   return new Promise(function(resolve){
+    var K=2.5, S=Math.round(600*K);
     var canvas=document.createElement('canvas');
-    canvas.width=600;canvas.height=600;
+    canvas.width=S;canvas.height=S;
     var datasets=[{
       label:supplierLabel||'Supplier',
       data:dataVals,
       borderColor:'#'+hexColor,
-      backgroundColor:'#'+hexColor+'33',
+      backgroundColor:'#'+hexColor+'2E',
       pointBackgroundColor:'#'+hexColor,
-      pointRadius:4,borderWidth:2.5
+      pointRadius:4*K,borderWidth:2.5*K
     }];
     if(avgVals){
       datasets.push({
         label:'Ø Other Suppliers',
         data:avgVals,
-        borderColor:'#AAAAAA',
-        backgroundColor:'#AAAAAA1A',
-        pointBackgroundColor:'#AAAAAA',
-        pointRadius:3,borderWidth:1.5,
-        borderDash:[6,3]
+        borderColor:'#9AA1AC',
+        backgroundColor:'#9AA1AC14',
+        pointBackgroundColor:'#9AA1AC',
+        pointRadius:3*K,borderWidth:1.5*K,
+        borderDash:[6*K,3*K]
       });
     }
     var chart=new Chart(canvas,{
       type:'radar',
       data:{labels:labels,datasets:datasets},
-      options:{responsive:false,animation:false,
-        scales:{r:{min:0,max:100,ticks:{stepSize:25,font:{size:14},callback:function(v){return v+'%';}},
-          pointLabels:{font:{size:13,weight:'bold'},color:'#333'},
-          grid:{color:'#DDDDDD'},angleLines:{color:'#DDDDDD'}}},
-        plugins:{legend:{display:!!avgVals,labels:{font:{size:12},boxWidth:14,padding:8}}}}
+      options:{responsive:false,animation:false,devicePixelRatio:1,
+        layout:{padding:10*K},
+        scales:{r:{min:0,max:100,
+          ticks:{stepSize:25,font:{size:11*K},color:'#8A8F98',backdropColor:'rgba(255,255,255,.85)',
+                 callback:function(v){return v+'%';}},
+          pointLabels:{font:{size:12*K,weight:'bold'},color:'#333333',padding:8*K},
+          grid:{color:'#DFE3E8',lineWidth:1*K},angleLines:{color:'#DFE3E8',lineWidth:1*K}}},
+        plugins:{legend:{display:!!avgVals,labels:{font:{size:11*K},boxWidth:14*K,padding:10*K,color:'#464646'}}}}
     });
     setTimeout(function(){
       var png=canvas.toDataURL('image/png').replace('data:','');
       chart.destroy();
       resolve(png);
-    },150);
+    },200);
   });
 }
 
@@ -12798,9 +13439,18 @@ function _rptDate(v){
   var d=new Date(v);
   return isNaN(d.getTime())?null:d;
 }
+// Truncate for a fixed-width slide box. A trailing checkpoint citation is kept
+// whatever happens — it is short, and a finding without its #id can no longer be
+// traced back to the checkpoint it came from. Strings without a citation (names,
+// task titles, table cells) are unaffected: the pattern simply does not match.
 function _rptTrunc(t,chars){
   t=String(t||'');
-  return t.length>chars?t.slice(0,chars-1).replace(/\s+\S*$/,'')+'…':t;
+  if(t.length<=chars)return t;
+  var cite='',m=t.match(_RPT_CITE);
+  if(m){cite=' '+m[0].trim();t=t.slice(0,m.index).trim();}
+  var room=Math.max(4,chars-cite.length-1);
+  if(t.length>room)t=t.slice(0,room).replace(/\s+\S*$/,'')+'…';
+  return t+cite;
 }
 // One axis for the WHOLE list, computed before paging — otherwise page 2 would
 // get its own scale and the two pages could not be compared. Snapped to whole
@@ -14189,7 +14839,7 @@ checkSession(); // shows the login gate, or reveals the app + loads cloud data i
 <style id="splitViewCSS">
 .split-toggle{color:var(--text3)!important;padding:7px 10px!important}
 .split-toggle:hover{color:var(--text)!important;background:var(--bg2)!important}
-.split-toggle.on{color:var(--primary)!important;background:var(--bg3)!important}
+.split-toggle.on{color:var(--primary-fg)!important;background:var(--bg3)!important}
 #splitRow{display:block}
 #splitGutter{display:none}
 #paneB{display:none}
@@ -14203,7 +14853,7 @@ body.satsplit #splitGutter{display:flex;flex:0 0 12px;cursor:col-resize;align-it
 #splitGutter:hover::before,#splitGutter.dragging::before{background:var(--primary);height:82px}
 body.resizing{cursor:col-resize!important;user-select:none}
 .split-clone{display:block;position:relative;opacity:.5;filter:grayscale(.15)}
-.split-hint{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--primary);background:var(--info-bg);border:1px dashed var(--primary);border-radius:var(--r);padding:8px 12px;margin-bottom:14px;cursor:default}
+.split-hint{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--primary-fg);background:var(--info-bg);border:1px dashed var(--primary);border-radius:var(--r);padding:8px 12px;margin-bottom:14px;cursor:default}
 /* Each pane carries its OWN sub-navigation so the module's sub-areas
    (e.g. Actions / Development) stay visible in every half at once. */
 .pane-subnav{position:sticky;top:-16px;z-index:6;display:flex;gap:2px;flex-wrap:wrap;align-items:center;padding:9px 14px;margin:-16px -18px 14px;background:var(--bg2);border-bottom:1px solid var(--border);border-radius:var(--rl) var(--rl) 0 0}
