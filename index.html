@@ -84,6 +84,21 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
 .ui-confirm-btns .btn{flex:1;justify-content:center;padding:9px 16px}
 .ui-confirm-input{width:100%;box-sizing:border-box;margin-top:16px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;text-align:left}
 .ui-confirm-input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 18%,transparent)}
+/* Completion gate dialog (requestCompletion) — the confirm card, widened, left-aligned form */
+.ui-confirm.cmpl-dlg{width:520px;max-height:92vh;overflow-y:auto}
+.cmpl-dlg .ui-confirm-ic{background:color-mix(in srgb,var(--st-done) 14%,transparent);color:var(--st-done)}
+.cmpl-lbl{display:block;text-align:left;font-size:12px;font-weight:600;color:var(--text2);margin:16px 0 0}
+.cmpl-lbl span{font-weight:400;color:var(--text3)}
+.cmpl-dlg textarea.ui-confirm-input{margin-top:6px;font-size:13px;resize:vertical;min-height:84px}
+.cmpl-dlg textarea.ui-confirm-input.err{border-color:var(--crit)}
+.cmpl-err{display:none;text-align:left;font-size:11.5px;color:var(--crit);margin-top:4px}
+.cmpl-dlg .dropzone{margin-top:6px;padding:10px;text-align:left}
+.cmpl-dlg .dropzone-empty{padding:12px}
+.cmpl-files{display:flex;flex-direction:column;gap:5px}
+.cmpl-file{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:5px 8px}
+.cmpl-file span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cmpl-file small{color:var(--text3);flex-shrink:0}
+.cmpl-file button{background:none;border:none;cursor:pointer;color:var(--crit);font-size:15px;line-height:1;padding:0 2px}
 .project-menu{position:fixed;z-index:5000;width:300px;max-width:calc(100vw - 16px);background:var(--bg);border:1px solid var(--border);border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.28);overflow:hidden;animation:pmIn .12s ease-out}
 @keyframes pmIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 .project-menu .pm-head{padding:11px 14px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text3);display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border)}
@@ -1153,7 +1168,6 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
 
     <div id="monitorConfigRisk">
       <div style="font-size:13px;font-weight:600;margin:0 0 8px"><i class="ti ti-alert-triangle"></i> Risk Model</div>
-      <p style="font-size:12px;color:var(--text2);margin-bottom:10px">Risk factors (rated 1–3 per supplier) and class thresholds — used for classification and the portfolio matrix.</p>
       <div id="riskModelEditor"></div>
       <div style="margin-top:12px;display:flex;gap:10px">
         <button class="btn" onclick="resetRiskModel()"><i class="ti ti-refresh"></i> Reset to Default</button>
@@ -1562,6 +1576,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
           <label>Assessment</label>
           <select id="expRoundSelect" onchange="expSelectRound(this.value)" style="flex:1"></select>
         </div>
+        <button class="btn sm" id="expGenAllSup" onclick="generateAllSuppliersReport()" style="align-self:center;white-space:nowrap"
+          title="Summary, task labels and findings for every supplier, from its reporting assessment"><i class="ti ti-sparkles"></i> Generate for all suppliers</button>
       </div>
       <div id="expReportContent"></div>
     </div>
@@ -1617,6 +1633,18 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
           <label>Supplier</label>
           <select id="reportSingleSelect" style="flex:1"></select>
         </div>
+      </div>
+
+      <div style="font-size:13px;font-weight:500;margin-bottom:8px">Slide style</div>
+      <div id="reportSlideStyle" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;padding:7px 12px;border:1px solid var(--border);border-radius:20px">
+          <input type="radio" name="reportSlideStyle" value="light" checked onchange="setReportSlideStyle('light')" style="accent-color:var(--primary)">
+          <span style="width:14px;height:14px;border-radius:3px;background:#fff;border:1px solid #c8ccd4;display:inline-block"></span> Light
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;padding:7px 12px;border:1px solid var(--border);border-radius:20px">
+          <input type="radio" name="reportSlideStyle" value="dark" onchange="setReportSlideStyle('dark')" style="accent-color:var(--primary)">
+          <span style="width:14px;height:14px;border-radius:3px;background:#0a0e2a;border:1px solid #2e3a70;display:inline-block;position:relative"><span style="position:absolute;left:2px;right:2px;bottom:2px;height:2px;background:#a2f233"></span></span> Dark
+        </label>
       </div>
 
       <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -1884,6 +1912,11 @@ function applyProjectData(d){
     if(f.axis!=='crit'&&f.axis!=='risk')
       f.axis=(/crit|spend/i.test(f.id||'')||/critical|spend/i.test(f.name||''))?'crit':'risk';
   });
+  // Factors now feed the X axis only: legacy Y-axis risk factors are dropped
+  // (their old ratings stay on the supplier but no longer count).
+  riskModel.factors=riskModel.factors.filter(function(f){return f.axis==='crit';});
+  if(!riskModel.factors.length)riskModel.factors=JSON.parse(JSON.stringify(DEFAULT_RISK_MODEL.factors));
+  riskModel.useFactors=false;
   if(!riskModel.axisLabels||typeof riskModel.axisLabels!=='object')
     riskModel.axisLabels=JSON.parse(JSON.stringify(DEFAULT_RISK_MODEL.axisLabels));
   if(!riskModel.axisLabels.x)riskModel.axisLabels.x=DEFAULT_RISK_MODEL.axisLabels.x;
@@ -1898,6 +1931,10 @@ function applyProjectData(d){
   if(!maps.length&&d.mapImage&&d.mapImage.data)
     maps=[{id:'m_legacy',name:'World',data:d.mapImage.data,w:d.mapImage.w,h:d.mapImage.h,
            bounds:d.mapImage.bounds||MAP_DEFAULT_BOUNDS}];
+  // Bundled sheets saved before the exact Miller calibration carry the old
+  // linear extent (or a hand calibration fighting the wrong model) — upgrade
+  // them once. The report crop is stored in image fractions and stays valid.
+  maps.forEach(function(m){if(!m.proj)mapApplyBundledFit(m);});
   suppliers.forEach(function(s){if(!s.supplierInfo||typeof s.supplierInfo!=='object')s.supplierInfo={};if(!Array.isArray(s.files))s.files=[];});
   function safeSet(id,val){var el=document.getElementById(id);if(el&&val!=null)el.value=val;}
   safeSet('auditorName',d.auditor);
@@ -2354,18 +2391,6 @@ var DEFAULT_RISK_MODEL={
   useKpis:false,
   kpiWeight:0.2
 };
-// One-click starting points for the config screen — not defaults. Each carries
-// the axis it belongs to, so adding one lands it on the right side of the matrix.
-var RISK_FACTOR_SUGGESTIONS=[
-  {id:'perf',  name:'Performance',                    axis:'risk'},
-  {id:'supply',name:'Supply security',                axis:'risk'},
-  {id:'geo',   name:'Geographic risk',                axis:'risk'},
-  {id:'fin',   name:'Financial stability',            axis:'risk'},
-  {id:'comp',  name:'Compliance',                     axis:'risk'},
-  {id:'spend', name:'Annual spend',                   axis:'crit'},
-  {id:'single',name:'Single-source dependency',       axis:'crit'},
-  {id:'strat', name:'Strategic importance',           axis:'crit'}
-];
 var kpiCatalog=JSON.parse(JSON.stringify(DEFAULT_KPI_CATALOG));
 var riskModel=JSON.parse(JSON.stringify(DEFAULT_RISK_MODEL));
 // ── Supplier Information — configurable per-project custom fields ──
@@ -3217,9 +3242,9 @@ function renderCompareRadar(sn){
   var datasets=chosen.map(function(r,i){
     var col=pal[i%pal.length];
     return {label:r.label,data:catOrder.map(function(c){return calcScore({categories:r.categories},c)||0;}),
-      borderColor:col,backgroundColor:col+'1A',pointRadius:3,borderWidth:2};
+      borderColor:col,backgroundColor:col+'1A',pointBackgroundColor:col,pointRadius:3,borderWidth:2,fill:true};
   });
-  charts.cmpRadarCanvas=new Chart(canvas,{type:'radar',data:{labels:catOrder,datasets:datasets},options:{responsive:true,maintainAspectRatio:false,scales:{r:{min:0,max:100,ticks:{stepSize:25,callback:function(v){return v+'%';}}}},plugins:{legend:{display:true,position:'bottom',labels:{font:{size:11},boxWidth:12}}}}});
+  charts.cmpRadarCanvas=new Chart(canvas,{type:'radar',data:{labels:catOrder,datasets:datasets},options:radarOptions()});
 }
 function calcScore(s,cat){
   // A supplier only reports a score once one of its audits is completed. Callers
@@ -3382,7 +3407,7 @@ function showPage(id,btn,opts){
     detail:function(){buildTlChips('det_tl_chips','toggleDetFilter',detFilterColor);populateSelects('detailSupSelect','detailCatFilter');renderDetail();},
     compare:function(){renderComparePage();},
     settings:function(){renderWeightControls();renderTiersEditor();renderBrandDefaultButtons();},
-    exp:function(){renderExpVariants();renderExpSelectors();renderAllExportLists();renderReportScope();renderMapSettings();},
+    exp:function(){renderExpVariants();renderExpSelectors();renderAllExportLists();renderReportScope();renderReportSlideStyle();renderMapSettings();},
     imp:function(){},
     calendar:function(){renderCalendar();},
     monitoring:function(){renderMonitoring();},
@@ -3915,6 +3940,7 @@ function renderActions(){
       var dueStr=due?due.toLocaleDateString('de-DE'):'—';
       if(isOverdue)dueStr='<span style="color:var(--crit);font-weight:600">'+dueStr+' ⚠</span>';
       var chk=_selActions.has(a.id);
+      var cmpl=a.status==='Done'?actCompletion(a):null;
       // Overdue owns the left edge — one unmistakable "act now" marker per row,
       // rather than competing colour in several cells.
       var rowCls='datarow'+(_i%2?' alt':'')+(chk?' sel':'')+(a.status==='Done'?' done':'')+(isOverdue?' od':'');
@@ -3927,6 +3953,7 @@ function renderActions(){
           +'<div style="display:flex;align-items:flex-start;gap:6px">'
             +'<span>'+esc(a.title)+'</span>'
             +(a.images&&a.images.length?'<span onclick="event.stopPropagation();openActionImgViewer('+a.id+',0)" title="View photos" style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;background:color-mix(in srgb,var(--primary) 9%,transparent);color:var(--primary-fg);cursor:pointer;flex-shrink:0"><i class="ti ti-camera" style="font-size:11px"></i>'+a.images.length+'</span>':'')
+            +(cmpl?'<span title="Completion proof: '+esc(cmpl.text)+'" style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;background:color-mix(in srgb,var(--st-done) 12%,transparent);color:var(--st-done);flex-shrink:0"><i class="ti ti-file-check" style="font-size:11px"></i>'+(cmpl.files&&cmpl.files.length?cmpl.files.length:'')+'</span>':'')
           +'</div>'
           +(a.checkpoint?'<div style="font-size:11px;color:var(--text2);margin-top:2px;line-height:1.4">↳ '+esc(a.checkpoint)+((a.extraCheckpoints&&a.extraCheckpoints.length)?' <span style="color:var(--text3)">+'+a.extraCheckpoints.length+' more</span>':'')+'</div>':'')
         +'</td>'
@@ -4001,11 +4028,24 @@ function markSelectedDone(){setSelectedStatus('Done');}
 // Bulk-set the status of every selected task to any of Open / In Progress / Done.
 function setSelectedStatus(status){
   var n=_selActions.size;if(!n||!status)return;
-  actions.forEach(function(a){if(_selActions.has(a.id))a.status=status;});
-  _selActions.clear();
-  renderActionsKpi();
-  renderActions();
-  toast(n+' task'+(n===1?'':'s')+' set to '+status);
+  var sel=actions.filter(function(a){return _selActions.has(a.id);});
+  function finish(){
+    _selActions.clear();
+    renderActionsKpi();
+    renderActions();
+    toast(n+' task'+(n===1?'':'s')+' set to '+status);
+  }
+  // Done goes through the completion gate — one proof for all selected tasks
+  // that aren't Done yet. Cancel leaves everything (incl. the selection) as is.
+  if(status==='Done'){
+    var pending=sel.filter(function(a){return a.status!=='Done';});
+    if(pending.length){
+      requestCompletion(pending,function(rec){pending.forEach(function(a){applyCompletion(a,rec);});finish();});
+      return;
+    }
+  }
+  sel.forEach(function(a){logStatusChange(a,status);a.status=status;});
+  finish();
 }
 // Duplicate one task — a fresh copy right below the original, so building a
 // similar task is a tweak, not a re-entry. Comments/log start clean.
@@ -4014,6 +4054,8 @@ function duplicateAction(id){
   if(!a)return;
   var copy=JSON.parse(JSON.stringify(a));
   copy.id=actionIdCounter++;copy.ref='';copy.comments=[];copy.title=(a.title||'Task')+' (copy)';
+  // The copy has no completion proof of its own, so it can't start out as Done.
+  if(copy.status==='Done')copy.status='Open';
   actions.splice(actions.indexOf(a)+1,0,copy);
   ensureActionRefs();renderActionsKpi();renderActions();
   toast('Task duplicated');
@@ -4028,6 +4070,7 @@ function duplicateSelected(){
     if(!a)return;
     var copy=JSON.parse(JSON.stringify(a));
     copy.id=actionIdCounter++;copy.ref='';copy.comments=[];copy.title=(a.title||'Task')+' (copy)';
+    if(copy.status==='Done')copy.status='Open';
     actions.push(copy);added++;
   });
   _selActions.clear();
@@ -4037,7 +4080,14 @@ function duplicateSelected(){
 
 function quickStatusChange(id,status){
   var a=actions.find(function(x){return x.id===id;});
-  if(a){a.status=status;}
+  if(!a)return;
+  if(status==='Done'&&a.status!=='Done'){
+    // Cancel re-renders so the row's dropdown snaps back to the old status.
+    requestCompletion([a],function(rec){applyCompletion(a,rec);renderActionsKpi();renderActions();toast('Task completed');},renderActions);
+    return;
+  }
+  logStatusChange(a,status);
+  a.status=status;
   renderActionsKpi();
   renderActions();
 }
@@ -4061,6 +4111,7 @@ var _actExistingImages=[];
 function openActionModal(id){
   var modal=document.getElementById('actionModal');
   var supSel=document.getElementById('actSupplier');
+  _actPresetRound=null;_actOnClose=null;
   supSel.innerHTML='<option value="">-- Select --</option>'+suppliers.map(function(s){return '<option>'+esc(s.name)+'</option>';}).join('');
 
   if(id!=null){
@@ -4222,6 +4273,20 @@ function renderActComments(){
     var c=it.c;
     var d=c.ts?new Date(c.ts):null;
     var when=d?d.toLocaleDateString(lang==='de'?'de-DE':'en-GB')+' '+d.toLocaleTimeString(lang==='de'?'de-DE':'en-GB',{hour:'2-digit',minute:'2-digit'}):'';
+    // Completion proof — highlighted, with its evidence files, and locked.
+    if(c.kind==='completion'){
+      var files=c.files||[];
+      return '<div style="display:flex;gap:8px;padding:8px 10px;margin:4px 0;border:1px solid color-mix(in srgb,var(--st-done) 35%,var(--border));border-radius:var(--r);background:color-mix(in srgb,var(--st-done) 7%,transparent)">'
+        +'<i class="ti ti-circle-check" style="color:var(--st-done);font-size:16px;flex-shrink:0;margin-top:1px"></i>'
+        +'<div style="flex:1;min-width:0">'
+          +'<div style="font-size:10.5px;font-weight:700;color:var(--st-done);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">Completion proof</div>'
+          +'<div style="font-size:12.5px;color:var(--text);white-space:pre-wrap;line-height:1.45">'+esc(c.text)+'</div>'
+          +(files.length?'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">'+files.map(function(f,fi){return fileThumbHtml(f,'openFileViewer(\'completion\',null,null,'+it.i+','+fi+')');}).join('')+'</div>':'')
+          +'<div style="font-size:10.5px;color:var(--text3);margin-top:3px">'+esc(when)+(c.author?' · '+esc(c.author):'')+'</div>'
+        +'</div>'
+        +'<i class="ti ti-lock" title="Completion proofs can\'t be deleted" style="color:var(--text3);font-size:13px;flex-shrink:0;padding:2px 4px"></i>'
+      +'</div>';
+    }
     var sys=c.system;
     return '<div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">'
       +'<div style="width:5px;flex-shrink:0;display:flex;justify-content:center"><span style="width:7px;height:7px;border-radius:50%;background:'+(sys?'var(--text3)':'var(--primary)')+';margin-top:5px"></span></div>'
@@ -4235,8 +4300,118 @@ function renderActComments(){
 }
 function removeActComment(i){
   if(i<0||i>=_actComments.length)return;
+  if(_actComments[i].kind==='completion')return; // proof records are locked
   _actComments.splice(i,1);
   renderActComments();
+}
+
+// ── Completion gate — no task reaches Done without a proof ──────────────────
+// Every path to Done (row dropdown, bulk "Set status", task editor) runs through
+// requestCompletion(). The proof lands in the task's progress log as a locked
+// entry {kind:'completion',ts,author,text,from,files}. Reopening a task leaves
+// it in place as history; completing again adds a new one.
+function _curAuthor(){var el=document.getElementById('auditorName');return (el&&el.value)||'';}
+// Latest completion proof of a task, or null (legacy Done tasks have none).
+function actCompletion(a){
+  var cs=(a&&a.comments)||[];
+  for(var i=cs.length-1;i>=0;i--)if(cs[i]&&cs[i].kind==='completion')return cs[i];
+  return null;
+}
+function logStatusChange(a,to){
+  if(!a||!a.status||a.status===to)return;
+  if(!a.comments)a.comments=[];
+  a.comments.push({ts:new Date().toISOString(),system:true,text:'Status: '+a.status+' → '+to});
+}
+function _completionEntry(rec,from){
+  return {ts:rec.ts,kind:'completion',author:rec.author,text:rec.text,from:from||null,files:rec.files.slice()};
+}
+function applyCompletion(a,rec){
+  if(!a.comments)a.comments=[];
+  a.comments.push(_completionEntry(rec,a.status));
+  a.status='Done';
+}
+// tasks: [{title}] — only used for the dialog's wording. onConfirm(rec) gets
+// {ts,author,text,files}; onCancel runs when the dialog is dismissed.
+function requestCompletion(tasks,onConfirm,onCancel){
+  var n=tasks.length, files=[], reading=0;
+  var prev=document.activeElement;
+  var ov=document.createElement('div');
+  ov.className='ui-confirm-ov';
+  ov.innerHTML='<div class="ui-confirm cmpl-dlg" role="dialog" aria-modal="true">'
+    +'<div class="ui-confirm-ic"><i class="ti ti-circle-check"></i></div>'
+    +'<div class="ui-confirm-title">'+(n===1?'Complete task':'Complete '+n+' tasks')+'</div>'
+    +'<div class="ui-confirm-msg">'+(n===1?esc(tasks[0].title||'Task'):'The same proof is recorded on every selected task.')+'</div>'
+    +'<label class="cmpl-lbl">Why is this task complete? *</label>'
+    +'<textarea class="ui-confirm-input cmpl-text" rows="4" placeholder="What was done, and how was it verified?"></textarea>'
+    +'<div class="cmpl-err">Please describe why the task is complete.</div>'
+    +'<label class="cmpl-lbl">Evidence files <span>— optional</span></label>'
+    +'<div class="dropzone cmpl-drop"></div>'
+    +'<input type="file" multiple class="cmpl-input" style="display:none">'
+    +'<div class="ui-confirm-btns">'
+      +'<button class="btn ui-confirm-cancel">Cancel</button>'
+      +'<button class="btn primary ui-confirm-ok"><i class="ti ti-check"></i> Mark as done</button>'
+    +'</div>'
+  +'</div>';
+  document.body.appendChild(ov);
+  var ta=ov.querySelector('.cmpl-text'), err=ov.querySelector('.cmpl-err');
+  var drop=ov.querySelector('.cmpl-drop'), inp=ov.querySelector('.cmpl-input'), ok=ov.querySelector('.ui-confirm-ok');
+  function renderFiles(){
+    drop.innerHTML=(files.length?'<div class="cmpl-files">'+files.map(function(f,i){
+        return '<div class="cmpl-file"><i class="ti '+fileTypeIcon(f.type,f.name)+'" style="color:var(--text2)"></i><span title="'+esc(f.name)+'">'+esc(f.name)+'</span><small>'+humanFileSize(f.size)+'</small><button type="button" data-rm="'+i+'" title="Remove">&times;</button></div>';
+      }).join('')+'</div><div class="dropzone-hint">Drop more files here or <b style="color:var(--primary-fg);cursor:pointer" data-pick="1">browse</b></div>'
+      :'<div class="dropzone-empty" data-pick="1"><i class="ti ti-paperclip"></i>Drop files here or <b>browse</b></div>')
+      +(reading?'<div class="dropzone-hint">Reading '+reading+' file'+(reading===1?'':'s')+'…</div>':'');
+    ok.disabled=reading>0;
+  }
+  function addFiles(list){
+    Array.prototype.forEach.call(list||[],function(file){
+      reading++;
+      var rd=new FileReader();
+      rd.onload=function(e){
+        function store(dataUrl){files.push({data:dataUrl,name:file.name,type:file.type||'',size:file.size||0});reading--;renderFiles();}
+        if(isImageType(file.type))compressImage(e.target.result,1200,0.75,store);
+        else store(e.target.result);
+      };
+      rd.onerror=function(){reading--;renderFiles();toast('Could not read '+file.name,'var(--crit)');};
+      rd.readAsDataURL(file);
+    });
+    renderFiles();
+  }
+  drop.addEventListener('click',function(e){
+    var rm=e.target.closest('[data-rm]');
+    if(rm){files.splice(parseInt(rm.getAttribute('data-rm')),1);renderFiles();return;}
+    if(e.target.closest('[data-pick]')){inp.value='';inp.click();}
+  });
+  inp.addEventListener('change',function(){addFiles(inp.files);});
+  drop.addEventListener('dragover',function(e){e.preventDefault();drop.classList.add('drag');});
+  drop.addEventListener('dragleave',function(){drop.classList.remove('drag');});
+  drop.addEventListener('drop',function(e){e.preventDefault();drop.classList.remove('drag');if(e.dataTransfer)addFiles(e.dataTransfer.files);});
+  ta.addEventListener('input',function(){if(ta.value.trim()){ta.classList.remove('err');err.style.display='none';}});
+  function close(){
+    ov.classList.remove('show');
+    document.removeEventListener('keydown',onKey,true);
+    setTimeout(function(){ov.remove();if(prev&&prev.focus)try{prev.focus();}catch(e){}},140);
+  }
+  function submit(){
+    if(reading)return;
+    var text=ta.value.trim();
+    if(!text){ta.classList.add('err');err.style.display='block';ta.focus();return;}
+    close();
+    onConfirm({ts:new Date().toISOString(),author:_curAuthor(),text:text,files:files});
+  }
+  function cancel(){close();if(onCancel)onCancel();}
+  // Capture phase + stopPropagation: Escape must close only this dialog, not
+  // the task editor underneath. Ctrl/Cmd+Enter confirms (plain Enter = newline).
+  function onKey(e){
+    if(e.key==='Escape'){e.stopPropagation();e.preventDefault();cancel();}
+    else if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.stopPropagation();e.preventDefault();submit();}
+  }
+  // No close-on-backdrop: a stray click must not throw away a typed proof.
+  ok.onclick=submit;
+  ov.querySelector('.ui-confirm-cancel').onclick=cancel;
+  document.addEventListener('keydown',onKey,true);
+  renderFiles();
+  requestAnimationFrame(function(){ov.classList.add('show');ta.focus();});
 }
 
 var _actView='list';
@@ -4712,11 +4887,23 @@ function closeActionModal(){
   // Opened from a checkpoint (Analysis)? Closing or saving returns there and
   // reopens that checkpoint — the Actions page was only a detour.
   if(_taskFromCp){_taskFromCp=false;if(_navStack.length)navBack();}
+  // Opened in place from a checkpoint (Assessment / Analysis popup) — refresh
+  // the origin so a new or edited task shows under its checkpoint right away.
+  if(_actOnClose){var f=_actOnClose;_actOnClose=null;f();}
 }
 
 function saveAction(){
   var title=document.getElementById('actTitle').value.trim();
   if(!title){uiAlert('Please enter a title.');return;}
+  // Saving as Done (from any other status, or a new task created as Done) goes
+  // through the completion gate first. Cancel keeps the editor open, unsaved.
+  if(document.getElementById('actStatus').value==='Done'&&_actOrigStatus!=='Done'){
+    requestCompletion([{title:title}],function(rec){_commitAction(title,rec);});
+    return;
+  }
+  _commitAction(title,null);
+}
+function _commitAction(title,completion){
   var editId=document.getElementById('actionEditId').value;
   var selectedPhotos=(_actExistingImages||[]).slice();
   // Stamp the audit this action belongs to — preserved on edit. On create it is
@@ -4725,6 +4912,9 @@ function saveAction(){
   if(editId){
     var existing=actions.find(function(a){return a.id===parseInt(editId);});
     roundId=existing?existing.roundId:null;
+  } else if(_actPresetRound!=null){
+    // Created from a checkpoint while scoring — belongs to THAT audit.
+    roundId=_actPresetRound;
   } else {
     var supForRound=suppliers.find(function(x){return x.name===document.getElementById('actSupplier').value;});
     var repRound=supForRound?reportingAudit(supForRound):null;
@@ -4735,7 +4925,10 @@ function saveAction(){
   var pend=document.getElementById('actCommentInput');
   if(pend&&pend.value.trim()){_actComments.push({ts:new Date().toISOString(),author:(document.getElementById('auditorName')&&document.getElementById('auditorName').value)||'',text:pend.value.trim()});}
   var newStatus=document.getElementById('actStatus').value;
-  if(editId&&_actOrigStatus&&newStatus!==_actOrigStatus)
+  // The completion proof itself records the move to Done — no extra status line.
+  if(completion)
+    _actComments.push(_completionEntry(completion,_actOrigStatus));
+  else if(editId&&_actOrigStatus&&newStatus!==_actOrigStatus)
     _actComments.push({ts:new Date().toISOString(),system:true,text:'Status: '+_actOrigStatus+' → '+newStatus});
   var obj={
     id:editId?parseInt(editId):actionIdCounter++,
@@ -5358,6 +5551,7 @@ function auConsoleHtml(s,flat,round){
     rail+='<div class="au-cprow'+(on?' on':'')+'" onclick="auFocus(\''+esc(f.cat).replace(/'/g,"\\'")+'\','+f.idx+')" title="'+esc(f.item.checkpoint)+'">'
       +'<span class="sd '+auScoreClass(f.item.score)+'">'+auScoreLabel(f.item.score)+'</span>'
       +'<span class="tx">'+esc(f.item.checkpoint)+'</span>'
+      +cpTaskIndicator(tasksForCheckpoint(s.name,f.cat,f.item.checkpoint))
     +'</div>';
   });
   if(grpOpen)rail+='</div>';
@@ -5423,6 +5617,7 @@ function auConsoleHtml(s,flat,round){
             +'<div style="font-size:11px;color:var(--text3);margin-top:4px">Photos, certificates, reports — any file type</div>'
           +'</div>')
       +'</div>'
+      +cpTasksHtml(s.name,cur.cat,cur.idx,tasksForCheckpoint(s.name,cur.cat,item.checkpoint),{from:'assessment',roundId:round.id})
       +'<div class="au-foot">'
         +'<span style="flex:1"></span>'
         +'<button class="btn" onclick="auNav(-1)"><i class="ti ti-arrow-left"></i> Prev</button>'
@@ -5539,7 +5734,7 @@ function auLedgerHtml(s,round){
     h+='<div class="au-ledger" style="margin-bottom:14px">'
       +'<div class="au-lcat">'+esc(cat)+'</div>'
       +'<div style="overflow-x:auto"><table class="au-ltable">'
-      +'<thead><tr><th class="num">#</th><th>Checkpoint</th><th style="width:250px">Score</th><th style="width:74px" title="Checkpoint weight for scoring (default 1)">Weight</th><th style="width:30%">Evidence / notes</th><th style="width:44px"></th></tr></thead><tbody>'
+      +'<thead><tr><th class="num">#</th><th>Checkpoint</th><th style="width:250px">Score</th><th style="width:74px" title="Checkpoint weight for scoring (default 1)">Weight</th><th style="width:30%">Evidence / notes</th><th style="width:96px"></th></tr></thead><tbody>'
       +items.map(function(item,idx){
         var files=item.files||[];
         var key=auLedgerKey(cat,idx);
@@ -5581,7 +5776,10 @@ function auLedgerHtml(s,round){
               +'</div>'
             +'</div>'
           +'</td>'
-          +'<td><button class="au-fbtn'+(files.length?' has':'')+'" onclick="auToggleFiles(\''+key+'\')" title="'+(files.length?files.length+' file(s) — click to show / hide':'Attach files')+'"><i class="ti ti-paperclip"></i>'+(files.length?'<span class="au-fcount">'+files.length+'</span>':'')+'</button></td>'
+          +'<td><div style="display:flex;gap:5px">'
+            +'<button class="au-fbtn'+(files.length?' has':'')+'" onclick="auToggleFiles(\''+key+'\')" title="'+(files.length?files.length+' file(s) — click to show / hide':'Attach files')+'"><i class="ti ti-paperclip"></i>'+(files.length?'<span class="au-fcount">'+files.length+'</span>':'')+'</button>'
+            +auLedgerTaskBtn(s,cat,idx,item,round)
+          +'</div></td>'
         +'</tr>'
         +'<tr class="au-filerow" id="auFrow_'+key+'"'+(files.length?'':' style="display:none"')+'>'
           +'<td colspan="6">'+auLedgerFilesHtml(s,cat,idx,round,files)+'</td>'
@@ -5590,6 +5788,17 @@ function auLedgerHtml(s,round){
       +'</tbody></table></div></div>';
   });
   return h||'<div class="empty">This round has no categories.</div>';
+}
+// Table row "add task" button. The badge counts tasks already linked to the
+// checkpoint (coloured like cpTaskIndicator); the full list sits in Score view.
+function auLedgerTaskBtn(s,cat,idx,item,round){
+  var tasks=tasksForCheckpoint(s.name,cat,item.checkpoint);
+  var tip=tasks.length
+    ?tasks.length+' linked task'+(tasks.length>1?'s':'')+': '+tasks.map(function(a){return (a.ref?a.ref+' ':'')+a.title;}).join(' · ')+' — click to add another'
+    :'Add a task for this checkpoint';
+  return '<button class="au-fbtn'+(tasks.length?' has':'')+'" onclick="newTaskForCheckpoint(\''+esc(s.name).replace(/'/g,"\\'")+'\',\''+esc(cat).replace(/'/g,"\\'")+'\','+idx+','+round.id+',\'assessment\')" title="'+esc(tip)+'">'
+    +'<i class="ti ti-subtask"></i>'+(tasks.length?'<span class="au-fcount">'+tasks.length+'</span>':'<i class="ti ti-plus" style="font-size:10px"></i>')
+  +'</button>';
 }
 // Attachments shown inline under a Table row — image thumbnails and file cards
 // with a drop / browse zone, so evidence is visible in place, not just a count.
@@ -6971,7 +7180,7 @@ function openCmpCheckpoint(supName,cat,idx){
           +'</div>';
         }).join('')+'</div>'
       :'')
-    +cpTasksHtml(supName,cat,idx,tasksForCheckpoint(supName,cat,item.checkpoint))
+    +cpTasksHtml(supName,cat,idx,tasksForCheckpoint(supName,cat,item.checkpoint),{from:'analysis'})
   +'</div>';
   var m=document.getElementById('cmpCheckpointModal');
   if(!m){
@@ -7019,17 +7228,28 @@ function cpTaskIndicator(tasks){
   var tip=tasks.length+' linked task'+(tasks.length>1?'s':'')+(open.length?' · '+open.length+' open':' · all done')+(overdue?' · overdue':'');
   return '<span class="cp-task-ind" title="'+tip+'" style="color:'+col+'"><i class="ti ti-subtask"></i>'+tasks.length+'</span>';
 }
-function cpTasksHtml(sup,cat,idx,tasks){
-  var head='<label style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);display:block;margin:18px 0 6px">Linked tasks'
-    +(tasks.length?' <span style="font-weight:500">('+tasks.length+')</span>':'')+'</label>';
-  if(!tasks.length)return head+'<div style="font-size:12.5px;color:var(--text3);font-style:italic">No task linked to this checkpoint.</div>';
-  var today=new Date();today.setHours(0,0,0,0);
+// opts.from: 'assessment' (scoring console — tasks open in place, new tasks are
+// pinned to opts.roundId) or 'analysis' (checkpoint popup). Without opts the
+// list is read-only and rows jump to the Actions page.
+function cpTasksHtml(sup,cat,idx,tasks,opts){
+  opts=opts||{};
   var esSn=esc(sup).replace(/'/g,"\\'"),esCat=esc(cat).replace(/'/g,"\\'");
+  var addBtn=opts.from
+    ?'<button class="btn sm" onclick="newTaskForCheckpoint(\''+esSn+'\',\''+esCat+'\','+idx+','+(opts.roundId!=null?opts.roundId:'null')+',\''+opts.from+'\')" title="Create a task linked to this checkpoint — it appears under Steering → Actions"><i class="ti ti-plus"></i> Add task</button>'
+    :'';
+  var head='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin:18px 0 6px">'
+    +'<label style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3)">Linked tasks'
+    +(tasks.length?' <span style="font-weight:500">('+tasks.length+')</span>':'')+'</label>'+addBtn+'</div>';
+  if(!tasks.length)return head+'<div style="font-size:12.5px;color:var(--text3);font-style:italic">No task linked to this checkpoint'+(opts.from?' yet.':'.')+'</div>';
+  var today=new Date();today.setHours(0,0,0,0);
   return head+'<div class="cp-task-list">'+tasks.map(function(a){
     var due=a.dueDate?new Date(a.dueDate):null;
     var od=due&&a.status!=='Done'&&due<today;
     var stc=ACT_STATUS_COLOR[a.status]||'var(--text3)';
-    return '<div class="cp-task-row" onclick="jumpToTaskFromCheckpoint('+a.id+',\''+esSn+'\',\''+esCat+'\','+idx+')" title="Open this task">'
+    var open=opts.from==='assessment'
+      ?'openTaskFromAssessment('+a.id+')'
+      :'jumpToTaskFromCheckpoint('+a.id+',\''+esSn+'\',\''+esCat+'\','+idx+')';
+    return '<div class="cp-task-row" onclick="'+open+'" title="Open this task">'
       +'<span style="font-size:11px;font-weight:600;color:var(--text3);font-variant-numeric:tabular-nums;white-space:nowrap">'+esc(a.ref||'—')+'</span>'
       +'<span style="flex:1;min-width:0;font-size:12.5px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(a.title||'')+'</span>'
       +'<span style="font-size:11px;font-weight:600;color:'+stc+';white-space:nowrap">'+esc(a.status||'')+'</span>'
@@ -7049,6 +7269,33 @@ function jumpToTaskFromCheckpoint(id,sup,cat,idx){
   openActionModal(id);
   _taskFromCp=true;
 }
+// Create a task straight from a checkpoint (Assessment Score / Table view,
+// Analysis popup). The editor opens on top of the current page with supplier and
+// checkpoint link pre-filled and the priority derived from the score, so the
+// task lands in Steering → Actions already linked. roundId (scoring console)
+// pins it to the audit being scored instead of the reporting audit; null means
+// the reporting mirror (s.categories), which is what the Analysis popup shows.
+var _actPresetRound=null,_actOnClose=null;
+function _cpItemAt(sup,cat,idx,roundId){
+  var s=suppliers.find(function(x){return x.name===sup;});if(!s)return null;
+  var r=roundId!=null?(s.rounds||[]).find(function(x){return x.id===roundId;}):null;
+  var cats=r?r.categories:s.categories;
+  return ((cats||{})[cat]||[])[idx]||null;
+}
+function newTaskForCheckpoint(sup,cat,idx,roundId,from){
+  var item=_cpItemAt(sup,cat,idx,roundId);if(!item)return;
+  if(from==='analysis')closeCmpCheckpoint();
+  openActionModal();
+  document.getElementById('actSupplier').value=sup;
+  _actCps=[{category:cat,checkpoint:item.checkpoint}];
+  if(typeof item.score==='number')document.getElementById('actPriority').value=priorityFromScore(item.score);
+  renderActCpChips();renderActCpPicker();
+  _actPresetRound=roundId;
+  _actOnClose=from==='analysis'?function(){openCmpCheckpoint(sup,cat,idx);}:auRender;
+  var t=document.getElementById('actTitle');if(t)t.focus();
+}
+// Existing task opened from the scoring console — edit in place, stay on the audit.
+function openTaskFromAssessment(id){openActionModal(id);_actOnClose=auRender;}
 
 // ── Image handling ────────────────────────────────────────────────────────────
 var _imgTarget=null; // {sup, cat, idx}
@@ -7072,6 +7319,12 @@ function triggerSupplierFileUpload(sup){
 }
 
 function getFileArray(target,create){
+  if(target.kind==='completion'){
+    var list=_actComments;
+    if(target.actionId!=null){var ac=actions.find(function(x){return x.id===target.actionId;});list=(ac&&ac.comments)||[];}
+    var ce=list[target.idx];
+    return (ce&&ce.kind==='completion'&&ce.files)||null;
+  }
   var s=suppliers.find(function(x){return x.name===target.sup;});
   if(!s)return null;
   if(target.kind==='supplier'){
@@ -7173,7 +7426,8 @@ function compressImage(dataUrl,maxPx,quality,cb){
 }
 
 function openFileViewer(kind,sup,cat,idx,fileIdx,roundId){
-  var target=kind==='supplier'?{kind:'supplier',sup:sup}:{kind:'checkpoint',sup:sup,cat:cat,idx:idx,roundId:roundId!=null?roundId:null};
+  // kind 'completion': sup = action id (null = the task editor's open log), idx = log entry index
+  var target=kind==='supplier'?{kind:'supplier',sup:sup}:kind==='completion'?{kind:'completion',actionId:sup,idx:idx}:{kind:'checkpoint',sup:sup,cat:cat,idx:idx,roundId:roundId!=null?roundId:null};
   var files=getFileArray(target,false);
   if(!files||!files.length)return;
   var current=fileIdx;
@@ -7199,7 +7453,7 @@ function openFileViewer(kind,sup,cat,idx,fileIdx,roundId){
     overlay.innerHTML=
       '<div style="position:absolute;top:16px;right:16px;display:flex;gap:10px">'
         +'<a href="'+f.data+'" download="'+esc(f.name||'file')+'" style="color:#fff;font-size:22px;text-decoration:none" title="Download"><i class="ti ti-download"></i></a>'
-        +'<button onclick="deleteFile(\''+kind+'\',\''+esc(sup)+'\',\''+esc(cat||'')+'\','+(idx!=null?idx:'null')+','+current+')" style="background:none;border:none;cursor:pointer;color:#ff6b6b;font-size:22px" title="Delete"><i class="ti ti-trash"></i></button>'
+        +(kind==='completion'?'':'<button onclick="deleteFile(\''+kind+'\',\''+esc(sup)+'\',\''+esc(cat||'')+'\','+(idx!=null?idx:'null')+','+current+')" style="background:none;border:none;cursor:pointer;color:#ff6b6b;font-size:22px" title="Delete"><i class="ti ti-trash"></i></button>')
         +'<button onclick="document.getElementById(\'imgViewerOverlay\').remove()" style="background:none;border:none;cursor:pointer;color:#fff;font-size:26px"><i class="ti ti-x"></i></button>'
       +'</div>'
       +'<div style="color:#ccc;font-size:13px">'+(current+1)+' / '+files.length+(f.name?' — '+esc(f.name):'')+(f.size?' ('+humanFileSize(f.size)+')':'')+'</div>'
@@ -7717,9 +7971,58 @@ function mapDrawRect(box,m){
   var w=iw*scale,h=ih*scale;
   return {x:box.x+(box.w-w)/2,y:box.y+(box.h-h)/2,w:w,h:h};
 }
-// Equirectangular, which is what these flat sheets are. lonMax may exceed 180
-// on a Pacific-centred world map (about -25 -> 335): a longitude of -100 has to
-// be read as +260 before it lands on the right half, or every American supplier
+// Exact calibration of the six bundled sheets. They are crops of one MILLER
+// cylindrical world map, not equirectangular: longitude is linear, but
+// latitude is stretched toward the poles. Read with a linear latitude scale and
+// the (also too wide) old preset extents, a supplier in Hannover landed in the
+// North Sea and Katowice in Denmark. These extents were solved by fitting
+// Natural Earth coastlines onto each image (98% land overlap on Europe), so a
+// bundled sheet places pins correctly without any manual calibration.
+// lonMax may run past 360° of span on the world sheet: it repeats Greenland.
+var MAP_BUNDLED_FIT={
+  pacific :{proj:'miller',bounds:{lonMin:-31.14,lonMax:348.43,latMin:-56.2, latMax:83.61}},
+  europe  :{proj:'miller',bounds:{lonMin:-24.46,lonMax:42.74, latMin:34.7,  latMax:71.15}},
+  asia    :{proj:'miller',bounds:{lonMin:25.7,  lonMax:180.23,latMin:-22.68,latMax:55.41}},
+  oceania :{proj:'miller',bounds:{lonMin:112.86,lonMax:178.55,latMin:-47.26,latMax:-10.09}},
+  africa  :{proj:'miller',bounds:{lonMin:-25.3, lonMax:57.78, latMin:-34.83,latMax:37.27}},
+  americas:{proj:'miller',bounds:{lonMin:-187.25,lonMax:-34.93,latMin:-56.11,latMax:83.14}}
+};
+// Marks a sheet as one of the bundled images (by its pixels, not its name — a
+// renamed sheet or the same PNG uploaded by hand is still that image) and
+// applies the exact calibration. Returns false for the user's own maps, which
+// keep the linear model and their two-anchor calibration.
+function mapApplyBundledFit(m){
+  if(!m||!m.data)return false;
+  var lib=(typeof window!=='undefined'&&Array.isArray(window.MAP_LIBRARY))?window.MAP_LIBRARY:[];
+  var x=lib.find(function(e){return e.data.length===m.data.length&&e.data===m.data;});
+  if(!x||!MAP_BUNDLED_FIT[x.preset])return false;
+  var fit=MAP_BUNDLED_FIT[x.preset];
+  m.bundled=x.preset;
+  m.proj=fit.proj;
+  m.bounds=JSON.parse(JSON.stringify(fit.bounds));
+  delete m.anchors;            // re-seeded from the exact extent when shown
+  return true;
+}
+// Vertical position on a sheet. Linear (equirectangular) unless the sheet says
+// otherwise; Miller compresses nothing horizontally, so only latitude differs.
+function _millerY(lat){
+  var p=Math.max(-89.9,Math.min(89.9,lat))*Math.PI/180;
+  return 1.25*Math.log(Math.tan(Math.PI/4+0.4*p));
+}
+function _millerLat(Y){return (2.5*Math.atan(Math.exp(0.8*Y))-0.625*Math.PI)*180/Math.PI;}
+function mapLatToFy(m,lat){
+  var b=(m&&m.bounds)||MAP_DEFAULT_BOUNDS;
+  if(m&&m.proj==='miller'){var t=_millerY(b.latMax),u=_millerY(b.latMin);return (t-_millerY(lat))/(t-u);}
+  return (b.latMax-lat)/(b.latMax-b.latMin);
+}
+function mapFyToLat(m,fy){
+  var b=(m&&m.bounds)||MAP_DEFAULT_BOUNDS;
+  if(m&&m.proj==='miller'){var t=_millerY(b.latMax),u=_millerY(b.latMin);return _millerLat(t-fy*(t-u));}
+  return b.latMax-fy*(b.latMax-b.latMin);
+}
+// Longitude is linear on every supported sheet. lonMax may exceed 180 on a
+// Pacific-centred world map (about -25 -> 335): a longitude of -100 has to be
+// read as +260 before it lands on the right half, or every American supplier
 // would fall off the map.
 function projectGeo(pt,rect,m){
   var b=(m&&m.bounds)||MAP_DEFAULT_BOUNDS;
@@ -7727,7 +8030,7 @@ function projectGeo(pt,rect,m){
   while(lon<b.lonMin)lon+=360;
   while(lon>b.lonMax)lon-=360;
   var fx=(lon-b.lonMin)/(b.lonMax-b.lonMin);
-  var fy=(b.latMax-pt.lat)/(b.latMax-b.latMin);
+  var fy=mapLatToFy(m,pt.lat);
   if(fx<0||fx>1||fy<0||fy>1)return null;
   return {x:rect.x+rect.w*fx,y:rect.y+rect.h*fy,fx:fx,fy:fy};
 }
@@ -7791,6 +8094,27 @@ var GEO_COUNTRIES={
   ZA:[-29.0,24.5,'South Africa'],MA:[32.0,-6.0,'Morocco'],      TN:[34.0,9.5,'Tunisia'],
   EG:[26.8,30.8,'Egypt'],        AE:[24.0,54.0,'United Arab Emirates'], IL:[31.4,35.0,'Israel']
 };
+// Other common spellings of the same countries — the long English names and
+// the German ones, since locations are typed by hand ("Brno, Czech Republic"
+// found no pin while only "Czechia" was known). Keys are lower case.
+var GEO_COUNTRY_ALIASES={
+  'czech republic':'CZ','tschechien':'CZ','tschechische republik':'CZ',
+  'deutschland':'DE','frankreich':'FR','italien':'IT','spanien':'ES','polen':'PL',
+  'slowakei':'SK','österreich':'AT','oesterreich':'AT','schweiz':'CH','niederlande':'NL',
+  'holland':'NL','the netherlands':'NL','belgien':'BE','luxemburg':'LU','dänemark':'DK',
+  'daenemark':'DK','schweden':'SE','norwegen':'NO','finnland':'FI',
+  'uk':'GB','u.k.':'GB','great britain':'GB','england':'GB','scotland':'GB','wales':'GB',
+  'großbritannien':'GB','grossbritannien':'GB','vereinigtes königreich':'GB','irland':'IE',
+  'ungarn':'HU','rumänien':'RO','rumaenien':'RO','bulgarien':'BG','griechenland':'GR',
+  'kroatien':'HR','slowenien':'SI','serbien':'RS','bosnien und herzegowina':'BA',
+  'bosnia':'BA','türkei':'TR','tuerkei':'TR','türkiye':'TR','turkiye':'TR','litauen':'LT',
+  'lettland':'LV','estland':'EE','indien':'IN','südkorea':'KR','suedkorea':'KR',
+  'korea':'KR','republic of korea':'KR','vietnam':'VN','viet nam':'VN','indonesien':'ID',
+  'singapur':'SG','usa':'US','u.s.':'US','u.s.a.':'US','united states of america':'US',
+  'vereinigte staaten':'US','kanada':'CA','mexiko':'MX','brasilien':'BR','argentinien':'AR',
+  'südafrika':'ZA','suedafrika':'ZA','marokko':'MA','tunesien':'TN','ägypten':'EG',
+  'aegypten':'EG','uae':'AE','vae':'AE','vereinigte arabische emirate':'AE'
+};
 // Reads the country out of a free-text location such as "Chemnitz, DE" or
 // "Rijeka, Croatia". Only the country is inferred — the town is what the user
 // clicks to correct.
@@ -7803,7 +8127,7 @@ function geoFromLocation(loc){
   if(GEO_COUNTRIES[code])return {lat:GEO_COUNTRIES[code][0],lon:GEO_COUNTRIES[code][1],
                                  country:GEO_COUNTRIES[code][2],derived:true};
   var lower=tail.toLowerCase();
-  var hit=Object.keys(GEO_COUNTRIES).find(function(k){
+  var hit=GEO_COUNTRY_ALIASES[lower]||Object.keys(GEO_COUNTRIES).find(function(k){
     return GEO_COUNTRIES[k][2].toLowerCase()===lower;});
   if(hit)return {lat:GEO_COUNTRIES[hit][0],lon:GEO_COUNTRIES[hit][1],
                  country:GEO_COUNTRIES[hit][2],derived:true};
@@ -7855,6 +8179,7 @@ function mapAddBundled(name){
   var b=MAP_PRESETS[x.preset]?MAP_PRESETS[x.preset].bounds:MAP_DEFAULT_BOUNDS;
   var nm={id:'m'+Date.now()+'_'+Math.round(Math.random()*1e4),name:x.name,data:x.data,
     w:x.w,h:x.h,bounds:JSON.parse(JSON.stringify(b))};
+  mapApplyBundledFit(nm);      // exact Miller extent instead of the rough preset
   mapEnsureAnchors(nm);
   maps.push(nm);
   renderMapSettings();
@@ -7932,10 +8257,12 @@ function mapUpload(files){
         var key=_guessPreset(file.name);
         // Pixel size is stored because the slide draws "contain": without the
         // aspect ratio the letterboxing is unknown and every pin shifts.
-        maps.push({id:'m'+Date.now()+'_'+Math.round(Math.random()*1e4),
+        var nm={id:'m'+Date.now()+'_'+Math.round(Math.random()*1e4),
           name:MAP_PRESETS[key].label,data:e.target.result,
           w:img.naturalWidth,h:img.naturalHeight,
-          bounds:JSON.parse(JSON.stringify(MAP_PRESETS[key].bounds))});
+          bounds:JSON.parse(JSON.stringify(MAP_PRESETS[key].bounds))};
+        mapApplyBundledFit(nm);   // one of our own sheets, uploaded by hand
+        maps.push(nm);
         if(++done===list.length){renderMapSettings();toast(list.length+' map'+(list.length===1?'':'s')+' added — check the reference dots');}
       };
       img.onerror=function(){if(++done===list.length)renderMapSettings();
@@ -7948,7 +8275,10 @@ function mapUpload(files){
 function mapSetName(i,v){if(maps[i])maps[i].name=v;}
 function mapSetPreset(i,k){
   if(!maps[i]||!k||!MAP_PRESETS[k])return;
-  maps[i].bounds=JSON.parse(JSON.stringify(MAP_PRESETS[k].bounds));
+  // A bundled sheet set back to its own region gets its exact extent, not the
+  // rough preset that the old linear model used.
+  var fit=(maps[i].bundled===k)&&MAP_BUNDLED_FIT[k];
+  maps[i].bounds=JSON.parse(JSON.stringify(fit?fit.bounds:MAP_PRESETS[k].bounds));
   mapResetAnchors(maps[i]);  // new region -> its own two anchor cities
   renderMapSettings();
 }
@@ -7986,6 +8316,10 @@ function _clamp01(x){return Math.max(0,Math.min(1,x));}
 function _round1(x){return Math.round(x*10)/10;}
 function mapPresetKey(m){
   var b=m.bounds||MAP_DEFAULT_BOUNDS;
+  if(m.bundled&&MAP_BUNDLED_FIT[m.bundled]){
+    var f=MAP_BUNDLED_FIT[m.bundled].bounds;
+    if(f.lonMin===b.lonMin&&f.lonMax===b.lonMax&&f.latMin===b.latMin&&f.latMax===b.latMax)return m.bundled;
+  }
   return Object.keys(MAP_PRESETS).find(function(k){
     var p=MAP_PRESETS[k].bounds;
     return p.lonMin===b.lonMin&&p.lonMax===b.lonMax&&p.latMin===b.latMin&&p.latMax===b.latMax;})||'';
@@ -8046,8 +8380,15 @@ function mapRecomputeBounds(m){
     nb.lonMin=l0-a[0].fx*sx;nb.lonMax=nb.lonMin+sx;
   }
   if(Math.abs(a[1].fy-a[0].fy)>0.02){
-    var sy=(a[1].lat-a[0].lat)/(a[1].fy-a[0].fy);
-    nb.latMax=a[0].lat-a[0].fy*sy;nb.latMin=nb.latMax+sy;
+    if(m.proj==='miller'){
+      // Solve in Miller space, where the vertical axis IS linear.
+      var Y0=_millerY(a[0].lat),Y1=_millerY(a[1].lat);
+      var sY=(Y1-Y0)/(a[1].fy-a[0].fy), Ytop=Y0-a[0].fy*sY;
+      nb.latMax=_millerLat(Ytop);nb.latMin=_millerLat(Ytop+sY);
+    } else {
+      var sy=(a[1].lat-a[0].lat)/(a[1].fy-a[0].fy);
+      nb.latMax=a[0].lat-a[0].fy*sy;nb.latMin=nb.latMax+sy;
+    }
   }
   m.bounds={lonMin:_round1(nb.lonMin),lonMax:_round1(nb.lonMax),latMin:_round1(nb.latMin),latMax:_round1(nb.latMax)};
 }
@@ -8210,7 +8551,7 @@ function pinPickAt(ev,el){
   var fx=(ev.clientX-r.left)/r.width, fy=(ev.clientY-r.top)/r.height;
   var b=sheet.bounds||MAP_DEFAULT_BOUNDS;
   var lon=b.lonMin+fx*(b.lonMax-b.lonMin);
-  var lat=b.latMax-fy*(b.latMax-b.latMin);
+  var lat=mapFyToLat(sheet,fy);
   while(lon>180)lon-=360;
   while(lon<-180)lon+=360;
   s.geo={lat:Math.round(lat*100)/100,lon:Math.round(lon*100)/100};
@@ -8452,7 +8793,7 @@ function rptContentEditorHtml(r){
   var h='<div class="card" style="margin-bottom:14px">'
     +'<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px;flex-wrap:wrap">'
       +'<div style="font-size:13px;font-weight:600;color:var(--text2)"><i class="ti ti-file-text"></i> Report content</div>'
-      +'<button class="btn sm" id="rcGenAll" onclick="generateReportContent(null)"><i class="ti ti-sparkles"></i> Generate report content</button>'
+      +rcGenAllBtnHtml()
     +'</div>'
     +'<p style="font-size:11px;color:var(--text3);margin:0 0 14px">This is what the Management Summary slides print. Limits match the space on the slide — the AI is told them, and longer text is trimmed when the slide is drawn.</p>';
 
@@ -8537,7 +8878,6 @@ function rptDetailEditorHtml(r){
   var h='<div style="border-top:1px solid var(--border);margin-top:4px;padding-top:14px">'
     +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">'
       +'<label style="font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text3)">Findings by category</label>'
-      +'<button class="btn sm" id="rcGenAllCats" style="padding:3px 8px" onclick="generateAllCategoryDetails()"><i class="ti ti-sparkles" style="font-size:12px"></i> Generate all</button>'
     +'</div>'
     +'<p style="font-size:11px;color:var(--text3);margin:0 0 8px">One slide per category. Scored checkpoints are split into two sub-categories, each with strengths and constraints. Unscored and N.A. checkpoints are left out of the report.</p>';
   // The split is checklist-level, so its state is reported once, here — not
@@ -8689,11 +9029,13 @@ function setTaskLabel(id,v){
 // model here rather than summarised, because every one of them is a way the
 // slide goes wrong: a checkpoint cited twice, an unassessed point printed as a
 // finding, or a half-built process buried next to a missing one.
-function generateCategoryDetail(cat,onDone){
-  var s=_rptSupplier(),r=_rptRound();
-  if(!s||!r)return;
+// `ctx` ({s,r}) pins the supplier and assessment for a batch run, which must not
+// follow whatever happens to be selected on screen while it is running.
+function generateCategoryDetail(cat,onDone,ctx){
+  var s=ctx?ctx.s:_rptSupplier(),r=ctx?ctx.r:_rptRound();
+  if(!s||!r){if(onDone)onDone();return;}
   var scored=rptScoredCheckpoints(r,cat);
-  if(!scored.length){toast('No scored checkpoints in '+cat);if(onDone)onDone();return;}
+  if(!scored.length){if(!ctx)toast('No scored checkpoints in '+cat);if(onDone)onDone();return;}
   var skipped=((r.categories[cat])||[]).length-scored.length;
   var groups=templateSubgroups(roundTemplate(r),cat);
   // With a checklist split in place the checkpoints are listed UNDER their
@@ -8709,7 +9051,7 @@ function generateCategoryDetail(cat,onDone){
     : scored.map(function(c){
         return '#'+c.cid+' ['+c.score+'/5] '+c.checkpoint+(c.notes?'\n    note: '+c.notes:'');
       }).join('\n');
-  var btn=document.getElementById('rcGenCat_'+_rcSafeId(cat));
+  var btn=ctx?null:document.getElementById('rcGenCat_'+_rcSafeId(cat));
   callClaude(
     'Supplier: '+s.name+'\nCategory: '+cat+'\n\n'
       +'Checkpoints (score 5 = best, 0 = worst). Unassessed and N.A. checkpoints are '
@@ -8778,39 +9120,124 @@ function generateCategoryDetail(cat,onDone){
         _rptRerender();
         if(!onDone)toast('Findings generated for '+cat+(skipped?' — '+skipped+' unscored checkpoint'+(skipped===1?'':'s')+' left out':''));
         if(onDone)onDone();
-      }catch(e){ toast('Could not parse AI response for '+cat,'var(--crit)'); if(onDone)onDone(); }
+      }catch(e){
+        if(!ctx)toast('Could not parse AI response for '+cat,'var(--crit)');
+        if(onDone)onDone('could not parse the findings for '+cat);
+      }
     },
     function(loading){if(btn){btn.disabled=loading;
-      btn.innerHTML=loading?'<i class="ti ti-loader" style="animation:spin 1s linear infinite;font-size:11px"></i>':'<i class="ti ti-refresh" style="font-size:11px"></i>';}}
+      btn.innerHTML=loading?'<i class="ti ti-loader" style="animation:spin 1s linear infinite;font-size:11px"></i>':'<i class="ti ti-refresh" style="font-size:11px"></i>';}},
+    onDone?{onError:function(m){onDone(m);}}:undefined
   );
 }
 function _rcSafeId(s){return String(s).replace(/\W/g,'_');}
-// Sequential, not parallel: five categories fired at once would race on
-// auRender() and hammer the API for no gain in wall-clock time the user cares
-// about. Progress is reported on the button.
-function generateAllCategoryDetails(){
-  var r=_rptRound();if(!r)return;
-  var cats=Object.keys(r.categories||{});
-  if(!cats.length)return;
-  var btn=document.getElementById('rcGenAllCats'),i=0;
-  var restore=function(){if(btn){btn.disabled=false;
-    btn.innerHTML='<i class="ti ti-sparkles" style="font-size:12px"></i> Generate all';}};
-  var step=function(){
-    if(i>=cats.length){restore();toast('Findings generated for '+cats.length+' categories');return;}
-    if(btn){btn.disabled=true;
-      btn.innerHTML='<i class="ti ti-loader" style="animation:spin 1s linear infinite;font-size:12px"></i> '+(i+1)+'/'+cats.length;}
-    var cat=cats[i++];
-    generateCategoryDetail(cat,step);
-  };
-  step();
+
+// ── One-click generation: everything for one supplier, or for all of them ──
+// "Generate report content" used to cover only the summary; the findings were a
+// second button, and every supplier had to be picked in turn. Now one job builds
+// the whole set — summary, task labels, findings per category — as a queue of
+// independent AI calls. They write to disjoint parts of the data (summary keys,
+// action labels, one category's detail each), so a few can run side by side
+// without racing; the cap keeps the API from being hammered.
+var RPT_JOB_PARALLEL=3;
+var _rcJob=null;   // {scope:'one'|'all', done, total, errors[]} while a job runs
+function rptJobTasks(s,r){
+  var t=[];
+  if(!s||!r)return t;
+  t.push({sn:s.name,what:'summary',run:function(cb){generateReportContent(null,{s:s,r:r,onDone:cb});}});
+  ensureActionRefs();
+  if((typeof actions!=='undefined'?actions:[]).some(function(a){return a.supplier===s.name;}))
+    t.push({sn:s.name,what:'task labels',run:function(cb){generateTaskLabels({s:s,onDone:cb});}});
+  Object.keys(r.categories||{}).forEach(function(cat){
+    if(!rptScoredCheckpoints(r,cat).length)return;
+    t.push({sn:s.name,what:cat,run:function(cb){generateCategoryDetail(cat,cb,{s:s,r:r});}});
+  });
+  return t;
 }
-function generateTaskLabels(){
-  var s=_rptSupplier();
-  if(!s)return;
+function runRptJob(tasks,scope){
+  if(_rcJob){toast('Report content is already being generated');return;}
+  if(!tasks.length){toast('Nothing to generate');return;}
+  if(!getApiKey()){uiAlert('Please enter your Anthropic API key in Settings first.');return;}
+  var job=_rcJob={scope:scope,done:0,total:tasks.length,errors:[]};
+  var sups={};tasks.forEach(function(t){sups[t.sn]=1;});
+  var nSup=Object.keys(sups).length;
+  var next=0,active=0;
+  var finish=function(){
+    _rcJob=null;
+    _rptJobUi();_rptRerender();
+    if(!job.errors.length)
+      toast('Report content generated'+(nSup>1?' for '+nSup+' suppliers':'')+' — review and adjust');
+    else
+      uiAlert(job.errors.length+' of '+job.total+' generation steps failed:\n\n'+job.errors.join('\n')
+        +'\n\nEverything else was generated. Use the refresh buttons to retry single blocks.');
+  };
+  var pump=function(){
+    while(active<RPT_JOB_PARALLEL&&next<tasks.length){
+      (function(t){
+        active++;
+        var settled=false;
+        t.run(function(err){
+          if(settled)return;settled=true;
+          active--;job.done++;
+          if(err)job.errors.push((nSup>1?t.sn+' · ':'')+t.what+(typeof err==='string'?' — '+err:''));
+          _rptJobUi();
+          if(job.done>=job.total)finish();else pump();
+        });
+      })(tasks[next++]);
+    }
+  };
+  _rptJobUi();pump();
+}
+// Both buttons are drawn from _rcJob, so a re-render mid-job keeps the progress.
+function rcGenAllBtnHtml(){
+  var busy=!!_rcJob;
+  return '<button class="btn sm" id="rcGenAll" onclick="generateFullReportContent()"'+(busy?' disabled':'')
+    +' title="Summary, task labels and findings for every category of this assessment">'
+    +(busy&&_rcJob.scope==='one'
+      ? '<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Generating… '+_rcJob.done+'/'+_rcJob.total
+      : '<i class="ti ti-sparkles"></i> Generate report content')
+    +'</button>';
+}
+function expGenAllBtnInner(){
+  return (_rcJob&&_rcJob.scope==='all')
+    ? '<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Generating… '+_rcJob.done+'/'+_rcJob.total
+    : '<i class="ti ti-sparkles"></i> Generate for all suppliers';
+}
+function _rptJobUi(){
+  var a=document.getElementById('rcGenAll');
+  if(a)a.outerHTML=rcGenAllBtnHtml();
+  var b=document.getElementById('expGenAllSup');
+  if(b){b.disabled=!!_rcJob;b.innerHTML=expGenAllBtnInner();}
+}
+function generateFullReportContent(){
+  var s=_rptSupplier(),r=_rptRound();
+  if(!s||!r){toast('Select a supplier and assessment first');return;}
+  runRptJob(rptJobTasks(s,r),'one');
+}
+// Uses each supplier's reporting assessment — the same one the Export page
+// preselects and the report prints.
+function generateAllSuppliersReport(){
+  if(_rcJob){toast('Report content is already being generated');return;}
+  var list=suppliers.map(function(s){return {s:s,r:reportingAudit(s)};}).filter(function(x){return x.r;});
+  if(!list.length){toast('No supplier has an assessment yet');return;}
+  var tasks=[];
+  list.forEach(function(x){tasks=tasks.concat(rptJobTasks(x.s,x.r));});
+  uiConfirm({
+    title:'Generate report content for all suppliers?',
+    message:'Builds summary, task labels and findings for '+list.length+' supplier'+(list.length===1?'':'s')
+      +' from their reporting assessment ('+tasks.length+' AI calls). Existing report content of those '
+      +'assessments, including manual edits, is replaced.',
+    confirmText:'Generate',danger:false,icon:'ti-sparkles'
+  }).then(function(ok){if(ok)runRptJob(tasks,'all');});
+}
+function generateTaskLabels(ctx){
+  var s=ctx?ctx.s:_rptSupplier();
+  var done=function(err){if(ctx&&ctx.onDone)ctx.onDone(err);};
+  if(!s){done();return;}
   ensureActionRefs();
   var list=(typeof actions!=='undefined'?actions:[]).filter(function(x){return x.supplier===s.name;});
-  if(!list.length){toast('No actions to label for this supplier');return;}
-  var btn=document.getElementById('rcGenTasks');
+  if(!list.length){if(!ctx)toast('No actions to label for this supplier');done();return;}
+  var btn=ctx?null:document.getElementById('rcGenTasks');
   callClaude(
     'Shorten these action titles into report labels.\n\n'
       +list.map(function(a){return a.ref+': '+(a.title||a.desc||'');}).join('\n')
@@ -8827,11 +9254,16 @@ function generateTaskLabels(){
           a.shortTitle=_rptClamp(obj[a.ref],RPT_TASK.maxChars);n++;
         });
         _rptRerender();
-        toast(n+' task label'+(n===1?'':'s')+' generated — review and adjust');
-      }catch(e){ toast('Could not parse AI response','var(--crit)'); }
+        if(!ctx)toast(n+' task label'+(n===1?'':'s')+' generated — review and adjust');
+        done();
+      }catch(e){
+        if(!ctx)toast('Could not parse AI response','var(--crit)');
+        done('could not parse the task labels');
+      }
     },
     function(loading){if(btn){btn.disabled=loading;
-      btn.innerHTML=loading?'<i class="ti ti-loader" style="animation:spin 1s linear infinite;font-size:12px"></i>':'<i class="ti ti-refresh" style="font-size:12px"></i>';}}
+      btn.innerHTML=loading?'<i class="ti ti-loader" style="animation:spin 1s linear infinite;font-size:12px"></i>':'<i class="ti ti-refresh" style="font-size:12px"></i>';}},
+    ctx?{onError:function(m){done(m);}}:undefined
   );
 }
 function setRptProse(k,v){
@@ -8859,16 +9291,15 @@ function removeRptItem(k,i){
   var r=_rptRound();if(!r)return;
   ensureReportContent(r)[k].splice(i,1);_rptRerender();
 }
-// `which` = null for every block, or one key to refresh just that one without
-// touching the others.
-function generateReportContent(which){
-  var s=_rptSupplier(),r=_rptRound();
-  if(!s||!r)return;
+// `which` = null for every summary block, or one key to refresh just that one
+// without touching the others. Task labels and findings are separate calls
+// (different shapes); generateFullReportContent() queues all of them together.
+// `ctx` ({s,r,onDone}) is set by that queue and keeps this call quiet.
+function generateReportContent(which,ctx){
+  var s=ctx?ctx.s:_rptSupplier(),r=ctx?ctx.r:_rptRound();
+  var done=function(err){if(ctx&&ctx.onDone)ctx.onDone(err);};
+  if(!s||!r){done();return;}
   var keys=which?[which]:Object.keys(RPT_CONTENT);
-  // "Generate report content" means everything the report needs, task labels
-  // included. They are a separate call because they have a different shape
-  // (keyed by action reference), not a different action for the user.
-  if(!which)generateTaskLabels();
   var score=calcScore(s,null);
   var findings=Object.keys(r.categories||{}).map(function(cat){
     var cs=calcScore(s,cat);
@@ -8891,9 +9322,7 @@ function generateReportContent(which){
       ? '"'+k+'": array of at most '+sp.maxItems+' strings, EACH at most '+sp.maxChars+' characters — '+sp.hint
       : '"'+k+'": one string of at most '+sp.maxChars+' characters — '+sp.hint;
   }).join(',\n  ');
-  var btnId=which?null:'rcGenAll';
-  var btn=btnId?document.getElementById(btnId):null;
-  toast('Generating report content…','var(--primary)');
+  if(!ctx)toast('Generating report content…','var(--primary)');
   callClaude(
     'Supplier: '+s.name+'\nOverall score: '+(score!=null?score+'%':'n/a')
       +'\n\nFindings by category:\n'+findings
@@ -8921,11 +9350,15 @@ function generateReportContent(which){
           }
         });
         _rptRerender();
-        toast('Report content generated — review and adjust');
-      }catch(e){ toast('Could not parse AI response','var(--crit)'); }
+        if(!ctx)toast('Report content generated — review and adjust');
+        done();
+      }catch(e){
+        if(!ctx)toast('Could not parse AI response','var(--crit)');
+        done('could not parse the summary');
+      }
     },
-    function(loading){if(btn){btn.disabled=loading;
-      btn.innerHTML=loading?'<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Generating…':'<i class="ti ti-sparkles"></i> Generate report content';}}
+    null,
+    ctx?{onError:function(m){done(m);}}:undefined
   );
 }
 // Assessment Details is now purely the supplier-level facts: assessor, supplier
@@ -9100,80 +9533,36 @@ function renderRiskModelEditor(){
   var factorRow=function(x,i){
     return '<div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">'
       +'<input value="'+esc(x.name||'')+'" oninput="riskModel.factors['+i+'].name=this.value" placeholder="Factor" style="flex:1;'+ist+'">'
-      +'<select onchange="rmSetAxis('+i+',this.value)" title="Which axis this factor feeds" style="'+ist+'">'
-        +'<option value="crit"'+(x.axis==='crit'?' selected':'')+'>X · '+esc(axisLabel('x'))+'</option>'
-        +'<option value="risk"'+(x.axis!=='crit'?' selected':'')+'>Y · '+esc(axisLabel('y'))+'</option>'
-      +'</select>'
       +'<input type="number" step="0.1" min="0" value="'+(x.weight!=null?x.weight:1)+'" oninput="riskModel.factors['+i+'].weight=parseFloat(this.value)||0" title="Weight" style="width:58px;'+ist+';text-align:center">'
       +'<button onclick="riskModel.factors.splice('+i+',1);renderRiskModelEditor()" title="Remove" style="background:none;border:none;cursor:pointer;color:var(--crit);width:24px;font-size:15px">×</button>'
     +'</div>';
   };
-  // Grouped by axis so the two roles are visible at a glance.
-  var critRows=riskModel.factors.map(function(x,i){return x.axis==='crit'?factorRow(x,i):'';}).join('');
-  var riskRows=riskModel.factors.map(function(x,i){return x.axis!=='crit'?factorRow(x,i):'';}).join('');
-  var sugg=RISK_FACTOR_SUGGESTIONS.filter(function(x){return !riskModel.factors.some(function(y){return y.id===x.id;});});
-  var suggChips=function(axis){
-    var list=sugg.filter(function(x){return x.axis===axis;});
-    return list.length?'<div style="display:flex;gap:5px;flex-wrap:wrap;margin:6px 0 2px">'
-      +list.map(function(x){return '<button onclick="rmAddSuggested(\''+x.id+'\')" style="font-size:11px;padding:3px 9px;border:1px dashed var(--border2);border-radius:20px;background:none;color:var(--text2);cursor:pointer">+ '+esc(x.name)+'</button>';}).join('')
-      +'</div>':'';
-  };
-  var pct=Math.round((riskModel.factorWeight!=null?riskModel.factorWeight:0.3)*100);
+  var critRows=riskModel.factors.map(function(x,i){return factorRow(x,i);}).join('');
   var kpct=Math.round((riskModel.kpiWeight!=null?riskModel.kpiWeight:0.2)*100);
-  // Spell out the real split, including the cap that applies when both optional
-  // signals together would otherwise outweigh the assessment entirely.
-  var blendNote=(function(){
-    var w=[];
-    if(riskModel.useFactors)w.push({n:'risk factors',v:pct});
-    if(riskModel.useKpis)w.push({n:'KPI performance',v:kpct});
-    var raw=w.reduce(function(a,c){return a+c.v;},0);
-    if(!raw)return 'Result = 100% assessment score.';
-    var sc=raw>100?100/raw:1;
-    var parts=w.map(function(c){return Math.round(c.v*sc)+'% '+c.n;});
-    var used=w.reduce(function(a,c){return a+Math.round(c.v*sc);},0);
-    return 'Result = '+Math.max(0,100-used)+'% assessment score + '+parts.join(' + ')+'.';
-  })();
+  var hdr=function(t,m){return '<div style="font-size:11px;font-weight:700;color:var(--text2);margin:'+(m||'16px')+' 0 6px">'+t+'</div>';};
+  var note=function(t){return '<p style="font-size:11px;color:var(--text3);margin:0 0 4px">'+t+'</p>';};
+  var slider=function(label,val,setter){
+    return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">'
+      +'<span style="font-size:12px;color:var(--text2);white-space:nowrap">'+label+'</span>'
+      +'<input type="range" min="0" max="100" step="5" value="'+val+'" oninput="'+setter+'=(parseInt(this.value)||0)/100;renderRiskModelEditor()" style="flex:1">'
+      +'<span style="font-size:12px;font-weight:700;width:48px;text-align:right;font-variant-numeric:tabular-nums">'+val+'%</span>'
+    +'</div>';
+  };
+  var check=function(on,prop,label){
+    return '<label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;margin-bottom:8px"><input type="checkbox" '+(on?'checked':'')+' onchange="riskModel.'+prop+'=this.checked;renderRiskModelEditor()"> '+label+'</label>';
+  };
   el.innerHTML=
-     '<p style="font-size:11.5px;color:var(--text3);margin:0 0 10px;line-height:1.5">The matrix has two independent axes. The <b>X axis</b> is aggregated from the criticality factors below — business impact, not quality. The <b>Y axis</b> comes from the <b>Assessment score</b> (tiers in <i>Settings → Score Thresholds</i>), optionally enriched by the risk factors. Every factor is rated 1 = low … 3 = high per supplier and weighted.</p>'
-    +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px">'
-      +'<div style="flex:1;min-width:180px"><label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">X axis title (criticality)</label>'
-        +'<input value="'+esc(axisLabel('x'))+'" oninput="riskModel.axisLabels.x=this.value" placeholder="Business criticality" style="width:100%;'+ist+'"></div>'
-      +'<div style="flex:1;min-width:180px"><label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">Y axis title (risk)</label>'
-        +'<input value="'+esc(axisLabel('y'))+'" oninput="riskModel.axisLabels.y=this.value" placeholder="Performance risk (assessment)" style="width:100%;'+ist+'"></div>'
-    +'</div>'
-    +'<div style="font-size:11px;font-weight:700;color:var(--text2);margin:0 0 6px"><i class="ti ti-arrow-right"></i> X-AXIS FACTORS <span style="font-weight:400;color:var(--text3)">('+esc(axisLabel('x'))+')</span></div>'
-    +(critRows.trim()?critRows:'<p style="font-size:11.5px;color:var(--text3);margin:0 0 6px">No criticality factors — the matrix has no X axis until at least one is added and rated.</p>')
-    +suggChips('crit')
-    +rmAddBtn('crit','Add criticality factor')
-    +'<div style="font-size:11px;font-weight:700;color:var(--text2);margin:16px 0 6px"><i class="ti ti-arrow-up"></i> Y-AXIS FACTORS <span style="font-weight:400;color:var(--text3)">('+esc(axisLabel('y'))+' — optional, blend into the class)</span></div>'
-    +(riskRows.trim()?riskRows:'<p style="font-size:11.5px;color:var(--text3);margin:0 0 6px">No risk factors.</p>')
-    +suggChips('risk')
-    +rmAddBtn('risk','Add risk factor')
-    +'<div style="font-size:11px;font-weight:700;color:var(--text2);margin:16px 0 6px">BLEND INTO THE CLASS</div>'
-    +'<label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;margin-bottom:8px"><input type="checkbox" '+(riskModel.useFactors?'checked':'')+' onchange="riskModel.useFactors=this.checked;renderRiskModelEditor()"> Blend risk factors into the risk class</label>'
-    +(riskModel.useFactors
-      ?'<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">'
-         +'<span style="font-size:12px;color:var(--text2);white-space:nowrap">Factor weight</span>'
-         +'<input type="range" min="0" max="100" step="5" value="'+pct+'" oninput="riskModel.factorWeight=(parseInt(this.value)||0)/100;renderRiskModelEditor()" style="flex:1">'
-         +'<span style="font-size:12px;font-weight:700;width:48px;text-align:right;font-variant-numeric:tabular-nums">'+pct+'%</span>'
-       +'</div>'
-       +'<p style="font-size:11px;color:var(--text3);margin:0">Criticality is never blended in — it is the independent X axis. Suppliers with no rated factors keep their plain score.</p>'
-      :'<p style="font-size:11px;color:var(--text3);margin:0">Off — the class comes purely from the assessment score. Risk factors stay as a note on the supplier. Criticality is unaffected either way: it is always the matrix\'s X axis.</p>')
-    // ── Optional KPI blending ────────────────────────────────────────────
-    // KPIs are an optional layer of the tool, so this is opt-in and off by
-    // default: a project that never enters a KPI is never affected by one.
-    +'<div style="font-size:11px;font-weight:700;color:var(--text2);margin:18px 0 6px">KPI PERFORMANCE</div>'
-    +'<label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;margin-bottom:8px"><input type="checkbox" '+(riskModel.useKpis?'checked':'')+' onchange="riskModel.useKpis=this.checked;renderRiskModelEditor()"> Blend KPI performance into the risk class</label>'
-    +(riskModel.useKpis
-      ?'<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">'
-         +'<span style="font-size:12px;color:var(--text2);white-space:nowrap">KPI weight</span>'
-         +'<input type="range" min="0" max="100" step="5" value="'+kpct+'" oninput="riskModel.kpiWeight=(parseInt(this.value)||0)/100;renderRiskModelEditor()" style="flex:1">'
-         +'<span style="font-size:12px;font-weight:700;width:48px;text-align:right;font-variant-numeric:tabular-nums">'+kpct+'%</span>'
-       +'</div>'
-       +'<p style="font-size:11px;color:var(--text3);margin:0">'+blendNote+' Each KPI counts how far its latest reading meets its target. Suppliers with no KPI readings keep their plain score.</p>'
-      :'<p style="font-size:11px;color:var(--text3);margin:0">Off — KPIs are shown but never move the risk class.</p>');
+    // Y axis = performance: the assessment score, optionally enriched by KPIs.
+     hdr('<i class="ti ti-arrow-up"></i> Y AXIS · '+esc(axisLabel('y')),'0')
+    +note('Assessment score (fixed).')
+    +check(riskModel.useKpis,'useKpis','Enrich with KPI performance')
+    +(riskModel.useKpis?slider('KPI weight',kpct,'riskModel.kpiWeight')+note('Y = '+(100-kpct)+'% assessment + '+kpct+'% KPIs.'):'')
+    // X axis = criticality: configurable factors only.
+    +hdr('<i class="ti ti-arrow-right"></i> X AXIS')
+    +'<input value="'+esc(axisLabel('x'))+'" oninput="riskModel.axisLabels.x=this.value" placeholder="Business criticality" title="Axis title" style="width:100%;margin-bottom:8px;'+ist+'">'
+    +(critRows||note('No factors yet.'))
+    +rmAddBtn('crit','Add factor');
 }
-function rmSetAxis(i,v){ if(riskModel.factors[i]){riskModel.factors[i].axis=(v==='crit'?'crit':'risk');renderRiskModelEditor();} }
 // A per-group add button, so a custom factor lands on the RIGHT axis directly
 // instead of always arriving as a risk factor to be reassigned afterwards.
 function rmAddBtn(axis,label){
@@ -9181,12 +9570,6 @@ function rmAddBtn(axis,label){
 }
 function rmAddFactor(axis){
   riskModel.factors.push({id:'rf_'+Date.now(),name:'',weight:1,axis:(axis==='crit'?'crit':'risk')});
-  renderRiskModelEditor();
-}
-function rmAddSuggested(id){
-  var x=RISK_FACTOR_SUGGESTIONS.find(function(y){return y.id===id;});
-  if(!x||riskModel.factors.some(function(y){return y.id===id;}))return;
-  riskModel.factors.push({id:x.id,name:x.name,weight:1,axis:x.axis||'risk'});
   renderRiskModelEditor();
 }
 function resetRiskModel(){ riskModel=JSON.parse(JSON.stringify(DEFAULT_RISK_MODEL)); renderRiskModelEditor(); }
@@ -9204,10 +9587,8 @@ function axisLabel(which){
   if(which==='x')return l.x||DEFAULT_RISK_MODEL.axisLabels.x;
   return l.y||DEFAULT_RISK_MODEL.axisLabels.y;
 }
-// The two factor sets. Criticality (X axis) and risk-blend (Y axis) are fed by
-// disjoint groups, assigned per factor in Configure.
+// Factors feed the X axis (criticality) only.
 function critFactors(){ return riskModel.factors.filter(function(f){return f.axis==='crit';}); }
-function riskBlendFactors(){ return riskModel.factors.filter(function(f){return f.axis!=='crit';}); }
 // Criticality as a weighted aggregate of ITS factors' 1–3 ratings — not a single
 // field. Returns the raw weighted mean on the 1..3 scale, or null if none rated.
 function critValue(s){
@@ -9227,34 +9608,6 @@ function critBucket(s){
   var v=critValue(s);
   if(v==null)return null;
   return v<5/3?1:(v<7/3?2:3);
-}
-// Risk % for a supplier (factors rated 1..3; 1→0%, 2→50%, 3→100%, weighted),
-// blended with the Assessment score as one more (automatic) signal when one
-// exists — a bad audit result should move the risk position even if nobody
-// has manually rated any risk factor yet. Assessment-only or factors-only
-// both work; the model just uses whichever signals are actually present, so a
-// project with no audits at all still gets a risk % from factors alone.
-// Portfolio classification comes from the ASSESSMENT SCORE, graded with the very
-// same four tiers the rest of the app already uses (TIERS: 85/70/55/0). Before
-// this, the matrix ran on a second, competing 3-class model derived from the
-// manual risk factors — two answers to "how bad is this supplier?" that could
-// disagree. In an assessment-driven tool the score is the defensible source, so
-// that's the one that classifies. Criticality/spend stays the manual X axis: it
-// genuinely cannot be derived from an assessment.
-// Manual factors expressed on the SAME 0–100 scale as a score, so the two can be
-// blended without unit gymnastics: rated 1 (low risk) → 100, 2 → 50, 3 → 0.
-// Criticality is excluded — it is the matrix's independent X axis, and folding it
-// in would drag high-spend suppliers toward "High Risk" for no quality reason.
-function factorScore(s){
-  if(!s||!s.risk||!s.risk.factors)return null;
-  var tot=0,w=0;
-  riskBlendFactors().forEach(function(f){
-    var r=s.risk.factors[f.id];
-    if(r==null||isNaN(Number(r)))return;
-    var wt=f.weight!=null?f.weight:1;
-    tot+=((3-Number(r))/2)*100*wt; w+=wt;
-  });
-  return w?tot/w:null;
 }
 // How well one KPI reading meets its target, as 0–100 on the same scale as an
 // assessment score. Where a target is 0 a ratio is meaningless, so the status
@@ -9278,17 +9631,12 @@ function kpiScore(s){
   });
   return n?tot/n:null;
 }
-// What the tier is actually read off. The assessment score is the base; the
-// optional signals (manual risk factors, KPI performance) only shift it when the
-// project explicitly enabled them, each at its own weight. Their combined weight
-// is capped at 1 so the blend can never invert into "everything but the score".
+// What the tier (Y axis) is read off. Y is performance: the assessment score,
+// optionally enriched by KPI performance at its own weight. Manual factors never
+// touch Y — they only build the X axis (criticality).
 function riskAdjustedScore(s){
   var base=calcScore(s,null);
   var comps=[];
-  if(riskModel.useFactors){
-    var fs=factorScore(s);
-    if(fs!=null)comps.push({v:fs,w:Math.max(0,Math.min(1,riskModel.factorWeight!=null?riskModel.factorWeight:0.3))});
-  }
   if(riskModel.useKpis){
     var ks=kpiScore(s);
     if(ks!=null)comps.push({v:ks,w:Math.max(0,Math.min(1,riskModel.kpiWeight!=null?riskModel.kpiWeight:0.2))});
@@ -10081,16 +10429,14 @@ function renderMonitoring(){
   var RISK_LVL=[{v:1,cls:'rlow',t:'Low'},{v:2,cls:'rmed',t:'Medium'},{v:3,cls:'rhigh',t:'High'}];
   // Criticality factors first (they build the X axis), then risk factors — so the
   // two groups the matrix reads read as two groups here too.
-  var orderedFactors=critFactors().concat(riskBlendFactors());
+  var orderedFactors=critFactors();
   var rf='<table class="au-ltable"><thead><tr><th>Factor</th><th style="width:168px">Rating</th></tr></thead><tbody>'
   +orderedFactors.map(function(f){
     var cur=(sel.risk&&sel.risk.factors)?sel.risk.factors[f.id]:null;
-    var isCrit=f.axis==='crit';
     // Same segmented control the assessment uses for scoring — one interaction
     // pattern for "rate this on a small scale" across both modules.
     return '<tr><td class="cp"><div class="t">'+esc(f.name)+'</div>'
-      +(isCrit?'<div class="sub">Criticality — matrix X axis (business impact)</div>'
-              :'<div class="sub">Risk factor — blends into the class'+(riskModel.useFactors?'':' when enabled')+'</div>')+'</td>'
+      +'<div class="sub">X axis</div></td>'
       +'<td><div class="au-seg">'
         +RISK_LVL.map(function(l){
           return '<button class="'+(cur==l.v?l.cls:'')+'" title="'+l.t+'" onclick="setRiskFactor(\''+f.id+'\','+l.v+')">'+l.v+'</button>';
@@ -10103,10 +10449,9 @@ function renderMonitoring(){
     // rated by hand. Makes the model's third ingredient visible where the
     // other two already live, instead of it working invisibly in the background.
     +'<tr><td class="cp"><div class="t" style="color:var(--text2)">Assessment score</div>'
-      +'<div class="sub">Determines the risk class'+(riskModel.useFactors?' at '+Math.round((1-(riskModel.factorWeight!=null?riskModel.factorWeight:0.3))*100)+'%':' — factors are not blended in')+'</div></td>'
+      +'<div class="sub">Y axis'+(riskModel.useKpis?' · + KPIs':'')+'</div></td>'
       +'<td style="text-align:center;font-weight:700;color:'+sc(selScore)+'">'+(selScore!=null?selScore+'%':'<span style="color:var(--text3);font-weight:400;font-size:12px">no assessment yet</span>')+'</td></tr>'
-    +'</tbody></table>'
-    +(riskModel.useFactors?'':'<p style="font-size:11px;color:var(--text3);padding:8px 18px 12px;margin:0;line-height:1.5">Risk factors are a plain note here — they do not affect the risk class unless you blend them in under <b>Configure risk model</b>. <b>Criticality</b> is unaffected either way: it is always the matrix\'s X axis, aggregated from the criticality factors.</p>');
+    +'</tbody></table>';
   // Driven purely by the objective risk class now, not a manual stage: the
   // worst tier offers a follow-up assessment as the obvious next step.
   var escalateBtn=(selCls.class===topClass)
@@ -10125,12 +10470,8 @@ function renderMonitoring(){
         +'<span style="font-size:12px;color:var(--text2)">Assessment: <b style="color:'+sc(selScore)+'">'+(selScore!=null?selScore+'%':'—')+'</b>'+deltaHtml+'</span>'
         +'<span class="mon-pill" style="font-size:11px;padding:3px 10px;background:color-mix(in srgb,'+selCls.color+' 15%,transparent);color:'+selCls.color+'" title="'+esc(selCls.risk||'')+'">'+esc(selCls.class)+'</span>'
         +escalateBtn
-        // Only offered when the factors actually feed the risk class. With
-        // useFactors off (the default) this would rate fields that change
-        // nothing — an AI action whose result has no effect is worse than none.
-        +(riskModel.useFactors?'<button class="btn sm" onclick="aiSuggestRisk()" style="margin-left:auto"><i class="ti ti-sparkles"></i> Suggest risk factors (AI)</button>':'')
       +'</div>'
-      +'<div class="au-lcat" style="font-size:13px;padding:13px 18px 6px">Risk Factors <span style="font-family:inherit;font-size:11px;color:var(--text3)">1 = low … 3 = high</span></div>'
+      +'<div class="au-lcat" style="font-size:13px;padding:13px 18px 6px">Risk Matrix Inputs <span style="font-family:inherit;font-size:11px;color:var(--text3)">1 = low … 3 = high</span></div>'
       +rf
     +'</div>';
 }
@@ -10507,28 +10848,6 @@ function kpiAllSuppliersHtml(view){
       +'<span style="font-size:11.5px;color:var(--text3);font-weight:400">'+(tot?off+' of '+tot+' readings off target':'no readings yet')+'</span></div>'
     +'<div style="overflow-x:auto"><table class="au-ltable"><thead>'+head+'</thead><tbody>'+rows+'</tbody></table></div>'
   +'</div>';
-}
-
-function aiSuggestRisk(){
-  var s=suppliers.find(function(x){return x.name===_monSel;}); if(!s)return;
-  var key=getApiKey(); if(!key)return;
-  var score=calcScore(s,null);
-  var catLines=Object.entries(s.categories).map(function(e){var cs=calcScore(s,e[0]);return e[0]+': '+(cs!=null?cs+'%':'n/a');}).join('\n');
-  var kpiLines=kpiCatalog.map(function(k){var v=kpiCurrentVal(s,k.id);return k.name+': '+(v!=null?v+(k.unit||''):'n/a')+' (target '+(k.target!=null?k.target:'-')+')';}).join('\n');
-  var factorList=riskModel.factors.map(function(f){return '"'+f.id+'" ('+f.name+')';}).join(', ');
-  toast('AI assessing risk…');
-  callClaude(
-    'Supplier: '+s.name+'\nOverall assessment score: '+(score!=null?score+'%':'n/a')+'\nCategory scores:\n'+catLines+'\n\nKPIs:\n'+kpiLines+'\n\nRate each risk factor from 1 (low risk) to 3 (high risk). Factor ids: '+factorList+'.\nReturn ONLY a JSON object mapping factor id to an integer 1-3, e.g. {"perf":2,"fin":1}.',
-    'You are a supplier risk analyst. Return only valid JSON, no explanation, no markdown.',
-    function(text){
-      try{ var m=text.match(/\{[\s\S]*\}/); var obj=JSON.parse(m[0]);
-        if(!s.risk)s.risk={factors:{}}; if(!s.risk.factors)s.risk.factors={};
-        riskModel.factors.forEach(function(f){ if(obj[f.id]!=null){var n=Math.round(Number(obj[f.id])); if(n>=1&&n<=3)s.risk.factors[f.id]=n;} });
-        s.risk.lastUpdated=new Date().toISOString();
-        renderMonitoring(); toast('AI risk suggestion applied — review & adjust');
-      }catch(e){ toast('Could not parse AI response','var(--crit)'); }
-    }
-  );
 }
 
 // ── Module 3: Steering ────────────────────────────────────────────────────
@@ -10980,11 +11299,19 @@ function callClaude(userMsg,systemMsg,onResult,onLoading,opts){
   .then(function(r){return r.json();})
   .then(function(data){
     if(onLoading)onLoading(false);
-    if(data.error){uiAlert('AI Error: '+data.error.message);return;}
+    if(data.error){
+      if(opts&&opts.onError)opts.onError('AI Error: '+data.error.message);
+      else uiAlert('AI Error: '+data.error.message);
+      return;
+    }
     var text=data.content&&data.content[0]?data.content[0].text:'';
     onResult(text,{truncated:data.stop_reason==='max_tokens',stopReason:data.stop_reason});
   })
-  .catch(function(err){if(onLoading)onLoading(false);uiAlert('AI request failed: '+err.message);});
+  // A batch passes onError so one failed request is counted and reported at the
+  // end instead of stalling the queue behind a modal per failure.
+  .catch(function(err){if(onLoading)onLoading(false);
+    if(opts&&opts.onError)opts.onError('AI request failed: '+err.message);
+    else uiAlert('AI request failed: '+err.message);});
 }
 // Recovers what survived a truncated JSON array: walks the string and keeps
 // every object that actually closed. A cut-off response then costs the last
@@ -11869,7 +12196,7 @@ function expSelectRound(id){
 function renderExpReportContent(){
   var el=document.getElementById('expReportContent');if(!el)return;
   var r=expRound();
-  if(!r){el.innerHTML='<p style="font-size:12px;color:var(--text3)">Select a supplier and assessment to edit report content.</p>';return;}
+  if(!r){el.innerHTML='<p style="font-size:12px;color:var(--text3)">Select a supplier and assessment to edit report content — or generate it for all suppliers at once.</p>';return;}
   el.innerHTML=rptContentEditorHtml(r);
 }
 // The report content editor is long; collapsing it lets the export options below
@@ -11906,6 +12233,18 @@ function renderReportScope(){
     if(cur)sel.value=cur;
   }
   setReportScope(_reportScope);
+}
+// PowerPoint slide style. Stored on reportBuilder, so it is saved with the
+// project like the accent choice. Only the .pptx report reads it — Excel and
+// Word keep the Corporate Design accent on white.
+function setReportSlideStyle(style){
+  reportBuilder.slideStyle=(style==='dark')?'dark':'light';
+  renderReportSlideStyle();
+}
+function renderReportSlideStyle(){
+  var st=reportBuilder.slideStyle==='dark'?'dark':'light';
+  var rb=document.querySelector('input[name="reportSlideStyle"][value="'+st+'"]');
+  if(rb)rb.checked=true;
 }
 function setReportScope(mode){
   _reportScope=(mode==='single')?'single':'all';
@@ -12398,10 +12737,10 @@ async function exportExcel(){
     const PCOL={'High':'C0392B','Medium':'E07B00','Low':'1A8A5A'};
     const ws=wb.addWorksheet('Action List',{tabColor:{argb:'FFE07B00'}});
     ws.views=[{state:'frozen',ySplit:4}];
-    titleBlock(ws,'Action List — '+project,'Stand '+today+'   |   '+actions.length+' actions',9);
+    titleBlock(ws,'Action List — '+project,'Stand '+today+'   |   '+actions.length+' actions',10);
     ws.getRow(3).height=8;
 
-    ['#','Title','Supplier','Category','Responsible','Start','Due Date','Priority','Status'].forEach(function(h,i){
+    ['#','Title','Supplier','Category','Responsible','Start','Due Date','Priority','Status','Completion proof'].forEach(function(h,i){
       hdrCell(ws.getRow(4).getCell(i+1),h,HDR,{align:{vertical:'middle',horizontal:i<4?'left':'center',indent:i<4?1:0}});
     });
     ws.getRow(4).height=26;
@@ -12409,9 +12748,13 @@ async function exportExcel(){
     actions.forEach(function(a,i){
       const row=ws.getRow(5+i);const bg=i%2===0?'FFFFFF':LGRAY;
       const sc4=SCOL[a.status]||'888888';const pc=PCOL[a.priority]||'888888';
-      [i+1,a.title,a.supplier,a.category,a.responsible,a.startDate||'—',a.dueDate||'—',a.priority,a.status].forEach(function(v,ci){
+      const cp=a.status==='Done'?actCompletion(a):null;
+      const cpTxt=cp?new Date(cp.ts).toLocaleDateString('de-DE')+(cp.author?' · '+cp.author:'')+' — '+cp.text+(cp.files&&cp.files.length?' ['+cp.files.length+' file'+(cp.files.length===1?'':'s')+']':''):'';
+      [i+1,a.title,a.supplier,a.category,a.responsible,a.startDate||'—',a.dueDate||'—',a.priority,a.status,cpTxt].forEach(function(v,ci){
         const cell=row.getCell(ci+1);
-        if(ci===8){// Status — colored bg
+        if(ci===9){// Completion proof — free text, wrapped
+          dataCell(cell,v,bg,{font:{size:9},align:{vertical:'middle',horizontal:'left',indent:1,wrapText:true}});
+        } else if(ci===8){// Status — colored bg
           cell.value=v;cell.font={bold:true,size:9,color:{argb:'FFFFFFFF'}};
           cell.fill=fill(sc4);cell.border=bd();cell.alignment={vertical:'middle',horizontal:'center'};
         } else if(ci===7){// Priority — colored text
@@ -12435,9 +12778,9 @@ async function exportExcel(){
     sf.fill=fill('F0F0F0');sf.border=bd();sf.alignment={vertical:'middle',indent:1};
     ws.getRow(fr+1).height=20;
 
-    ws.autoFilter={from:{row:4,column:1},to:{row:4+actions.length,column:9}};
+    ws.autoFilter={from:{row:4,column:1},to:{row:4+actions.length,column:10}};
     ws.getColumn(1).width=5;ws.getColumn(2).width=36;ws.getColumn(3).width=24;ws.getColumn(4).width=20;
-    ws.getColumn(5).width=22;ws.getColumn(6).width=12;ws.getColumn(7).width=12;ws.getColumn(8).width=12;ws.getColumn(9).width=14;
+    ws.getColumn(5).width=22;ws.getColumn(6).width=12;ws.getColumn(7).width=12;ws.getColumn(8).width=12;ws.getColumn(9).width=14;ws.getColumn(10).width=60;
   }
 
   // ── SHEET: RAW DATA ───────────────────────────────────────────────────────
@@ -13108,10 +13451,48 @@ var RB_VARIANTS={
   neutral:{label:'Neutral',accent:'464646'},
   custom :{label:'Custom', accent:'888888'}
 };
-var RB_C={textDark:'464646',textMid:'333333',line:'DDDDDD',foot:'AAAAAA',white:'FFFFFF'};
+// Slide palettes. Every colour a report module draws is read from RB_C, so the
+// light/dark switch is ONE swap at export time (rptUsePalette) instead of a
+// branch in every renderer. Keys are roles, not colours:
+//   bg       the slide itself (also the ring around pins, tier-bar ticks)
+//   surface  a card or chip sitting ON the slide (checkpoints, matrix chips)
+//   strong   headline text and big figures
+//   textDark body text · textMid secondary text · foot muted labels/footer
+//   line     hairlines · grid  chart gridlines · track  empty score cells
+//   onAccent text or rings drawn ON an accent fill — white on the light deck's
+//            blue, navy on the dark deck's lime (white on lime is unreadable)
+//   slip     the overdue stretch in the Gantt — a neutral, never the accent
+//   tint     scales accent washes on large areas (risk matrix). Lime washed
+//            over navy turns olive fast, so the dark deck uses about half.
+//   rampTo   the RGB the portfolio radar fades its series toward
+//   titleAccent  light: title in accent (P3 master). dark: title in `strong`
+//            and the kicker carries the accent — a whole lime headline on
+//            every slide is too loud.
+// The dark set is the tool's own dark mode (login navy canvas, --text ramp,
+// --border) with the lime primary as the single accent, so a deck exported
+// from the dark app looks like the app.
+var RB_PALETTES={
+  light:{bg:'FFFFFF',surface:'FFFFFF',strong:'16202C',textDark:'464646',textMid:'333333',
+         foot:'AAAAAA',line:'DDDDDD',grid:'E2E6EC',track:'E6E9EE',onAccent:'FFFFFF',
+         slip:'464646',tint:1,rampTo:[200,200,200],titleAccent:true,mapLand:null},
+  // Contrast on bg 0A0E2A: strong 17:1, textDark 14:1, textMid 8:1, foot 5:1,
+  // accent A2F233 14:1 — every text role clears WCAG AA even at 6pt.
+  dark :{bg:'0A0E2A',surface:'141B40',strong:'EEF1FF',textDark:'D5DBF5',textMid:'9AA4D4',
+         foot:'7D89C2',line:'2E3A70',grid:'2A3568',track:'2A3568',onAccent:'0A0E2A',
+         slip:'9AA4D4',tint:0.55,rampTo:[90,100,150],titleAccent:false,mapLand:'222D5E',accent:'A2F233'}
+};
+var RB_C={};
+function rptUsePalette(style){
+  var p=RB_PALETTES[style]||RB_PALETTES.light;
+  Object.keys(RB_C).forEach(function(k){delete RB_C[k];});
+  Object.keys(p).forEach(function(k){RB_C[k]=p[k];});
+  RB_C.style=RB_PALETTES[style]?style:'light';
+}
+rptUsePalette('light');
 
-// reportBuilder now only carries the accent-colour choice for the standard report export.
-var reportBuilder={variant:'blue'};
+// reportBuilder carries the accent-colour choice and the PowerPoint slide style
+// ('light' | 'dark') for the standard report export.
+var reportBuilder={variant:'blue',slideStyle:'light'};
 
 // ══════════════════════════════════════════════════════════════════════════
 // REPORT MODULES
@@ -13127,10 +13508,11 @@ function _px(c){return String(c||'').replace('#','');}
 
 // Chrome shared by every content slide: kicker, title, hairline, footer.
 function rptChrome(slide,ctx,kicker,title){
+  slide.background={color:RB_C.bg};
   if(kicker)slide.addText(kicker,{x:RB_POS.kicker.x,y:RB_POS.kicker.y,w:RB_POS.kicker.w,h:RB_POS.kicker.h,
-    fontSize:8,color:RB_C.textMid,fontFace:'Montserrat',valign:'middle'});
+    fontSize:8,color:RB_C.titleAccent?RB_C.textMid:ctx.accent,fontFace:'Montserrat',valign:'middle'});
   if(title)slide.addText(title,{x:RB_POS.title.x,y:RB_POS.title.y,w:RB_POS.title.w,h:RB_POS.title.h,
-    fontSize:14,bold:true,color:ctx.accent,fontFace:'Montserrat',valign:'middle'});
+    fontSize:14,bold:true,color:RB_C.titleAccent?ctx.accent:RB_C.strong,fontFace:'Montserrat',valign:'middle'});
   // No rule under the title: the P3 master has none, and content starts at
   // RB_POS.content.y — anything drawn above that sits outside the master grid.
   slide.addText(ctx.today,{x:RB_POS.footL.x,y:RB_POS.footL.y,w:RB_POS.footL.w,h:RB_POS.footL.h,
@@ -13156,7 +13538,7 @@ function rptTierBar(slide,x,y,w,h,pct,accent){
     slide.addShape('rect',{x:x,y:y,w:w*(v/100),h:h,fill:{color:accent},line:{type:'none'}});
   }
   bands.slice(1).forEach(function(b){
-    slide.addShape('line',{x:x+w*(b.lo/100),y:y,w:0,h:h,line:{color:'FFFFFF',width:0.75}});
+    slide.addShape('line',{x:x+w*(b.lo/100),y:y,w:0,h:h,line:{color:RB_C.bg,width:0.75}});   // a cut in the bar, so slide-coloured
   });
 }
 // 0–5 checkpoint score as five cells — discrete data, nothing rounded. Filled
@@ -13166,18 +13548,18 @@ function rptScoreDots(slide,x,y,score,cell,accent){
   var gap=0.03,filled=(score==null||score==='N.A.'||isNaN(Number(score)))?-1:Number(score);
   for(var i=0;i<5;i++){
     slide.addShape('rect',{x:x+i*(cell+gap),y:y,w:cell,h:cell,
-      fill:{color:i<filled?accent:'E6E9EE'},line:{type:'none'}});
+      fill:{color:i<filled?accent:RB_C.track},line:{type:'none'}});
   }
 }
 
 // ── Module: Cover ─────────────────────────────────────────────────────────
 function rptCover(pres,ctx){
   var s=pres.addSlide();
-  s.background={color:RB_C.white};
+  s.background={color:RB_C.bg};
   s.addShape('rect',{x:0,y:0,w:0.14,h:RB_SLIDE.H,fill:{color:ctx.accent},line:{type:'none'}});
   s.addText('Supplier Assessment',{x:0.8,y:1.75,w:8.6,h:0.3,fontSize:10,color:RB_C.textMid,
     fontFace:'Montserrat',charSpacing:2});
-  s.addText(ctx.project,{x:0.8,y:2.1,w:8.6,h:0.9,fontSize:30,bold:true,color:'16202C',fontFace:'Montserrat'});
+  s.addText(ctx.project,{x:0.8,y:2.1,w:8.6,h:0.9,fontSize:30,bold:true,color:RB_C.strong,fontFace:'Montserrat'});
   s.addShape('line',{x:0.8,y:3.15,w:2.2,h:0,line:{color:ctx.accent,width:2}});
   var meta=[ctx.company,ctx.assessor?'Assessor: '+ctx.assessor:'',ctx.today].filter(Boolean).join('   ·   ');
   s.addText(meta,{x:0.8,y:3.4,w:8.6,h:0.3,fontSize:10,color:RB_C.textMid,fontFace:'Montserrat'});
@@ -13231,7 +13613,7 @@ function rptRiskScale(sl,ctx,x,y,w,h,score){
 }
 async function rptMgmtSummary(pres,ctx,s){
   var sl=pres.addSlide();
-  sl.background={color:RB_C.white};
+  sl.background={color:RB_C.bg};
   var A=ctx.accent,C=RB_POS.content;
   var score=calcScore(s,null),tier=score!=null?getTier(score):null;
   var round=(typeof reportingAudit==='function')?reportingAudit(s):null;
@@ -13244,7 +13626,7 @@ async function rptMgmtSummary(pres,ctx,s){
   // ── Left: overall score, then the risk scale ────────────────────────────
   rptPanel(sl,ctx,LX,C.y,LW,1.05,'Overall score');
   sl.addText(score!=null?score+'%':'—',{x:LX,y:C.y+0.26,w:LW,h:0.58,fontSize:32,bold:true,
-    color:'16202C',fontFace:'Montserrat',align:'center',valign:'middle'});
+    color:RB_C.strong,fontFace:'Montserrat',align:'center',valign:'middle'});
   rptTierBar(sl,LX,C.y+0.88,LW,0.10,score,A);
   var rY=C.y+1.14+GAP, rH=C.y+C.h-rY;
   rptPanel(sl,ctx,LX,rY,LW,rH,'Risk assessment');
@@ -13265,11 +13647,11 @@ async function rptMgmtSummary(pres,ctx,s){
       valAxisHidden:true,
       // Net in a light neutral so the data area reads as the subject; the
       // default grey outranked it.
-      valGridLine:{color:'E2E6EC',size:0.5},
-      catGridLine:{color:'E2E6EC',size:0.5},
+      valGridLine:{color:RB_C.grid,size:0.5},
+      catGridLine:{color:RB_C.grid,size:0.5},
       valAxisLineShow:false,catAxisLineShow:false,
-      border:{pt:0,color:'FFFFFF'},
-      catAxisLabelFontSize:7,catAxisLabelFontFace:'Montserrat',catAxisLabelColor:'333333',
+      border:{pt:0,color:RB_C.bg},
+      catAxisLabelFontSize:7,catAxisLabelFontFace:'Montserrat',catAxisLabelColor:RB_C.textMid,
       lineSize:1.5,dataBorder:{pt:1.25,color:A}
     });
   } else {
@@ -13294,7 +13676,8 @@ async function rptMgmtSummary(pres,ctx,s){
     var y=C.y+0.32+i*0.25;
     sl.addText(p[0],{x:RX+0.10,y:y,w:0.85,h:0.22,fontSize:7.5,color:RB_C.textMid,
       fontFace:'Montserrat',valign:'middle'});
-    sl.addText(p[1],{x:RX+0.98,y:y,w:RW-1.08,h:0.22,fontSize:7.5,color:RB_C.textDark,
+    sl.addText(_rptFitLine(p[1],RW-1.08-0.20,7.5,false),{x:RX+0.98,y:y,w:RW-1.08,h:0.22,   // one row = one line (less the box inset); a wrapped name ran over the rule below
+      fontSize:7.5,color:RB_C.textDark,
       fontFace:'Montserrat',valign:'middle'});
     if(i<facts.length-1)sl.addShape('line',{x:RX+0.10,y:y+0.23,w:RW-0.20,h:0,line:{color:RB_C.line,width:0.5}});
   });
@@ -13312,7 +13695,7 @@ async function rptMgmtSummary(pres,ctx,s){
     // sit, which is the one thing a category comparison needs to show.
     rptTierBar(sl,barX,y+rowH*0.30,barW,Math.min(0.13,rowH*0.34),p,A);
     sl.addText(p!=null?p+'%':'—',{x:RX+RW-0.56,y:y,w:0.46,h:rowH*0.86,fontSize:fs+0.5,bold:true,
-      color:'16202C',fontFace:'Montserrat',align:'right',valign:'middle'});
+      color:RB_C.strong,fontFace:'Montserrat',align:'right',valign:'middle'});
   });
 }
 
@@ -13341,7 +13724,7 @@ var RPT_NARR={
 };
 async function rptMgmtNarrative(pres,ctx,s){
   var sl=pres.addSlide();
-  sl.background={color:RB_C.white};
+  sl.background={color:RB_C.bg};
   var A=ctx.accent,C=RB_POS.content,N=RPT_NARR;
   var round=(typeof reportingAudit==='function')?reportingAudit(s):null;
   var rc=round?ensureReportContent(round):null;
@@ -13505,7 +13888,7 @@ async function rptActionGantt(pres,ctx,s){
 
   for(var p=0;p<pages.length;p++){
     var sl=pres.addSlide();
-    sl.background={color:RB_C.white};
+    sl.background={color:RB_C.bg};
     rptChrome(sl,ctx,s.name,rptPageTitle('Action Plan · Schedule',p,pages.length));
 
     var rowsTop=C.y+G.head, page=pages[p];
@@ -13566,13 +13949,13 @@ async function rptActionGantt(pres,ctx,s){
           fill:{color:A},line:{type:'none'}});
       } else {
         sl.addShape(pres.ShapeType.rect,{x:x1,y:mid,w:w,h:G.barH,
-          fill:{color:RB_C.white},line:{color:A,width:0.75}});
+          fill:{color:RB_C.bg},line:{color:A,width:0.75}});
       }
       // Slippage: the stretch between a passed due date and today, in grey so
       // the slide keeps to one colour while still showing the overrun.
       if(!done&&du<now&&now<=axis.to){
         sl.addShape(pres.ShapeType.rect,{x:x2,y:mid+G.barH*0.28,w:Math.max(0.03,px(now)-x2),
-          h:G.barH*0.44,fill:{color:RB_C.textDark},line:{type:'none'}});
+          h:G.barH*0.44,fill:{color:RB_C.slip},line:{type:'none'}});
       }
     });
 
@@ -13586,9 +13969,9 @@ async function rptActionGantt(pres,ctx,s){
       if(k==='prio')sl.addShape(pres.ShapeType.rect,{x:lx,y:ly+(0.16-G.markW)/2,w:G.markW,h:G.markW,
         fill:{color:A},line:{type:'none'}});
       else if(k==='slip')sl.addShape(pres.ShapeType.rect,{x:lx,y:ly+0.055,w:0.14,h:0.05,
-        fill:{color:RB_C.textDark},line:{type:'none'}});
+        fill:{color:RB_C.slip},line:{type:'none'}});
       else sl.addShape(pres.ShapeType.rect,{x:lx,y:ly+0.03,w:0.14,h:0.10,
-        fill:k==='open'?{color:RB_C.white}:{color:A,transparency:k==='done'?65:0},
+        fill:k==='open'?{color:RB_C.bg}:{color:A,transparency:k==='done'?65:0},
         line:k==='open'?{color:A,width:0.75}:{type:'none'}});
       sl.addText(e[1],{x:lx+0.19,y:ly,w:0.95,h:0.16,fontSize:6,color:RB_C.foot,margin:0,
         fontFace:'Montserrat',valign:'middle'});
@@ -13647,12 +14030,12 @@ async function rptActionTable(pres,ctx,s){
 
   for(var p=0;p<pages.length;p++){
     var sl=pres.addSlide();
-    sl.background={color:RB_C.white};
+    sl.background={color:RB_C.bg};
     rptChrome(sl,ctx,s.name,rptPageTitle('Action Plan · Detail',p,pages.length));
 
     var head=T.cols.map(function(c){
       return {text:c.label,options:{bold:true,color:RB_C.foot,fontSize:6.5,charSpacing:1.2,
-        fill:{color:RB_C.white},border:[{type:'none'},{type:'none'},
+        fill:{color:RB_C.bg},border:[{type:'none'},{type:'none'},
           {type:'solid',color:RB_C.line,pt:0.75},{type:'none'}]}};
     });
     var body=pages[p].map(function(a){
@@ -13794,7 +14177,7 @@ function _aoPaginate(groups,budget,heightFn){
 // lives on the Action Detail slide.
 var AO_FS=7;
 function _aoCheckpoint(sl,x,y,w,h,cp,A){
-  sl.addShape('roundRect',{x:x,y:y,w:w,h:h,rectRadius:0.03,fill:{color:RB_C.white},line:{color:RB_C.line,width:0.75}});
+  sl.addShape('roundRect',{x:x,y:y,w:w,h:h,rectRadius:0.03,fill:{color:RB_C.surface},line:{color:RB_C.line,width:0.75}});
   var dotsW=0.34, tw=w-dotsW-0.22;
   var numLen=cp.num?cp.num.length+2:0;
   var name=_rptTrunc(cp.name,Math.max(6,_rptFitChars(tw,AO_FS,2)-numLen));
@@ -13807,22 +14190,22 @@ function _aoCheckpoint(sl,x,y,w,h,cp,A){
 function _aoTask(sl,x,y,w,h,t,A,showLabel){
   var st=t.status,textCol=RB_C.textDark;
   if(t.priority==='High')sl.addShape('rect',{x:x-0.10,y:y+(h-0.06)/2,w:0.06,h:0.06,fill:{color:A},line:{type:'none'}});
-  if(st==='In Progress'){sl.addShape('roundRect',{x:x,y:y,w:w,h:h,rectRadius:0.03,fill:{color:A},line:{type:'none'}});textCol=RB_C.white;}
+  if(st==='In Progress'){sl.addShape('roundRect',{x:x,y:y,w:w,h:h,rectRadius:0.03,fill:{color:A},line:{type:'none'}});textCol=RB_C.onAccent;}
   else if(st==='Done'){sl.addShape('roundRect',{x:x,y:y,w:w,h:h,rectRadius:0.03,fill:{color:A,transparency:82},line:{color:A,width:0.5,transparency:55}});
     sl.addShape('rect',{x:x+0.005,y:y+0.03,w:0.03,h:h-0.06,fill:{color:A,transparency:45},line:{type:'none'}});}
-  else {sl.addShape('roundRect',{x:x,y:y,w:w,h:h,rectRadius:0.03,fill:{color:RB_C.white},line:{color:A,width:0.75}});
+  else {sl.addShape('roundRect',{x:x,y:y,w:w,h:h,rectRadius:0.03,fill:{color:RB_C.surface},line:{color:A,width:0.75}});
     sl.addShape('rect',{x:x+0.005,y:y+0.03,w:0.03,h:h-0.06,fill:{color:A},line:{type:'none'}});}
   var labW=showLabel?0.60:0.0, tw=w-0.20-labW;
   var handle=t.ref?t.ref+'  ':'';
   var name=_rptTrunc(t.label,Math.max(6,_rptFitChars(tw,AO_FS,2)-(handle?handle.length:0)));
   var runs=[];
-  if(handle)runs.push({text:handle,options:{color:(st==='In Progress'?RB_C.white:RB_C.foot),bold:true}});
+  if(handle)runs.push({text:handle,options:{color:(st==='In Progress'?RB_C.onAccent:RB_C.foot),bold:true}});
   runs.push({text:name,options:{color:textCol}});
   sl.addText(runs,{x:x+0.11,y:y,w:tw,h:h,fontSize:AO_FS,margin:0,fontFace:'Montserrat',valign:'middle',lineSpacingMultiple:1.02});
   if(showLabel){
     var lab=st==='In Progress'?'In Progress':(st==='Done'?'Done':'Open');
     sl.addText(lab,{x:x+w-labW-0.05,y:y,w:labW,h:h,fontSize:6,margin:0,
-      color:st==='In Progress'?RB_C.white:RB_C.foot,fontFace:'Montserrat',align:'right',valign:'middle'});
+      color:st==='In Progress'?RB_C.onAccent:RB_C.foot,fontFace:'Montserrat',align:'right',valign:'middle'});
   }
 }
 // Curved connector. pptxgenjs has no bezier, so a cubic S-curve (control points
@@ -13845,7 +14228,7 @@ function _aoLegend(sl,C,A){
   var ly=C.y+C.h-0.19,lx=C.x,tc=RB_C.foot;
   function label(t,w){sl.addText(t,{x:lx+0.21,y:ly-0.02,w:w,h:0.15,fontSize:6,color:tc,fontFace:'Montserrat',valign:'middle',margin:0});}
   // Open
-  sl.addShape('roundRect',{x:lx,y:ly,w:0.16,h:0.10,rectRadius:0.02,fill:{color:RB_C.white},line:{color:A,width:0.75}});
+  sl.addShape('roundRect',{x:lx,y:ly,w:0.16,h:0.10,rectRadius:0.02,fill:{color:RB_C.surface},line:{color:A,width:0.75}});
   sl.addShape('rect',{x:lx+0.005,y:ly+0.02,w:0.03,h:0.06,fill:{color:A},line:{type:'none'}});
   label('Open',0.5);lx+=0.72;
   // In Progress
@@ -13876,7 +14259,7 @@ async function rptActionOriginDiagram(pres,ctx,s){
   function gh(g){return Math.max(headH+g.cps.length*pitch,g.tasks.length*pitch+0.10)+catGap;}
   var pages=_aoPaginate(data.groups,budget,gh);
   for(var p=0;p<pages.length;p++){
-    var sl=pres.addSlide();sl.background={color:RB_C.white};
+    var sl=pres.addSlide();sl.background={color:RB_C.bg};
     rptChrome(sl,ctx,s.name,rptPageTitle(RPT_AO_TITLE,p,pages.length));
     sl.addText('From the assessment findings — the weak checkpoints (left) drove '+data.taskCount+' action'+(data.taskCount===1?'':'s')+' (right).',
       {x:C.x,y:C.y,w:C.w,h:0.18,fontSize:8,color:RB_C.textMid,fontFace:'Montserrat',valign:'middle',margin:0});
@@ -13973,22 +14356,34 @@ function _rptFontFactor(){
   _rptFontScale=(a!==b)?1:1.14;
   return _rptFontScale;
 }
-function _rptTextW(t,fs){
+// `bold` matters: Montserrat Bold runs ~8% wider, and measuring bold text with
+// the regular face is exactly how a "fitting" value ends up under its neighbour.
+function _rptTextW(t,fs,bold){
   var c=_rptCtx();
-  c.font=(fs*4/3)+'px Montserrat, Arial, sans-serif';   // pt -> css px
+  c.font=(bold?'bold ':'')+(fs*4/3)+'px Montserrat, Arial, sans-serif';   // pt -> css px
   return (c.measureText(t).width/96)*_rptFontFactor();  // inches
 }
-function _rptLineCount(t,w,fs){
+function _rptLineCount(t,w,fs,bold){
   t=String(t||'').trim();
   if(!t)return 1;
   var max=w*0.98;                 // PowerPoint breaks a hair earlier than canvas
   var words=t.split(/\s+/),lines=1,cur='';
   for(var i=0;i<words.length;i++){
     var probe=cur?cur+' '+words[i]:words[i];
-    if(_rptTextW(probe,fs)<=max)cur=probe;
+    if(_rptTextW(probe,fs,bold)<=max)cur=probe;
     else {lines++;cur=words[i];}
   }
   return lines;
+}
+// One line that is MEASURED to fit `w`, ellipsised otherwise. For narrow
+// single-line cells, where the character estimate of _rptFitChars is too
+// coarse: it cannot know that "MMM" is twice as wide as "iii".
+function _rptFitLine(t,w,fs,bold){
+  t=String(t||'').trim();
+  var max=w*0.95;
+  if(_rptTextW(t,fs,bold)<=max)return t;
+  while(t.length>1&&_rptTextW(t+'…',fs,bold)>max)t=t.slice(0,-1);
+  return t.replace(/[\s,;:·(\-]+$/,'')+'…';
 }
 function rptDetailRows(d,colW,D){
   // One row per PAIR: the i-th strength beside the i-th constraint. A row is
@@ -14056,7 +14451,7 @@ async function rptCategoryDetail(pres,ctx,s){
 
     for(var p=0;p<pages.length;p++){
       var sl=pres.addSlide();
-      sl.background={color:RB_C.white};
+      sl.background={color:RB_C.bg};
       rptChrome(sl,ctx,s.name,rptPageTitle('Findings · '+cat,p,pages.length));
 
       // ── header row: category and its score, on the master's first line
@@ -14136,10 +14531,44 @@ var RPT_PROFILE={
   imgGap:0.14, capH:0.16,
   pin:0.085
 };
+// Maps are pictures, so the palette swap cannot reach them. The bundled sheets
+// are light-grey land (DFE2E6) on a transparent sea with white borders — on the
+// navy slide that is a glaring grey slab. For the dark deck every pixel is
+// re-inked by its luminance: white (the borders) becomes the slide colour, the
+// land grey becomes mapLand, and anything darker — a user's own map with roads
+// or labels — keeps climbing toward lighter navy, so its detail survives in the
+// same order. Alpha is kept, so the sea stays transparent. Light deck: untouched.
+var _RPT_MAP_LAND_L=224;   // luminance of the bundled land fill
+function rptThemeMap(rendered){
+  if(!RB_C.mapLand||!rendered||!rendered.data)return Promise.resolve(rendered);
+  return new Promise(function(resolve){
+    var img=new Image();
+    img.onload=function(){
+      try{
+        var cv=document.createElement('canvas');cv.width=img.width;cv.height=img.height;
+        var cx=cv.getContext('2d');cx.drawImage(img,0,0);
+        var id=cx.getImageData(0,0,cv.width,cv.height),d=id.data;
+        var hx=function(h){return [parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)];};
+        var bg=hx(RB_C.bg),land=hx(RB_C.mapLand),LL=_RPT_MAP_LAND_L;
+        for(var i=0;i<d.length;i+=4){
+          if(!d[i+3])continue;
+          var L=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
+          // 0 at white, 1 at the land grey, 2.5 at black — continuous at the land.
+          var k=L>=LL?(255-L)/(255-LL):1+1.5*(LL-L)/LL;
+          for(var c=0;c<3;c++)d[i+c]=Math.max(0,Math.min(255,Math.round(bg[c]+(land[c]-bg[c])*k)));
+        }
+        cx.putImageData(id,0,0);
+        resolve({data:cv.toDataURL('image/png'),w:cv.width,h:cv.height});
+      }catch(e){resolve(rendered);}   // a tainted canvas must not cost the slide its map
+    };
+    img.onerror=function(){resolve(rendered);};
+    img.src=rendered.data;
+  });
+}
 async function rptSupplierProfile(pres,ctx,s){
   var P=RPT_PROFILE,C=RB_POS.content,A=ctx.accent;
   var sl=pres.addSlide();
-  sl.background={color:RB_C.white};
+  sl.background={color:RB_C.bg};
   rptChrome(sl,ctx,s.name,'Supplier Profile');
 
   var RX=C.x+P.leftW+P.colGap, RW=C.x+C.w-RX;
@@ -14155,7 +14584,7 @@ async function rptSupplierProfile(pres,ctx,s){
   // ── map + pin + leader line
   var pinPt=null;
   if(sheet){
-    var rendered=await mapRenderImage(sheet);
+    var rendered=await rptThemeMap(await mapRenderImage(sheet));
     var rect=mapDrawRect(mapBox,{w:rendered.w,h:rendered.h});
     sl.addImage({data:rendered.data,x:rect.x,y:rect.y,w:rect.w,h:rect.h});
     var p=g?projectGeoView(g,rect,sheet):null;
@@ -14165,7 +14594,7 @@ async function rptSupplierProfile(pres,ctx,s){
       sl.addShape(pres.ShapeType.ellipse,{x:p.x-P.pin*1.25,y:p.y-P.pin*1.25,w:P.pin*2.5,h:P.pin*2.5,
         fill:{color:A,transparency:78},line:{type:'none'}});
       sl.addShape(pres.ShapeType.ellipse,{x:p.x-P.pin/2,y:p.y-P.pin/2,w:P.pin,h:P.pin,
-        fill:{color:A},line:{color:RB_C.white,width:1}});
+        fill:{color:A},line:{color:RB_C.bg,width:1}});
       // Leader line straight down to the info box, then a short shoulder into
       // the box edge — a diagonal across the map would cross countries and read
       // as a route rather than a reference.
@@ -14239,7 +14668,7 @@ async function rptSupplierProfile(pres,ctx,s){
       // height reserved above; only truncate when it genuinely exceeds maxLines.
       var needed=_rptLineCount(f.value,countW,P.valFs);
       var valTxt=needed>maxLines?_rptTrunc(f.value,_rptFitChars(valW,P.valFs,maxLines)):f.value;
-      sl.addText(f.label,{x:fx,y:fy,w:labelW,h:h,fontSize:7,margin:0,
+      sl.addText(f.label,{x:fx,y:fy,w:labelW-0.10,h:h,fontSize:7,margin:0,   // 0.10 air: a wrapped label must not touch its value
         color:RB_C.foot,fontFace:'Montserrat',valign:'top'});
       sl.addText(valTxt,
         {x:fx+labelW,y:fy,w:valW,h:h,fontSize:P.valFs,bold:true,margin:0,
@@ -14279,8 +14708,11 @@ function _rptRamp(hex,n){
   var out=[];
   for(var i=0;i<n;i++){
     var t=n<2?0:(i/(n-1))*0.68;                 // never fade all the way out
-    var mix=function(c){return Math.round(c+(200-c)*t);};
-    out.push(('0'+mix(r).toString(16)).slice(-2)+('0'+mix(g).toString(16)).slice(-2)+('0'+mix(b).toString(16)).slice(-2));
+    // Fade toward a neutral that recedes on THIS slide: light grey on white,
+    // a slate blue on navy (fading lime toward grey would brighten it instead).
+    var to=RB_C.rampTo||[200,200,200];
+    var mix=function(c,k){return Math.round(c+(to[k]-c)*t);};
+    out.push(('0'+mix(r,0).toString(16)).slice(-2)+('0'+mix(g,1).toString(16)).slice(-2)+('0'+mix(b,2).toString(16)).slice(-2));
   }
   return out.map(function(s){return s.toUpperCase();});
 }
@@ -14309,7 +14741,7 @@ async function rptPortfolio(pres,ctx){
   for(var p=0;p<pages.length;p++){
     var page=pages[p];
     var sl=pres.addSlide();
-    sl.background={color:RB_C.white};
+    sl.background={color:RB_C.bg};
     rptChrome(sl,ctx,ctx.project||'',rptPageTitle('Portfolio Comparison',p,pages.length));
 
     // ── left: the portfolio in three numbers, then the full ranking
@@ -14340,7 +14772,7 @@ async function rptPortfolio(pres,ctx){
       sl.addShape(pres.ShapeType.rect,{x:bx,y:by,w:w,h:bh,
         fill:{color:A,transparency:12+i*22},line:{type:'none'}});
       if(w>0.30)sl.addText(String(counts[i]),{x:bx,y:by,w:w,h:bh,fontSize:6.5,bold:true,margin:0,
-        color:i<2?RB_C.white:RB_C.textDark,fontFace:'Montserrat',align:'center',valign:'middle'});
+        color:i<2?RB_C.onAccent:RB_C.textDark,fontFace:'Montserrat',align:'center',valign:'middle'});
       bx+=w;
     });
     sl.addText(tiers.map(function(t,i){return counts[i]+'× '+t.label;}).filter(function(x){return x.indexOf('0× ')!==0;}).join('   ·   '),
@@ -14401,11 +14833,11 @@ async function rptPortfolio(pres,ctx){
       sl.addChart('radar',series,{
         x:RX,y:C.y+0.30,w:RW,h:C.h-0.30-0.22,
         radarStyle:'marker',chartColors:ramp,
-        showLegend:true,legendPos:'b',legendFontSize:6.5,legendFontFace:'Montserrat',
+        showLegend:true,legendPos:'b',legendFontSize:6.5,legendFontFace:'Montserrat',legendColor:RB_C.textMid,
         valAxisMinVal:0,valAxisMaxVal:100,valAxisMajorUnit:20,valAxisHidden:true,
-        valGridLine:{color:'E2E6EC',size:0.5},catGridLine:{color:'E2E6EC',size:0.5},
-        valAxisLineShow:false,catAxisLineShow:false,border:{pt:0,color:'FFFFFF'},
-        catAxisLabelFontSize:7,catAxisLabelFontFace:'Montserrat',catAxisLabelColor:'333333',
+        valGridLine:{color:RB_C.grid,size:0.5},catGridLine:{color:RB_C.grid,size:0.5},
+        valAxisLineShow:false,catAxisLineShow:false,border:{pt:0,color:RB_C.bg},
+        catAxisLabelFontSize:7,catAxisLabelFontFace:'Montserrat',catAxisLabelColor:RB_C.textMid,
         lineSize:1.5,lineDataSymbolSize:4
       });
     }
@@ -14437,7 +14869,7 @@ async function rptRiskMatrix(pres,ctx){
   var tiers=riskTiersWorstFirst();
 
   var sl=pres.addSlide();
-  sl.background={color:RB_C.white};
+  sl.background={color:RB_C.bg};
   rptChrome(sl,ctx,ctx.project||'',showCrit?'Risk Matrix · class vs. criticality':'Risk Matrix');
 
   var gx=C.x+M.axisW+M.headW, gy=C.y+(showCrit?0.20:0);
@@ -14484,7 +14916,7 @@ async function rptRiskMatrix(pres,ctx){
       // the darkest, which is the top-right one once criticality rises.
       var sev=(1-ri/Math.max(tiers.length-1,1))*0.6+(cols.length>1?(ci/(cols.length-1)):0.5)*0.4;
       sl.addShape(pres.ShapeType.rect,{x:x,y:y,w:colW,h:rowH,
-        fill:{color:A,transparency:Math.round(96-sev*22)},line:{color:RB_C.line,width:0.5}});   // 74..96: 14 points read as flat
+        fill:{color:A,transparency:Math.round(96-sev*22*RB_C.tint)},line:{color:RB_C.line,width:0.5}});   // 74..96: 14 points read as flat
       var cell=data.filter(function(d){
         if(!d.tier||d.tier.label!==t.label)return false;
         return showCrit?((d.crit||1)===c.v):true;});
@@ -14499,7 +14931,7 @@ async function rptRiskMatrix(pres,ctx){
       draw.forEach(function(d,i){
         var cy=y+M.cellPad+i*(chipH+chipGap);
         sl.addShape(pres.ShapeType.roundRect,{x:x+M.cellPad,y:cy,w:colW-2*M.cellPad,h:chipH,
-          rectRadius:0.03,fill:{color:RB_C.white},line:{color:RB_C.line,width:0.5}});
+          rectRadius:0.03,fill:{color:RB_C.surface},line:{color:RB_C.line,width:0.5}});
         sl.addText(_rptTrunc(d.name,_rptFitChars(colW-2*M.cellPad-scoreW-0.10,chipFs,1)),
           {x:x+M.cellPad+0.06,y:cy,w:colW-2*M.cellPad-scoreW-0.10,h:chipH,fontSize:chipFs,margin:0,
            color:RB_C.textDark,fontFace:'Montserrat',valign:'middle'});
@@ -14528,47 +14960,139 @@ async function rptRiskMatrix(pres,ctx){
 
 // ── Module: Supplier Overview (all suppliers on shared map + info cards) ─────
 // Left: a single map showing every supplier's pin, labelled with a number that
-// keys into the right-hand card list. Right: condensed info cards, 10 per page.
+// keys into the right-hand card list. Right: one info card per supplier, as
+// many per page as their measured heights allow.
 // When suppliers span continents without a world sheet the WIDEST sheet is used
 // so all pins land on one image — the same fallback mapForPoint already does.
+//
+// Cards list their fields in ONE column: label left, value right. Two field
+// columns side by side left ~0.6in a value in a 3.6in panel, so real catalogue
+// labels ("Shopfloor size (m²)", "Main products / services") and values
+// ("Precision-machined aluminium housings") were cut on almost every card.
+// One column gives a value ~2.4in; a value that still does not fit wraps to a
+// second line, and every card is exactly as tall as its content.
 var RPT_OVERVIEW={
   leftW:5.40, colGap:0.30,
   pin:0.065, labelR:0.09,
-  cardGap:0.04,
-  nameH:0.17, fieldFs:5, fieldLabelW:0.55
+  cardGap:0.05, cardPadX:0.08, cardPadY:0.04,
+  nameH:0.18, fieldFs:5.5, lineMul:1.15, rowGap:0.006,
+  fieldLabelW:0.55,           // label column grows to the longest label in use …
+  fieldLabelMaxW:1.25,        // … up to this; only a label longer than that wraps
+  labelGap:0.08,              // air between label and value
+  maxValueLines:2             // past this a value is shortened, never overlapped
 };
+// The visible part of `t` that fits `maxLines` lines of `w` inches, by
+// measurement; ellipsised only when it genuinely does not fit.
+function _rptFitLines(t,w,fs,bold,maxLines){
+  t=String(t||'').trim();
+  if(_rptLineCount(t,w,fs,bold)<=maxLines)return t;
+  var words=t.split(/\s+/);
+  while(words.length>1&&_rptLineCount(words.join(' ')+'…',w,fs,bold)>maxLines)words.pop();
+  var out=words.join(' ');
+  if(_rptLineCount(out+'…',w,fs,bold)>maxLines)out=_rptFitLine(out,w,fs,bold).replace(/…$/,'');
+  return out.replace(/[\s,;:·(\-\/]+$/,'')+'…';
+}
+// Straight line between two points in any direction. pptxgenjs draws a line
+// from the box's top-left to bottom-right, so a rising line needs flipV.
+function _rptLine(sl,x1,y1,x2,y2,line){
+  var o={x:Math.min(x1,x2),y:Math.min(y1,y2),w:Math.abs(x2-x1),h:Math.abs(y2-y1),line:line};
+  if((x2<x1)!==(y2<y1))o.flipV=true;
+  sl.addShape('line',o);
+}
+// Number badges are PLACED, not stacked on the pin. Suppliers located from the
+// country alone share the exact country centre, so three German plants used to
+// put three badges on one spot and only the last number was readable. Each
+// badge tries rings of positions around its pin — straight above first, the
+// old default — and takes the first spot that clears every other badge and
+// every pin halo and stays on the map. A badge that had to move gets a leader
+// line back to its pin (`moved`). If the map is too crowded for any free spot,
+// the badge falls back to the default above its pin rather than vanishing.
+function rptPlaceBadges(pins,rect,halo,r){
+  var placed=[],gap=0.02;
+  function free(cx,cy){
+    if(cx-r<rect.x||cx+r>rect.x+rect.w||cy-r<rect.y||cy+r>rect.y+rect.h)return false;
+    for(var i=0;i<placed.length;i++){
+      var dx=cx-placed[i].x,dy=cy-placed[i].y;
+      if(dx*dx+dy*dy<Math.pow(2*r+gap,2))return false;
+    }
+    for(var j=0;j<pins.length;j++){
+      var ex=cx-pins[j].x,ey=cy-pins[j].y;
+      if(ex*ex+ey*ey<Math.pow(r+halo+gap*0.5,2))return false;
+    }
+    return true;
+  }
+  // Up, then the upper diagonals, then sideways, then below — reading order
+  // stays close to "number above its pin" for as long as the space allows.
+  var angles=[-90,-45,-135,0,180,45,135,90,-67.5,-112.5,-22.5,-157.5,22.5,157.5,67.5,112.5];
+  pins.forEach(function(pt){
+    var base=halo+r+gap, step=2*r+gap*1.5, spot=null;
+    for(var ring=0;ring<6&&!spot;ring++){
+      var d=base+ring*step;
+      for(var a=0;a<(ring?angles.length:8);a++){
+        var t=angles[a]*Math.PI/180, cx=pt.x+d*Math.cos(t), cy=pt.y+d*Math.sin(t);
+        if(free(cx,cy)){spot={x:cx,y:cy,moved:ring>0||a>0};break;}
+      }
+    }
+    if(!spot)spot={x:pt.x,y:Math.max(rect.y+r,pt.y-base),moved:false};
+    spot.n=pt.n;spot.px=pt.x;spot.py=pt.y;
+    placed.push(spot);
+  });
+  return placed;
+}
 async function rptSupplierOverview(pres,ctx){
   var sups=(ctx.suppliers||[]).slice();
   if(!sups.length)return;
   var O=RPT_OVERVIEW,C=RB_POS.content,A=ctx.accent;
 
   var catalog=(typeof supplierInfoCatalog!=='undefined'&&Array.isArray(supplierInfoCatalog)?supplierInfoCatalog:[]);
-  // Determine the max number of filled fields across all suppliers so every
-  // card reserves enough rows and all pages look uniform.
-  var maxFields=0;
-  sups.forEach(function(s){
-    var n=catalog.filter(function(f){
-      return ((s.supplierInfo||{})[f.id]||'').toString().trim();}).length;
-    if(n>maxFields)maxFields=n;
+  var RX=C.x+O.leftW+O.colGap, RW=C.x+C.w-RX;
+  var lineH=(O.fieldFs/72)*O.lineMul;
+  // One label column for every card on every page, as wide as the longest
+  // label actually in use — so labels line up down the list. A label longer
+  // than the cap wraps onto a second line rather than being cut.
+  var labelW=O.fieldLabelW;
+  catalog.forEach(function(f){
+    var used=sups.some(function(s){return ((s.supplierInfo||{})[f.id]||'').toString().trim();});
+    if(used)labelW=Math.max(labelW,_rptTextW(f.label||f.id,O.fieldFs,false)/0.95+0.02);
   });
-  var lineH=(O.fieldFs/72)*1.25;
-  var fieldRows=Math.ceil(Math.max(maxFields,1)/2);
-  var cardH=O.nameH+0.04+fieldRows*lineH;
-  // How many cards fit on one page?
-  var cardTop=C.y+0.28;
+  labelW=Math.min(labelW,O.fieldLabelMaxW);
+  var valX=O.cardPadX+labelW+O.labelGap;            // relative to the card's left edge
+  var valW=RW-valX-O.cardPadX;
+  // Lay every card out once, measured: each field row is as tall as the taller
+  // of its label and value, so the card height is the content's real height.
+  var cards=sups.map(function(s,si){
+    var rows=catalog.map(function(f){
+      var v=((s.supplierInfo||{})[f.id]||'').toString().trim();
+      if(!v)return null;
+      var lab=String(f.label||f.id);
+      var val=_rptFitLines(v,valW,O.fieldFs,true,O.maxValueLines);
+      var n=Math.max(_rptLineCount(lab,labelW,O.fieldFs,false),_rptLineCount(val,valW,O.fieldFs,true));
+      return {label:lab,value:val,h:Math.min(O.maxValueLines,n)*lineH};
+    }).filter(Boolean);
+    var body=rows.reduce(function(a,r){return a+r.h+O.rowGap;},0);
+    return {s:s,n:si+1,rows:rows,h:O.cardPadY+O.nameH+(rows.length?0.025+body:0)+O.cardPadY};
+  });
+  // Pages are filled by HEIGHT, not by a fixed count: a card with two-line
+  // values takes the room it needs and the next one moves to the next page.
+  var cardTop=C.y+0.30;
   var avail=C.y+C.h-cardTop;
-  var perPage=Math.max(1,Math.floor((avail+O.cardGap)/(cardH+O.cardGap)));
-  var pages=rptPages(sups,perPage);
+  var pages=[],cur=[],used=0;
+  cards.forEach(function(c){
+    var need=(cur.length?O.cardGap:0)+c.h;
+    if(cur.length&&used+need>avail){pages.push(cur);cur=[];used=0;need=c.h;}
+    cur.push(c);used+=need;
+  });
+  if(cur.length)pages.push(cur);
 
   for(var p=0;p<pages.length;p++){
     var page=pages[p];
     var sl=pres.addSlide();
-    sl.background={color:RB_C.white};
+    sl.background={color:RB_C.bg};
     rptChrome(sl,ctx,ctx.project||'',rptPageTitle('Supplier Overview',p,pages.length));
 
     // ── left: shared map with all suppliers on THIS page
     var mapBox={x:C.x,y:C.y,w:O.leftW,h:C.h};
-    var geos=page.map(function(s){return {s:s,g:supplierGeo(s)};});
+    var geos=page.map(function(c){return {s:c.s,n:c.n,g:supplierGeo(c.s)};});
     var sheet=null;
     var usable=maps.filter(function(m){return m&&m.data;});
     if(usable.length){
@@ -14582,27 +15106,36 @@ async function rptSupplierOverview(pres,ctx){
     }
 
     if(sheet){
-      var rendered=await mapRenderImage(sheet);
+      var rendered=await rptThemeMap(await mapRenderImage(sheet));
       var rect=mapDrawRect(mapBox,{w:rendered.w,h:rendered.h});
       sl.addImage({data:rendered.data,x:rect.x,y:rect.y,w:rect.w,h:rect.h});
+      var pins=[];
       geos.forEach(function(r,i){
         if(!r.g)return;
         var pt=projectGeoView(r.g,rect,sheet);
-        if(!pt)return;
+        if(pt)pins.push({n:r.n,x:pt.x,y:pt.y});
+      });
+      var badges=rptPlaceBadges(pins,rect,O.pin*1.3,O.labelR);
+      // Leader lines first, then pins, then badges — a line starts UNDER its
+      // pin and ends under its badge, so it never crosses a dot or a number.
+      badges.forEach(function(b){
+        if(b.moved)_rptLine(sl,b.px,b.py,b.x,b.y,{color:A,width:0.75});
+      });
+      pins.forEach(function(pt){
         sl.addShape(pres.ShapeType.ellipse,{
           x:pt.x-O.pin*1.3,y:pt.y-O.pin*1.3,w:O.pin*2.6,h:O.pin*2.6,
           fill:{color:A,transparency:75},line:{type:'none'}});
         sl.addShape(pres.ShapeType.ellipse,{
           x:pt.x-O.pin/2,y:pt.y-O.pin/2,w:O.pin,h:O.pin,
-          fill:{color:A},line:{color:RB_C.white,width:0.75}});
-        var lx=pt.x-O.labelR,ly=pt.y-O.pin/2-O.labelR*2-0.02;
-        if(ly<rect.y)ly=pt.y+O.pin/2+0.02;
+          fill:{color:A},line:{color:RB_C.bg,width:0.75}});
+      });
+      badges.forEach(function(b){
         sl.addShape(pres.ShapeType.ellipse,{
-          x:lx,y:ly,w:O.labelR*2,h:O.labelR*2,
-          fill:{color:A},line:{color:RB_C.white,width:0.75}});
-        sl.addText(String(p*perPage+i+1),{
-          x:lx,y:ly,w:O.labelR*2,h:O.labelR*2,
-          fontSize:6,bold:true,color:RB_C.white,fontFace:'Montserrat',
+          x:b.x-O.labelR,y:b.y-O.labelR,w:O.labelR*2,h:O.labelR*2,
+          fill:{color:A},line:{color:RB_C.bg,width:0.75}});
+        sl.addText(String(b.n),{
+          x:b.x-O.labelR,y:b.y-O.labelR,w:O.labelR*2,h:O.labelR*2,
+          fontSize:6,bold:true,color:RB_C.onAccent,fontFace:'Montserrat',
           align:'center',valign:'middle',margin:0});
       });
     } else {
@@ -14613,54 +15146,41 @@ async function rptSupplierOverview(pres,ctx){
         align:'center',valign:'middle'});
     }
 
-    // ── right: supplier info cards
-    var RX=C.x+O.leftW+O.colGap, RW=C.x+C.w-RX;
+    // ── right: supplier info cards, stacked at their measured heights
     rptPanel(sl,ctx,RX,C.y,RW,C.h,'Supplier locations');
 
-    page.forEach(function(s,i){
-      var idx=p*perPage+i+1;
-      var cy=cardTop+i*(cardH+O.cardGap);
+    var cy=cardTop;
+    page.forEach(function(c,i){
       if(i%2===0)
-        sl.addShape(pres.ShapeType.rect,{x:RX,y:cy,w:RW,h:cardH,
+        sl.addShape(pres.ShapeType.rect,{x:RX,y:cy,w:RW,h:c.h,
           fill:{color:A,transparency:96},line:{type:'none'}});
 
-      // Number circle
-      var numR=0.075;
+      // Number circle, centred on the name line
+      var numR=0.075, ny=cy+O.cardPadY;
       sl.addShape(pres.ShapeType.ellipse,{
-        x:RX+0.05,y:cy+0.02,w:numR*2,h:numR*2,
+        x:RX+0.05,y:ny+O.nameH/2-numR,w:numR*2,h:numR*2,
         fill:{color:A},line:{type:'none'}});
-      sl.addText(String(idx),{
-        x:RX+0.05,y:cy+0.02,w:numR*2,h:numR*2,
-        fontSize:6,bold:true,color:RB_C.white,fontFace:'Montserrat',
+      sl.addText(String(c.n),{
+        x:RX+0.05,y:ny+O.nameH/2-numR,w:numR*2,h:numR*2,
+        fontSize:6,bold:true,color:RB_C.onAccent,fontFace:'Montserrat',
         align:'center',valign:'middle',margin:0});
 
       // Supplier name
-      var nameX=RX+0.05+numR*2+0.06;
-      sl.addText(_rptTrunc(s.name,_rptFitChars(RW-(nameX-RX)-0.04,8,1)),{
-        x:nameX,y:cy+0.01,w:RW-(nameX-RX)-0.04,h:O.nameH,
+      var nameX=RX+0.05+numR*2+0.06, nameW=RX+RW-O.cardPadX-nameX;
+      sl.addText(_rptFitLine(c.s.name,nameW,8,true),{
+        x:nameX,y:ny,w:nameW,h:O.nameH,
         fontSize:8,bold:true,margin:0,color:RB_C.textDark,fontFace:'Montserrat',valign:'middle'});
 
-      // Supplier info fields, two columns
-      var fields=catalog.map(function(f){
-        return {label:f.label||f.id,value:((s.supplierInfo||{})[f.id]||'').toString().trim()};
-      }).filter(function(f){return f.value;});
-      if(!fields.length)return;
-
-      var fy=cy+O.nameH+0.02;
-      var colW=(RW-0.16)/2;
-      var perCol=Math.ceil(fields.length/2);
-      var valW=colW-O.fieldLabelW;
-
-      fields.forEach(function(f,fi){
-        var col=Math.floor(fi/perCol), row=fi%perCol;
-        var fx=RX+0.08+col*(colW+0.04);
-        var fcy=fy+row*lineH;
-        sl.addText(f.label,{x:fx,y:fcy,w:O.fieldLabelW,h:lineH,
-          fontSize:O.fieldFs,margin:0,color:RB_C.foot,fontFace:'Montserrat',valign:'middle'});
-        sl.addText(_rptTrunc(f.value,_rptFitChars(valW,O.fieldFs,1)),{
-          x:fx+O.fieldLabelW,y:fcy,w:valW,h:lineH,
-          fontSize:O.fieldFs,bold:true,margin:0,color:RB_C.textDark,fontFace:'Montserrat',valign:'middle'});
+      // Fields: label | value, one row each, value wraps when it must
+      var fy=ny+O.nameH+0.025;
+      c.rows.forEach(function(r){
+        sl.addText(r.label,{x:RX+O.cardPadX,y:fy,w:labelW,h:r.h,
+          fontSize:O.fieldFs,margin:0,lineSpacingMultiple:1.0,color:RB_C.foot,fontFace:'Montserrat',valign:'top'});
+        sl.addText(r.value,{x:RX+valX,y:fy,w:valW,h:r.h,
+          fontSize:O.fieldFs,bold:true,margin:0,lineSpacingMultiple:1.0,color:RB_C.textDark,fontFace:'Montserrat',valign:'top'});
+        fy+=r.h+O.rowGap;
       });
+      cy+=c.h+O.cardGap;
     });
   }
 }
@@ -14691,7 +15211,7 @@ var RPT_MODULES={
 // from the per-supplier chapters, and one supplier's chapter from the next.
 function rptDivider(pres,ctx,opts){
   var s=pres.addSlide();
-  s.background={color:RB_C.white};
+  s.background={color:RB_C.bg};
   var A=ctx.accent;
   // Left accent band, echoing the cover.
   s.addShape('rect',{x:0,y:0,w:0.14,h:RB_SLIDE.H,fill:{color:A},line:{type:'none'}});
@@ -14700,14 +15220,25 @@ function rptDivider(pres,ctx,opts){
     s.addText(num.length<2?'0'+num:num,{x:0.8,y:1.55,w:3.0,h:1.4,fontSize:68,bold:true,
       color:A,fontFace:'Montserrat',valign:'middle'});
   }
-  var tx=num?2.7:0.8;
-  s.addText(opts.kicker||'Section',{x:tx,y:2.05,w:9.64-tx-0.4,h:0.3,fontSize:10,
+  var tx=num?2.7:0.8, tw=9.64-tx-0.4;
+  // The title is MEASURED: a two-line supplier name used to run its second line
+  // straight through the accent rule, which sat at a fixed 3.35 below a box
+  // sized for one line. Two lines grow the block upward (kept centred on the
+  // numeral); a name that would need a third line drops to 22pt first. The
+  // rule never rises above its one-line position, so short titles look as before.
+  var title=opts.title||'', fs=28;
+  var lines=_rptLineCount(title,tw-0.2,fs,true);
+  if(lines>2){fs=22;lines=Math.min(3,_rptLineCount(title,tw-0.2,fs,true));}
+  var lh=(fs/72)*1.2, th=lines*lh+0.12;
+  var top=2.38-(lines-1)*lh/2;
+  var ruleY=Math.max(3.35,top+th+0.08);
+  s.addText(opts.kicker||'Section',{x:tx,y:top-0.33,w:tw,h:0.3,fontSize:10,
     color:RB_C.textMid,fontFace:'Montserrat',charSpacing:2});
-  s.addText(opts.title||'',{x:tx,y:2.38,w:9.64-tx-0.4,h:0.9,fontSize:28,bold:true,
-    color:'16202C',fontFace:'Montserrat',valign:'top'});
-  s.addShape('line',{x:tx+0.02,y:3.35,w:2.0,h:0,line:{color:A,width:2}});
+  s.addText(title,{x:tx,y:top,w:tw,h:th,fontSize:fs,bold:true,lineSpacingMultiple:1.0,
+    color:RB_C.strong,fontFace:'Montserrat',valign:'top'});
+  s.addShape('line',{x:tx+0.02,y:ruleY,w:2.0,h:0,line:{color:A,width:2}});
   if(opts.subtitle)
-    s.addText(opts.subtitle,{x:tx+0.02,y:3.5,w:9.64-tx-0.4,h:0.5,fontSize:11,
+    s.addText(opts.subtitle,{x:tx+0.02,y:ruleY+0.15,w:tw,h:0.5,fontSize:11,
       color:RB_C.textMid,fontFace:'Montserrat',valign:'top'});
   // Dividers are unnumbered section breaks, like the cover — the visible page
   // number runs continuously across the CONTENT slides, so it is not touched here.
@@ -14716,10 +15247,10 @@ function rptDivider(pres,ctx,opts){
 // the dividers use, so a reader can map the agenda to the chapter tabs.
 function rptAgenda(pres,ctx,items){
   var s=pres.addSlide();
-  s.background={color:RB_C.white};
+  s.background={color:RB_C.bg};
   var A=ctx.accent,C=RB_POS.content;
   rptChrome(s,ctx,ctx.project||'',_reportScopeTitle(ctx));
-  s.addText('Agenda',{x:C.x,y:C.y,w:C.w,h:0.4,fontSize:20,bold:true,color:'16202C',fontFace:'Montserrat'});
+  s.addText('Agenda',{x:C.x,y:C.y,w:C.w,h:0.4,fontSize:20,bold:true,color:RB_C.strong,fontFace:'Montserrat'});
   var top=C.y+0.7, avail=C.y+C.h-top;
   var rowH=Math.min(0.5,avail/Math.max(items.length,1));
   items.forEach(function(it,i){
@@ -14752,8 +15283,13 @@ async function exportStandardReport(){
     if(!sel.length)sel=suppliers.slice();
   }
   var el=function(id){return document.getElementById(id);};
+  // Slide style first: the palette decides the accent too. The dark deck is
+  // pinned to the tool's lime — the corporate blues/purple sit at ~1.5:1 on
+  // navy and would turn every title, bar and number unreadable.
+  var dark=reportBuilder.slideStyle==='dark';
+  rptUsePalette(dark?'dark':'light');
   var ctx={
-    accent:_px(reportBuilder.variant==='custom'&&reportBuilder.customColor?reportBuilder.customColor:RB_VARIANTS[(reportBuilder&&reportBuilder.variant)||'blue'].accent),
+    accent:dark?RB_C.accent:_px(reportBuilder.variant==='custom'&&reportBuilder.customColor?reportBuilder.customColor:RB_VARIANTS[(reportBuilder&&reportBuilder.variant)||'blue'].accent),
     company:(el('companyName')&&el('companyName').value)||'P3 Group',
     project:(el('projectName')&&el('projectName').value)||'Supplier Assessment Report',
     assessor:(el('auditorName')&&el('auditorName').value)||'',
@@ -14814,9 +15350,10 @@ async function exportStandardReport(){
       }
     }
 
-    await pres.writeFile({fileName:'Report_'+new Date().toISOString().slice(0,10)+'.pptx'});
+    await pres.writeFile({fileName:'Report_'+new Date().toISOString().slice(0,10)+(dark?'_dark':'')+'.pptx'});
     toast('Report created');
   }catch(e){console.error(e);uiAlert('Export failed: '+(e&&e.message?e.message:e));}
+  finally{rptUsePalette('light');}   // RB_C is global — never leave it dark for the next caller
 }
 
 renderThemeGrid();
