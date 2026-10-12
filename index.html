@@ -668,6 +668,31 @@ input[type="color"].cp-swatch::-moz-color-swatch{border:none;border-radius:calc(
   --shadow-lg:0 14px 40px rgba(0,0,0,.6);
 }
 
+/* ── Report-map previews (calibration + supplier picker) ──────────────────
+   The sheet is a light-grey picture on a transparent sea, so pins and labels
+   cannot borrow theme colours: lime-on-grey with a white halo vanished in dark
+   mode. Labels are fixed navy chips and pins carry a navy outline — readable
+   on light land and dark sea in either theme. Dark mode only tones the land
+   down and deepens the sea so the coastlines stay crisp. */
+.map-frame{background:var(--bg2)}
+.map-pin-label{display:inline-block;font-size:9px;font-weight:700;line-height:1.25;padding:1px 5px;
+  border-radius:3px;background:#0a0e2a;color:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.6);margin-bottom:1px}
+.map-pin-ic{font-size:20px;color:var(--primary);
+  filter:drop-shadow(0 0 .6px #0a0e2a) drop-shadow(0 0 .6px #0a0e2a) drop-shadow(0 1px 1px rgba(0,0,0,.35))}
+.map-dot{position:absolute;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;
+  background:var(--primary);box-shadow:0 0 0 1.5px #0a0e2a,0 0 0 2.5px rgba(255,255,255,.7)}
+.map-dot-label{position:absolute;margin:6px 0 0;transform:translateX(-50%);white-space:nowrap;
+  font-size:8px;font-weight:600;line-height:1.25;padding:0 4px;border-radius:3px;background:#0a0e2a;color:#fff;pointer-events:none}
+.map-hint{position:absolute;left:6px;right:6px;bottom:5px;font-size:9.5px;padding:2px 6px;border-radius:4px;
+  pointer-events:none;text-align:center;color:var(--text2);
+  background:color-mix(in srgb,var(--bg) 85%,transparent);border:1px solid var(--border-soft)}
+:root[data-theme="dark"] .map-frame{background:var(--bg3)}
+:root[data-theme="dark"] .map-sheet-img{filter:brightness(.84) contrast(1.06)}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) .map-frame{background:var(--bg3)}
+  :root:not([data-theme="light"]) .map-sheet-img{filter:brightness(.84) contrast(1.06)}
+}
+
 /* ── Dark top bar (stays horizontal — content keeps full width) ─────────── */
 .topbar{background:var(--bar);border-bottom:1px solid rgba(0,0,0,.3);padding:0 18px}
 .topbar .logo{color:var(--bar-text)}
@@ -1663,6 +1688,17 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
         <button class="btn sm" onclick="selectAllExport('excel')">All</button>
         <button class="btn sm" onclick="selectNoneExport('excel')">None</button>
       </div>
+      <div style="font-size:13px;font-weight:500;margin-bottom:8px">Workbook style</div>
+      <div id="reportXlStyle" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;padding:7px 12px;border:1px solid var(--border);border-radius:20px">
+          <input type="radio" name="reportXlStyle" value="light" checked onchange="setReportXlStyle('light')" style="accent-color:var(--primary)">
+          <span style="width:14px;height:14px;border-radius:3px;background:#fff;border:1px solid #c8ccd4;display:inline-block"></span> Light
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;padding:7px 12px;border:1px solid var(--border);border-radius:20px">
+          <input type="radio" name="reportXlStyle" value="dark" onchange="setReportXlStyle('dark')" style="accent-color:var(--primary)">
+          <span style="width:14px;height:14px;border-radius:3px;background:#0a0e2a;border:1px solid #2e3a70;display:inline-block;position:relative"><span style="position:absolute;left:2px;right:2px;bottom:2px;height:2px;background:#a2f233"></span></span> Dark
+        </label>
+      </div>
       <button class="btn primary" onclick="exportExcel()"><i class="ti ti-file-spreadsheet"></i> <span>Export Excel</span></button>
     </div>
 
@@ -1672,6 +1708,18 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
         <button class="btn sm" onclick="selectAllExport('pdf')">All</button>
         <button class="btn sm" onclick="selectNoneExport('pdf')">None</button>
       </div>
+      <div style="font-size:13px;font-weight:500;margin-bottom:8px">Document style</div>
+      <div id="reportDocStyle" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;padding:7px 12px;border:1px solid var(--border);border-radius:20px">
+          <input type="radio" name="reportDocStyle" value="light" checked onchange="setReportDocStyle('light')" style="accent-color:var(--primary)">
+          <span style="width:14px;height:14px;border-radius:3px;background:#fff;border:1px solid #c8ccd4;display:inline-block"></span> Light
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;padding:7px 12px;border:1px solid var(--border);border-radius:20px">
+          <input type="radio" name="reportDocStyle" value="dark" onchange="setReportDocStyle('dark')" style="accent-color:var(--primary)">
+          <span style="width:14px;height:14px;border-radius:3px;background:#0a0e2a;border:1px solid #2e3a70;display:inline-block;position:relative"><span style="position:absolute;left:2px;right:2px;bottom:2px;height:2px;background:#a2f233"></span></span> Dark
+        </label>
+      </div>
+      <div style="font-size:11.5px;color:var(--text3);margin:-8px 0 16px">Dark uses Word's page color. To keep it when printing or saving as PDF, enable <i>Print background colors and images</i> in Word (File → Options → Display).</div>
       <button class="btn primary" onclick="exportWord()"><i class="ti ti-file-type-docx"></i> <span>Download Word Report</span></button>
     </div>
 
@@ -3394,7 +3442,7 @@ function showPage(id,btn,opts){
     detail:function(){buildTlChips('det_tl_chips','toggleDetFilter',detFilterColor);populateSelects('detailSupSelect','detailCatFilter');renderDetail();},
     compare:function(){renderComparePage();},
     settings:function(){renderWeightControls();renderTiersEditor();renderBrandDefaultButtons();},
-    exp:function(){renderExpVariants();renderExpSelectors();renderAllExportLists();renderReportScope();renderReportSlideStyle();renderMapSettings();},
+    exp:function(){renderExpVariants();renderExpSelectors();renderAllExportLists();renderReportScope();renderReportSlideStyle();renderReportDocStyle();renderReportXlStyle();renderMapSettings();},
     imp:function(){},
     calendar:function(){renderCalendar();},
     monitoring:function(){renderMonitoring();},
@@ -3915,12 +3963,17 @@ function getRoundCategories(sup,roundId){
 }
 function renderActionsKpi(){
   var el=document.getElementById('actionsKpi');if(!el)return;
-  var total=actions.length;
-  var open=actions.filter(function(a){return a.status==='Open';}).length;
-  var inprog=actions.filter(function(a){return a.status==='In Progress';}).length;
-  var done=actions.filter(function(a){return a.status==='Done';}).length;
-  var high=actions.filter(function(a){return a.priority==='High';}).length;
-  var overdue=actions.filter(function(a){return a.dueDate&&a.status!=='Done'&&new Date(a.dueDate)<new Date();}).length;
+  // Cards follow the supplier/category scope; status and priority filters stay
+  // out, otherwise the Open/Done/High breakdown would collapse to one value.
+  var fSup=(document.getElementById('actFilterSup')||{}).value||'';
+  var fCat=(document.getElementById('actFilterCat')||{}).value||'';
+  var scope=actions.filter(function(a){return (!fSup||a.supplier===fSup)&&(!fCat||a.category===fCat);});
+  var total=scope.length;
+  var open=scope.filter(function(a){return a.status==='Open';}).length;
+  var inprog=scope.filter(function(a){return a.status==='In Progress';}).length;
+  var done=scope.filter(function(a){return a.status==='Done';}).length;
+  var high=scope.filter(function(a){return a.priority==='High';}).length;
+  var overdue=scope.filter(function(a){return a.dueDate&&a.status!=='Done'&&new Date(a.dueDate)<new Date();}).length;
   el.innerHTML=
     '<div class="metric"><div class="metric-label">Total</div><div class="metric-value">'+total+'</div></div>'
     +'<div class="metric"><div class="metric-label">Open</div><div class="metric-value">'+open+'</div></div>'
@@ -4140,6 +4193,7 @@ function quickStatusChange(id,status){
 }
 
 function renderCurrentActView(){
+  renderActionsKpi();
   if(_actView==='gantt')renderGantt();
   else if(_actView==='coverage')renderCoverage();
   else renderActions();
@@ -8209,15 +8263,12 @@ function mapPreviewHtml(points,clickFn,m){
   var dots=(points||[]).map(function(p){
     var r=projectGeo(p,{x:0,y:0,w:100,h:100},m);
     if(!r)return '';
-    return '<div title="'+esc(p.name||'')+'" style="position:absolute;left:'+r.fx*100+'%;top:'+r.fy*100+'%;'
-      +'width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:50%;background:var(--primary);'
-      +'box-shadow:0 0 0 1.5px #fff"></div>'
-      +(p.name?'<div style="position:absolute;left:'+r.fx*100+'%;top:'+r.fy*100+'%;margin:4px 0 0 -30px;width:60px;'
-        +'text-align:center;font-size:8px;color:var(--text2);text-shadow:0 0 2px #fff">'+esc(p.name)+'</div>':'');
+    return '<div class="map-dot" title="'+esc(p.name||'')+'" style="left:'+r.fx*100+'%;top:'+r.fy*100+'%"></div>'
+      +(p.name?'<div class="map-dot-label" style="left:'+r.fx*100+'%;top:'+r.fy*100+'%">'+esc(p.name)+'</div>':'');
   }).join('');
-  return '<div '+(clickFn?'onclick="'+clickFn+'(event,this)" style="cursor:crosshair;':'style="')
-    +'position:relative;width:100%;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--bg2)">'
-    +'<img src="'+m.data+'" style="display:block;width:100%;pointer-events:none">'+dots+'</div>';
+  return '<div class="map-frame" '+(clickFn?'onclick="'+clickFn+'(event,this)" style="cursor:crosshair;':'style="')
+    +'position:relative;width:100%;border:1px solid var(--border);border-radius:var(--r);overflow:hidden">'
+    +'<img class="map-sheet-img" src="'+m.data+'" style="display:block;width:100%;pointer-events:none">'+dots+'</div>';
 }
 // Guesses the sheet from the file name so uploading five continent files at
 // once does not mean setting five extents by hand. Always verifiable afterwards.
@@ -8386,8 +8437,8 @@ function mapCalPreviewHtml(m,i){
   var pins=(m.anchors||[]).map(function(p,a){
     return '<div onmousedown="mapAnchorDragStart(event,'+i+','+a+')" '
       +'style="position:absolute;left:'+(p.fx*100)+'%;top:'+(p.fy*100)+'%;transform:translate(-50%,-100%);cursor:grab;z-index:3;text-align:center;white-space:nowrap">'
-      +'<div style="font-size:9px;font-weight:700;color:var(--primary-fg);text-shadow:0 0 2px #fff,0 0 2px #fff">'+esc(p.name)+'</div>'
-      +'<i class="ti ti-map-pin-filled" style="font-size:18px;color:var(--primary-fg);filter:drop-shadow(0 0 1.5px #fff)"></i>'
+      +'<div class="map-pin-label">'+esc(p.name)+'</div>'
+      +'<i class="ti ti-map-pin-filled map-pin-ic"></i>'
     +'</div>';
   }).join('');
   // The crop rectangle (report region) drawn on the sheet, so it stays visible
@@ -8403,13 +8454,13 @@ function mapCalPreviewHtml(m,i){
   // aspect-ratio container so the image fills it exactly at zoom 1 (no clipping),
   // which keeps the crop maths simple: at zoom 1 the visible region is the whole
   // sheet.
-  return '<div id="mapview_'+i+'" class="mapcal-view" onwheel="mapPreviewWheel(event,'+i+')" onmousedown="mapPanStart(event,'+i+')" '
-    +'style="position:relative;width:100%;aspect-ratio:'+(m.w||2)+'/'+(m.h||1)+';overflow:hidden;border:1px solid var(--border);border-radius:var(--r);background:var(--bg2);cursor:grab;user-select:none">'
+  return '<div id="mapview_'+i+'" onwheel="mapPreviewWheel(event,'+i+')" onmousedown="mapPanStart(event,'+i+')" '
+    +'style="position:relative;width:100%;aspect-ratio:'+(m.w||2)+'/'+(m.h||1)+';overflow:hidden;border:1px solid var(--border);border-radius:var(--r);cursor:grab;user-select:none" class="mapcal-view map-frame">'
     +'<div class="mapcal-stage" style="position:absolute;left:0;top:0;width:100%;transform:translate('+v.px+'px,'+v.py+'px) scale('+v.z+');transform-origin:0 0">'
-      +'<img src="'+m.data+'" draggable="false" style="display:block;width:100%;pointer-events:none">'
+      +'<img class="map-sheet-img" src="'+m.data+'" draggable="false" style="display:block;width:100%;pointer-events:none">'
       +cropRect+pins
     +'</div>'
-    +'<div style="position:absolute;left:6px;right:6px;bottom:5px;font-size:9.5px;color:var(--text3);background:rgba(255,255,255,.72);padding:2px 6px;border-radius:4px;pointer-events:none;text-align:center">Scroll = zoom · drag map = pan · drag each pin onto its city</div>'
+    +'<div class="map-hint">Scroll = zoom · drag map = pan · drag each pin onto its city</div>'
   +'</div>';
 }
 function _mapApplyView(view,v){
@@ -12022,9 +12073,10 @@ function renderReportScope(){
   }
   setReportScope(_reportScope);
 }
-// PowerPoint slide style. Stored on reportBuilder, so it is saved with the
-// project like the accent choice. Only the .pptx report reads it — Excel and
-// Word keep the Corporate Design accent on white.
+// PowerPoint slide style, Word document style and Excel workbook style. Stored
+// on reportBuilder, so they are saved with the project like the accent choice.
+// Kept separate: a dark deck for the screen often goes with a light Word report
+// for printing.
 function setReportSlideStyle(style){
   reportBuilder.slideStyle=(style==='dark')?'dark':'light';
   renderReportSlideStyle();
@@ -12032,6 +12084,24 @@ function setReportSlideStyle(style){
 function renderReportSlideStyle(){
   var st=reportBuilder.slideStyle==='dark'?'dark':'light';
   var rb=document.querySelector('input[name="reportSlideStyle"][value="'+st+'"]');
+  if(rb)rb.checked=true;
+}
+function setReportDocStyle(style){
+  reportBuilder.docStyle=(style==='dark')?'dark':'light';
+  renderReportDocStyle();
+}
+function renderReportDocStyle(){
+  var st=reportBuilder.docStyle==='dark'?'dark':'light';
+  var rb=document.querySelector('input[name="reportDocStyle"][value="'+st+'"]');
+  if(rb)rb.checked=true;
+}
+function setReportXlStyle(style){
+  reportBuilder.xlStyle=(style==='dark')?'dark':'light';
+  renderReportXlStyle();
+}
+function renderReportXlStyle(){
+  var st=reportBuilder.xlStyle==='dark'?'dark':'light';
+  var rb=document.querySelector('input[name="reportXlStyle"][value="'+st+'"]');
   if(rb)rb.checked=true;
 }
 function setReportScope(mode){
@@ -12107,10 +12177,15 @@ async function exportExcel(){
   const RA=_px(reportBuilder.variant==='custom'&&reportBuilder.customColor?reportBuilder.customColor:RB_VARIANTS[(reportBuilder&&reportBuilder.variant)||'blue'].accent).toUpperCase();
   function _xlLighten(hex,amt){var h=String(hex).replace('#','');var r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);r=Math.round(r+(255-r)*amt);g=Math.round(g+(255-g)*amt);b=Math.round(b+(255-b)*amt);return [r,g,b].map(function(n){return ('0'+n.toString(16)).slice(-2);}).join('').toUpperCase();}
   function _xlText(hex){var h=String(hex).replace('#','');var r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);return (0.299*r+0.587*g+0.114*b)/255>0.62?'000000':'FFFFFF';}
-  const PRIMARY=RA;                 // title bands
-  const ACCENT=_xlLighten(RA,0.5);  // thin accent stripe (was fixed lime)
-  const P3BLUE=RA;                  // sheet tab accents
-  const HDR=RA;                     // table header fill
+  // Dark workbook = the dark deck/Word look: navy bands, lime stripe and tabs.
+  // The sheets below are written in the light palette and then recoloured in
+  // one pass (_xlDarken) just before saving.
+  const XDARK=reportBuilder.xlStyle==='dark';
+  const DP=RB_PALETTES.dark;
+  const PRIMARY=XDARK?DP.surface:RA;               // title bands
+  const ACCENT=XDARK?DP.accent:_xlLighten(RA,0.5); // thin accent stripe (was fixed lime)
+  const P3BLUE=XDARK?DP.accent:RA;                 // sheet tab accents
+  const HDR=XDARK?DP.track:RA;                     // table header fill
   const LGRAY='F5F6F8';
 
   function scoreHex(pct){
@@ -12314,7 +12389,7 @@ async function exportExcel(){
     const headers=['Supplier',...infoFields.map(function(f){return f.label;}),
       'Overall %','Tier','Criticality','Risk Tier','Last Assessment','Next Assessment','Assessor'];
     const nCol=headers.length;
-    titleBlock(ws,'Supplier Register — '+project,'Stand '+today+'   |   '+sel.length+' suppliers',nCol);
+    titleBlock(ws,'Supplier Register — '+project,'Stand '+today+'   |   '+sel.length+(sel.length===1?' supplier':' suppliers'),nCol);
     ws.getRow(3).height=8;
 
     const hRow=ws.getRow(4);
@@ -12689,14 +12764,92 @@ async function exportExcel(){
     ws.getColumn(1).width=16;ws.getColumn(2).width=18;ws.getColumn(3).width=16;ws.getColumn(4).width=34;
   }
 
+  _xlFixContrast(wb);
+  if(XDARK)_xlDarken(wb,PRIMARY);
+
   // ── DOWNLOAD ──────────────────────────────────────────────────────────────
   const buffer=await wb.xlsx.writeBuffer();
   const blob=new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
-  a.href=url;a.download='Supplier_WorkingFiles_'+project.replace(/[^a-zA-Z0-9]/g,'_')+'_'+new Date().toISOString().slice(0,10)+'.xlsx';
+  a.href=url;a.download='Supplier_WorkingFiles_'+project.replace(/[^a-zA-Z0-9]/g,'_')+'_'+new Date().toISOString().slice(0,10)+(XDARK?'_dark':'')+'.xlsx';
   a.click();URL.revokeObjectURL(url);
   toast('Excel working file exported — '+wb.worksheets.length+' sheets');
+}
+
+// Score/tier/status cells are written with WHITE text on their tier colour. With
+// a light tier palette (the lime "system" colours, light greens, orange) that
+// white is unreadable, so every white-on-colour cell is checked and switches to
+// navy wherever navy has the higher WCAG contrast against the fill.
+function _xlFixContrast(wb){
+  function lum(hex){
+    return [0,2,4].map(function(i){var c=parseInt(hex.substr(i,2),16)/255;return c<=0.03928?c/12.92:Math.pow((c+0.055)/1.055,2.4);})
+      .reduce(function(a,c,i){return a+c*[0.2126,0.7152,0.0722][i];},0);
+  }
+  function ratio(a,b){var x=lum(a),y=lum(b);return (Math.max(x,y)+0.05)/(Math.min(x,y)+0.05);}
+  var DARKTXT='0A0E2A';
+  wb.worksheets.forEach(function(ws){
+    ws.eachRow(function(row){
+      row.eachCell(function(cell){
+        var f=cell.fill,fo=cell.font;
+        if(!f||f.type!=='pattern'||f.pattern!=='solid'||!f.fgColor||!f.fgColor.argb)return;
+        if(!fo||!fo.color||!fo.color.argb||String(fo.color.argb).slice(-6).toUpperCase()!=='FFFFFF')return;
+        var bg=String(f.fgColor.argb).slice(-6).toUpperCase();
+        if(ratio(DARKTXT,bg)>ratio('FFFFFF',bg))cell.font=Object.assign({},fo,{color:{argb:'FF'+DARKTXT}});
+      });
+    });
+  });
+}
+
+// Recolour a finished light workbook into the dark palette (RB_PALETTES.dark).
+// Only the NEUTRAL light fills (white rows, grey zebra/notes) and the grey text on
+// them are mapped; coloured cells — tier scores, bands, the lime stripe — keep
+// their fill and their contrast-picked text. Empty cells and the columns to the
+// right get the navy page via a column style, so no white sheet shows through.
+function _xlDarken(wb,bandHex){
+  var D=RB_PALETTES.dark;
+  // Light rows/notes → raised navy; the charcoal sub-headers (333/444/555) →
+  // the same header navy as the accent headers, so no grey bands remain.
+  var FILL={FFFFFF:D.surface,F5F6F8:'1B2452',F0F0F0:'1B2452',EEEEEE:'1B2452',
+            '333333':D.surface,'444444':D.track,'555555':D.track};
+  var FONT={'000000':D.textDark,'333333':D.textDark,'444444':D.textDark,'555555':D.textMid,'666666':D.textMid,
+            '777777':D.foot,'888888':D.foot,'999999':D.foot,
+            C0392B:'F06A6A',B91C1C:'F06A6A',E07B00:'F2B33D',A16207:'F2B33D',FFAA00:'F2B33D',
+            '1A8A5A':'4FC08D','15803D':'4FC08D','17806E':'4FAE95','8B4513':'D79A6B'};
+  function rgb(c){return c&&c.argb?String(c.argb).slice(-6).toUpperCase():null;}
+  function solid(hex){return {type:'pattern',pattern:'solid',fgColor:{argb:'FF'+hex}};}
+  wb.worksheets.forEach(function(ws){
+    // Gridlines off (they read as a white mesh on navy); keep any frozen panes.
+    ws.views=(ws.views&&ws.views.length?ws.views:[{}]).map(function(v){return Object.assign({},v,{showGridLines:false});});
+    if(ws.properties.tabColor&&rgb(ws.properties.tabColor)===bandHex)ws.properties.tabColor={argb:'FF'+D.accent};
+    var nCol=Math.max(ws.columnCount,1);
+    ws.eachRow({includeEmpty:true},function(row){
+      for(var c=1;c<=nCol;c++){
+        var cell=row.getCell(c);
+        var f=cell.fill, fx=f&&f.type==='pattern'&&f.pattern==='solid'?rgb(f.fgColor):null;
+        var neutral=!fx||FILL[fx]!==undefined;
+        if(!fx)cell.fill=solid(D.bg);
+        else if(FILL[fx])cell.fill=solid(FILL[fx]);
+        if(neutral){
+          var fo=cell.font||{}, fc=rgb(fo.color);
+          var to=fc==null?D.textDark:(FONT[fc]||fc);
+          if(fc!==to)cell.font=Object.assign({},fo,{color:{argb:'FF'+to}});
+        }
+        if(cell.border){
+          var b={};['top','left','bottom','right'].forEach(function(k){
+            if(cell.border[k])b[k]=Object.assign({},cell.border[k],{color:{argb:'FF'+D.line}});
+          });
+          cell.border=b;
+        }
+      }
+    });
+    // Column-level style (set on the plain style object, NOT via the setter,
+    // which would also overwrite every existing cell in the column).
+    for(var cc=1;cc<=Math.max(nCol+12,40);cc++){
+      var col=ws.getColumn(cc);
+      col.style=Object.assign({},col.style,{fill:solid(D.bg),font:Object.assign({},(col.style||{}).font,{color:{argb:'FF'+D.textDark}})});
+    }
+  });
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -12718,11 +12871,21 @@ async function exportWord(){
   if(!sel.length)sel=suppliers.slice();
   var portfolio=sel.length>1;
 
-  // Accent from the SAME source the PowerPoint + Excel reports read.
-  var A='#'+_px(reportBuilder.variant==='custom'&&reportBuilder.customColor
+  // Accent from the SAME source the PowerPoint + Excel reports read. The dark
+  // document mirrors the dark deck: RB_PALETTES.dark (the app's own dark mode)
+  // with the lime accent pinned, since the corporate blues vanish on navy.
+  var dark=reportBuilder.docStyle==='dark';
+  var DP=RB_PALETTES.dark;
+  var A=dark?'#'+DP.accent:'#'+_px(reportBuilder.variant==='custom'&&reportBuilder.customColor
                  ?reportBuilder.customColor
                  :RB_VARIANTS[(reportBuilder&&reportBuilder.variant)||'blue'].accent);
-  var C={dark:'#16202C',textDark:'#464646',textMid:'#333333',line:'#DDDDDD',foot:'#8A8F98',bg2:'#F2F4F7'};
+  // page = document background (also the "invisible" separator colour),
+  // surface = raised boxes, track = empty part of bars and score dots.
+  var C=dark
+    ?{dark:'#'+DP.strong,textDark:'#'+DP.textDark,textMid:'#'+DP.textMid,line:'#'+DP.line,foot:'#'+DP.foot,bg2:'#'+DP.surface,
+      page:'#'+DP.bg,surface:'#'+DP.surface,track:'#'+DP.track,dot:'#'+DP.track}
+    :{dark:'#16202C',textDark:'#464646',textMid:'#333333',line:'#DDDDDD',foot:'#8A8F98',bg2:'#F2F4F7',
+      page:'#FFFFFF',surface:'#FFFFFF',track:'#EDEFF2',dot:'#E6E9EE'};
   var company =(document.getElementById('companyName').value)||'P3 Group';
   var project =(document.getElementById('projectName').value)||'Supplier Assessment Report';
   var assessor=(document.getElementById('auditorName').value)||'';
@@ -12734,7 +12897,9 @@ async function exportWord(){
   // rules as the PowerPoint + Excel reports: accent from reportBuilder, TIERS
   // colours on the matrix, accent score bars/dots, module order from RPT_MODULES.
   // No full-page cover band, so there are never trailing blank pages.
-  function mix(hex,amt){var h=hex.replace('#','');var r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),b=parseInt(h.substr(4,2),16);r=Math.round(r+(255-r)*amt);g=Math.round(g+(255-g)*amt);b=Math.round(b+(255-b)*amt);return '#'+[r,g,b].map(function(n){return ('0'+n.toString(16)).slice(-2);}).join('');}
+  // Tints fade the accent toward the PAGE colour (white, or navy in dark mode),
+  // so "lighter" always means "closer to the background".
+  function mix(hex,amt){var h=hex.replace('#',''),p=C.page.replace('#','');var r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),b=parseInt(h.substr(4,2),16);var pr=parseInt(p.substr(0,2),16),pg=parseInt(p.substr(2,2),16),pb=parseInt(p.substr(4,2),16);r=Math.round(r+(pr-r)*amt);g=Math.round(g+(pg-g)*amt);b=Math.round(b+(pb-b)*amt);return '#'+[r,g,b].map(function(n){return ('0'+n.toString(16)).slice(-2);}).join('');}
   function tierOf(pct){return pct==null?null:(TIERS.find(function(t){return pct>=t.min;})||TIERS[TIERS.length-1]);}
   function tierColor(pct){var t=tierOf(pct);return t?t.color:'#888';}
   function tierLbl(pct){var t=tierOf(pct);return t?t.label:'—';}
@@ -12745,13 +12910,13 @@ async function exportWord(){
   function bar(pct){
     var v=pct==null||isNaN(pct)?0:Math.max(0,Math.min(100,Math.round(pct))),c='';
     if(v>0)c+='<td width="'+v+'%" style="background:'+A+';font-size:1px;line-height:1px;height:8px">&nbsp;</td>';
-    if(v<100)c+='<td width="'+(100-v)+'%" style="background:#EDEFF2;font-size:1px;line-height:1px;height:8px">&nbsp;</td>';
+    if(v<100)c+='<td width="'+(100-v)+'%" style="background:'+C.track+';font-size:1px;line-height:1px;height:8px">&nbsp;</td>';
     return '<table width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;table-layout:fixed"><tr>'+c+'</tr></table>';
   }
   // 0–5 score as five small coloured cells (a one-row table).
   function dots(score){
     var f=(score==null||score==='N.A.'||isNaN(Number(score)))?-1:Number(score),c='';
-    for(var i=0;i<5;i++)c+='<td width="11" style="width:11px;height:9px;font-size:1px;line-height:1px;background:'+(i<f?A:'#E6E9EE')+';border:1px solid #FFFFFF">&nbsp;</td>';
+    for(var i=0;i<5;i++)c+='<td width="11" style="width:11px;height:9px;font-size:1px;line-height:1px;background:'+(i<f?A:C.dot)+';border:1px solid '+C.page+'">&nbsp;</td>';
     return '<table cellspacing="0" cellpadding="0" style="border-collapse:collapse;display:inline-block"><tr>'+c+'</tr></table>';
   }
   function panel(t){return '<p class=plabel>'+esc(String(t).toUpperCase())+'</p>';}
@@ -12779,7 +12944,7 @@ async function exportWord(){
         return vs.length?Math.round(vs.reduce(function(a,b){return a+b;},0)/vs.length):0;
       });
     }
-    radar[sp.name]='data:'+await renderRadarToPng(rcs,vals,_px(A),avg,shortName(sp.name,34));
+    radar[sp.name]='data:'+await renderRadarToPng(rcs,vals,_px(A),avg,shortName(sp.name,34),dark?C:null);
   }
 
   var P=[];
@@ -13054,7 +13219,7 @@ async function exportWord(){
   var css=''
     +'@page Section1{size:595.3pt 841.9pt;margin:1.7cm 1.5cm 1.7cm 1.5cm;mso-page-orientation:portrait}'
     +'div.Section1{page:Section1}'
-    +'body{font-family:Arial,"Segoe UI",sans-serif;font-size:10pt;line-height:1.45;color:'+C.textDark+'}'
+    +'body{font-family:Arial,"Segoe UI",sans-serif;font-size:10pt;line-height:1.45;color:'+C.textDark+(dark?';background:'+C.page:'')+'}'
     +'p{margin:0 0 5pt}'
     +'td{word-wrap:break-word}'
     +'h1.h1{font-size:25pt;font-weight:bold;color:'+C.dark+';margin:0;line-height:1.2}'
@@ -13076,9 +13241,9 @@ async function exportWord(){
     // No grid cell carries a background or a border — the colour sits on the
     // nested tile (.mct). That is what makes the stray colour strip impossible:
     // there is no full-row-height coloured surface for Word to mis-clip.
-    +'table.mtx{background:#FFFFFF}'
+    +'table.mtx{background:'+C.page+'}'
     +'.mtx tr{page-break-inside:avoid}'
-    +'.mtx td{border:0;background:#FFFFFF;text-align:center;font-size:9pt;vertical-align:middle}'
+    +'.mtx td{border:0;background:'+C.page+';text-align:center;font-size:9pt;vertical-align:middle}'
     +'.mtx td.mcw{padding:2pt}'
     +'.mtx td.mct{border:0;padding:8pt 3pt;text-align:center;font-size:9pt;font-weight:bold;line-height:1.2}'
     +'.mtx td.mct.na{background:'+C.bg2+';color:'+C.foot+';font-weight:normal}'
@@ -13091,14 +13256,14 @@ async function exportWord(){
     // Same rule as the comparison matrix: uniform border WIDTH on every cell
     // (only the colour differs, white where no line should show), so Word cannot
     // mis-place a separator on a tall row and leave a tinted sliver behind.
-    +'table.rm{background:#FFFFFF}'
+    +'table.rm{background:'+C.page+'}'
     +'.rm tr{page-break-inside:avoid}'
     +'.rm td{border:.75pt solid '+C.line+';padding:8pt;font-size:8.5pt;vertical-align:top}'
-    +'.rm td.rmcorner{border:.75pt solid #FFFFFF}'
-    +'.rm td.rmcolh{font-size:8.5pt;font-weight:bold;letter-spacing:.6pt;color:'+C.foot+';text-align:center;border:.75pt solid #FFFFFF;padding:0 0 7pt}'
-    +'.rm td.rmrowh{border:.75pt solid #FFFFFF;text-align:right;padding:8pt 10pt 8pt 0}'
+    +'.rm td.rmcorner{border:.75pt solid '+C.page+'}'
+    +'.rm td.rmcolh{font-size:8.5pt;font-weight:bold;letter-spacing:.6pt;color:'+C.foot+';text-align:center;border:.75pt solid '+C.page+';padding:0 0 7pt}'
+    +'.rm td.rmrowh{border:.75pt solid '+C.page+';text-align:right;padding:8pt 10pt 8pt 0}'
     +'.rm td.rmrowh b{font-size:9.5pt;color:'+C.textDark+'}.rm td.rmrowh span{font-size:8pt;color:'+C.foot+'}'
-    +'table.chip td{border:0;padding:5pt 7pt;background:#FFFFFF}'
+    +'table.chip td{border:0;padding:5pt 7pt;background:'+C.surface+'}'
     +'table.chip td.chipn{font-size:8.5pt;color:'+C.textDark+';line-height:1.3}'
     +'table.chip td.chips{font-size:8.5pt;font-weight:bold;text-align:right}'
     +'p.rmaxis{font-size:8.5pt;font-weight:bold;letter-spacing:.6pt;color:'+C.foot+';text-align:center;margin:9pt 0 0}'
@@ -13136,14 +13301,18 @@ async function exportWord(){
     +'.atbl td.aref{font-weight:bold;color:'+C.foot+'}';
 
   var head='﻿<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>'+esc(project)+'</title>'
-    +'<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom><w:DoNotOptimizeForBrowser/></w:WordDocument></xml><![endif]-->'
-    +'<style>'+css+'</style></head><body><div class=Section1>';
+    +'<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom><w:DoNotOptimizeForBrowser/>'+(dark?'<w:DisplayBackgroundShape/>':'')+'</w:WordDocument></xml><![endif]-->'
+    +'<style>'+css+'</style></head>'
+    // Page colour: bgcolor is what Word maps to Design → Page Color; DisplayBackgroundShape
+    // switches its display on. Word prints it only with "Print background colors"
+    // enabled, but PDF export and screen viewing show it.
+    +'<body'+(dark?' bgcolor="'+C.page+'"':'')+'><div class=Section1>';
   var doc=head+P.join('')+'</div></body></html>';
 
   var blob=new Blob([doc],{type:'application/msword'});
   var url=URL.createObjectURL(blob);
   var a=document.createElement('a');
-  a.href=url;a.download='Supplier_Report_'+new Date().toISOString().slice(0,10)+'.doc';
+  a.href=url;a.download='Supplier_Report_'+new Date().toISOString().slice(0,10)+(dark?'_dark':'')+'.doc';
   document.body.appendChild(a);a.click();a.remove();
   setTimeout(function(){URL.revokeObjectURL(url);},1500);
   toast(lang==='de'?'Word-Report heruntergeladen':'Word report downloaded');
@@ -13153,7 +13322,11 @@ async function exportWord(){
 // and radius scaled to match, so the picture stays sharp when Word prints it at
 // ~4in wide — a 600px bitmap visibly softened on paper. Generous layout padding
 // keeps long spoke labels ("Production & Process Control") off the canvas edge.
-function renderRadarToPng(labels, dataVals, hexColor, avgVals, supplierLabel){
+// Optional `theme` (the Word report's dark palette) recolours grid, labels and
+// the comparison series for a navy page; without it the light look is unchanged.
+function renderRadarToPng(labels, dataVals, hexColor, avgVals, supplierLabel, theme){
+  var T=theme?{grid:theme.line,label:theme.textDark,tick:theme.foot,backdrop:theme.page,legend:theme.textMid,avg:theme.textMid}
+             :{grid:'#DFE3E8',label:'#333333',tick:'#8A8F98',backdrop:'rgba(255,255,255,.85)',legend:'#464646',avg:'#9AA1AC'};
   return new Promise(function(resolve){
     var K=2.5, S=Math.round(600*K);
     var canvas=document.createElement('canvas');
@@ -13170,9 +13343,9 @@ function renderRadarToPng(labels, dataVals, hexColor, avgVals, supplierLabel){
       datasets.push({
         label:'Ø Other Suppliers',
         data:avgVals,
-        borderColor:'#9AA1AC',
-        backgroundColor:'#9AA1AC14',
-        pointBackgroundColor:'#9AA1AC',
+        borderColor:T.avg,
+        backgroundColor:T.avg+'14',
+        pointBackgroundColor:T.avg,
         pointRadius:3*K,borderWidth:1.5*K,
         borderDash:[6*K,3*K]
       });
@@ -13183,11 +13356,11 @@ function renderRadarToPng(labels, dataVals, hexColor, avgVals, supplierLabel){
       options:{responsive:false,animation:false,devicePixelRatio:1,
         layout:{padding:10*K},
         scales:{r:{min:0,max:100,
-          ticks:{stepSize:25,font:{size:11*K},color:'#8A8F98',backdropColor:'rgba(255,255,255,.85)',
+          ticks:{stepSize:25,font:{size:11*K},color:T.tick,backdropColor:T.backdrop,
                  callback:function(v){return v+'%';}},
-          pointLabels:{font:{size:12*K,weight:'bold'},color:'#333333',padding:8*K},
-          grid:{color:'#DFE3E8',lineWidth:1*K},angleLines:{color:'#DFE3E8',lineWidth:1*K}}},
-        plugins:{legend:{display:!!avgVals,labels:{font:{size:11*K},boxWidth:14*K,padding:10*K,color:'#464646'}}}}
+          pointLabels:{font:{size:12*K,weight:'bold'},color:T.label,padding:8*K},
+          grid:{color:T.grid,lineWidth:1*K},angleLines:{color:T.grid,lineWidth:1*K}}},
+        plugins:{legend:{display:!!avgVals,labels:{font:{size:11*K},boxWidth:14*K,padding:10*K,color:T.legend}}}}
     });
     setTimeout(function(){
       var png=canvas.toDataURL('image/png').replace('data:','');
@@ -13278,9 +13451,9 @@ function rptUsePalette(style){
 }
 rptUsePalette('light');
 
-// reportBuilder carries the accent-colour choice and the PowerPoint slide style
-// ('light' | 'dark') for the standard report export.
-var reportBuilder={variant:'blue',slideStyle:'light'};
+// reportBuilder carries the accent-colour choice and the PowerPoint, Word and
+// Excel styles (each 'light' | 'dark') for the report exports.
+var reportBuilder={variant:'blue',slideStyle:'light',docStyle:'light',xlStyle:'light'};
 
 // ══════════════════════════════════════════════════════════════════════════
 // REPORT MODULES
@@ -13351,7 +13524,7 @@ function rptCover(pres,ctx){
   s.addShape('line',{x:0.8,y:3.15,w:2.2,h:0,line:{color:ctx.accent,width:2}});
   var meta=[ctx.company,ctx.assessor?'Assessor: '+ctx.assessor:'',ctx.today].filter(Boolean).join('   ·   ');
   s.addText(meta,{x:0.8,y:3.4,w:8.6,h:0.3,fontSize:10,color:RB_C.textMid,fontFace:'Montserrat'});
-  s.addText(ctx.suppliers.length+' suppliers assessed',{x:0.8,y:3.75,w:8.6,h:0.3,
+  s.addText(ctx.suppliers.length+(ctx.suppliers.length===1?' supplier assessed':' suppliers assessed'),{x:0.8,y:3.75,w:8.6,h:0.3,
     fontSize:10,color:RB_C.foot,fontFace:'Montserrat'});
 }
 
