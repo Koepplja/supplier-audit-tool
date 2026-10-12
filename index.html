@@ -5138,6 +5138,7 @@ function renderTplEditor(){
   var h='<div class="card">'
     +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'
       +'<input id="tplDraftName" type="text" value="'+esc(tplDraft.name)+'" placeholder="Template name..." oninput="tplDraft.name=this.value" style="flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:var(--r);font-size:14px;font-weight:600;background:var(--bg);color:var(--text)">'
+      +(aiTplHasMissingRubrics()?'<button class="btn" onclick="aiTplGenAllRubrics()" title="Generate a 0–5 scoring rubric for every checkpoint that has none"><i class="ti ti-sparkles"></i> Rubrics with AI</button>':'')
       +'<button class="btn primary" onclick="commitTemplate()"><i class="ti ti-device-floppy"></i> Save</button>'
       +(tplDraftIdx>=0?'<button class="btn" onclick="cancelTplEdit()"><i class="ti ti-x"></i> Cancel</button>':'')
     +'</div>';
@@ -5147,11 +5148,13 @@ function renderTplEditor(){
   } else {
     cats.forEach(function(cat,ci){
       var items=tplDraft.categories[cat]||[];
+      var ai=items._ai||{};
       h+='<div style="border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden">'
         // Category header
         +'<div style="background:var(--bg2);padding:10px 12px;display:flex;align-items:center;gap:8px">'
           +'<i class="ti ti-folder" style="color:var(--primary-fg);font-size:15px"></i>'
           +'<input type="text" value="'+esc(cat)+'" onchange="renameTplCat(\''+esc(cat)+'\',this.value)" style="flex:1;border:none;background:transparent;font-size:13px;font-weight:600;color:var(--text);outline:none;min-width:0" placeholder="Category name">'
+          +(ai.state==='rubric'?'<span style="font-size:11px;color:var(--primary-fg);white-space:nowrap;display:inline-flex;align-items:center;gap:4px"><i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Rubrics…</span>':'')
           +'<span style="font-size:11px;color:var(--text3);white-space:nowrap">'+items.length+' checkpoints</span>'
           +'<label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text3);white-space:nowrap" title="Category weight in overall score (0 = excluded)">'
             +'<i class="ti ti-scale" style="font-size:11px"></i> Weight'
@@ -5161,7 +5164,14 @@ function renderTplEditor(){
         +'</div>'
         // Checkpoints
         +'<div style="padding:8px 12px">'
-        +items.map(function(item,ii){
+        +(ai.state==='loading'
+          ?'<div style="display:flex;align-items:center;gap:8px;padding:8px 2px;font-size:12px;color:var(--text2)"><i class="ti ti-loader" style="animation:spin 1s linear infinite;color:var(--primary-fg);font-size:15px"></i><span>AI is writing checkpoints'+(ai.hint?' — <span style="color:var(--text3)">'+esc(ai.hint)+'</span>':'…')+'</span></div>'
+          :'')
+        +(ai.state==='error'
+          ?'<div style="display:flex;align-items:center;gap:8px;padding:8px 2px;font-size:12px;color:var(--crit)"><i class="ti ti-alert-triangle"></i><span style="flex:1;min-width:0">'+esc(ai.msg||'Generation failed.')+'</span>'
+            +'<button class="btn" onclick="aiTplRetryCategory(\''+esc(cat)+'\')" style="padding:4px 10px;font-size:12px"><i class="ti ti-refresh"></i> Retry</button></div>'
+          :'')
+        +(ai.state==='loading'?'':items.map(function(item,ii){
           var rubricId='rubric_'+ci+'_'+ii;
           var hasRubric=!!item.rubric;
           var rubricContent=hasRubric
@@ -5196,7 +5206,7 @@ function renderTplEditor(){
             +'</div>'
             +'</div>';
         }).join('')
-        +'<button onclick="addTplCheckpoint(\''+esc(cat)+'\')" style="background:none;border:none;cursor:pointer;color:var(--primary-fg);font-size:12px;padding:6px 0;display:flex;align-items:center;gap:4px;margin-top:4px"><i class="ti ti-plus"></i> Add checkpoint</button>'
+        +'<button onclick="addTplCheckpoint(\''+esc(cat)+'\')" style="background:none;border:none;cursor:pointer;color:var(--primary-fg);font-size:12px;padding:6px 0;display:flex;align-items:center;gap:4px;margin-top:4px"><i class="ti ti-plus"></i> Add checkpoint</button>')
         +'</div>'
         +'</div>';
     });
@@ -5280,6 +5290,8 @@ function deleteTplCheckpoint(cat,idx){
 
 async function commitTemplate(){
   if(!tplDraft)return;
+  var aiBusy=Object.keys(tplDraft.categories).some(function(k){var a=tplDraft.categories[k]._ai;return a&&(a.state==='loading'||a.state==='rubric');});
+  if(aiBusy&&!(await uiConfirm({title:'AI still working',message:'Some categories are still being generated. Save what is there now?',confirmText:'Save anyway',danger:false,icon:'ti-device-floppy'})))return;
   var name=document.getElementById('tplDraftName')?document.getElementById('tplDraftName').value.trim():tplDraft.name.trim();
   if(!name){uiAlert('Please enter a template name.');return;}
   // Check for empty checkpoints
@@ -6119,276 +6131,329 @@ function openAuditWizard(sn){
 
 
 // ── AI Checklist Generator ────────────────────────────────────────────────────
-var AI_ALL_FOCUS=[
+// Two steps instead of one big request: (1) the AI proposes categories from a
+// short description and the user curates them; (2) checkpoints are generated
+// per category, a few in parallel, and land in the builder as each finishes.
+// Small answers never hit the token ceiling, and a failure costs one category
+// (with a Retry) instead of the whole template. Rubrics are not generated up
+// front — the editor's "Rubrics with AI" button fills them on demand.
+var AI_FOCUS_CHIPS=[
   'Quality Management System','Incoming Inspection & Control','Non-Conformance Management','Supplier Development & Qualification',
   'Production Planning & Capacity','Inventory & Demand Planning','Supply Chain Risk Management','Logistics & Transportation',
   'Warehouse & Material Handling','Procurement & Sourcing','Cost & Pricing Transparency','Cost Reduction & Efficiency',
   'Sustainability & ESG','Regulatory & Compliance','Innovation & R&D','Digital Transformation & Traceability',
   'Health & Safety','Business Continuity & Resilience','Financial Stability','IT Security & Cybersecurity'
 ];
-var AI_PRESETS={
-  'Operations & Supply Chain':['Supply Chain Risk Management','Inventory & Demand Planning','Production Planning & Capacity','Logistics & Transportation','Warehouse & Material Handling','Procurement & Sourcing','Business Continuity & Resilience','Digital Transformation & Traceability'],
-  'Quality & Compliance':['Quality Management System','Incoming Inspection & Control','Non-Conformance Management','Supplier Development & Qualification','Regulatory & Compliance','Health & Safety'],
-  'Automotive (IATF)':['Quality Management System','Non-Conformance Management','Production Planning & Capacity','Logistics & Transportation','Cost & Pricing Transparency','Sustainability & ESG','Innovation & R&D'],
-  'General Manufacturing':['Quality Management System','Logistics & Transportation','Cost & Pricing Transparency','Sustainability & ESG','Innovation & R&D','Financial Stability'],
-  'Finance & Risk':['Financial Stability','Cost & Pricing Transparency','Cost Reduction & Efficiency','Regulatory & Compliance','IT Security & Cybersecurity','Business Continuity & Resilience']
+var AI_APPROACH={
+  assessment:{label:'maturity assessment with a consulting focus',
+    cp:'Phrase every checkpoint as a concrete maturity / capability question that reveals how well-established and effective a practice is, while staying checkable against evidence. Avoid pure yes/no compliance checks — the goal is to surface strengths and development potential.',
+    rubric:'0 = not present, 1 = initial/ad-hoc, 2 = partially established, 3 = established, 4 = well-managed, 5 = best-practice / role model.'},
+  audit:{label:'compliance audit',
+    cp:'Phrase every checkpoint as a concrete, verifiable audit requirement that can be checked against evidence (documents, records).',
+    rubric:'0 = not implemented, 1 = isolated / informal, 2 = partially implemented, evidence incomplete, 3 = largely implemented with evidence, 4 = fully implemented and effective, 5 = fully implemented, effective and exemplary.'}
 };
+var AI_TPL_SYSTEM='You are an expert in supplier quality management, procurement and supplier maturity assessments. Respond with valid JSON only — no prose, no markdown, no code fences.';
+var AI_TPL_LBL='font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px';
+var AI_TPL_INP='width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text);box-sizing:border-box';
+var _aiTplWiz=null;
 
 function aiGenerateTemplate(){
-  var key=getApiKey();
-  if(!key){uiAlert('Please enter your Anthropic API key in Settings first.');return;}
-  var ex=document.getElementById('aiTplModal');if(ex)ex.remove();
-  var m=document.createElement('div');m.id='aiTplModal';
-  m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:3000;display:flex;align-items:center;justify-content:center;padding:16px';
+  if(!getApiKey()){uiAlert('Please enter your Anthropic API key in Settings first.');return;}
+  _aiTplWiz={desc:'',focus:[],approach:'assessment',lang:'English',name:'',cats:[],req:0};
+  _aiTplStep1();
+}
 
-  var focusCheckboxes=AI_ALL_FOCUS.map(function(f,i){
-    return '<label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;padding:5px 9px;border:1px solid var(--border);border-radius:7px;background:var(--bg2)">'
-      +'<input type="checkbox" class="aiTplFocusCb" value="'+f+'" style="width:13px;height:13px;accent-color:var(--primary)">'+f+'</label>';
-  }).join('');
-
-  var presetBtns=Object.keys(AI_PRESETS).map(function(p){
-    return '<button type="button" onclick="setAiTplPreset(\''+p+'\')" style="padding:5px 10px;border:1px solid var(--border);border-radius:20px;background:var(--bg);color:var(--text);font-size:11px;cursor:pointer;white-space:nowrap">'+p+'</button>';
-  }).join('');
-
+function _aiTplModal(step,body){
+  var m=document.getElementById('aiTplModal');
+  if(!m){
+    m=document.createElement('div');m.id='aiTplModal';
+    m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:3000;display:flex;align-items:center;justify-content:center;padding:16px';
+    m.onclick=function(e){if(e.target===m)_aiTplClose();};
+    document.body.appendChild(m);
+  }
+  var sub=step===1?'Step 1 of 2 · Describe what the checklist should assess':'Step 2 of 2 · Review the proposed categories';
   m.innerHTML='<div style="background:var(--bg);border-radius:16px;width:100%;max-width:600px;max-height:92vh;overflow-y:auto;box-shadow:var(--shadow-lg)">'
     +'<div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;position:sticky;top:0;background:var(--bg);z-index:1">'
       +'<div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-sparkles" style="color:var(--on-primary);font-size:17px"></i></div>'
       +'<div><div style="font-size:15px;font-weight:700;color:var(--text)">AI Checklist Generator</div>'
-        +'<div style="font-size:11px;color:var(--text2)">Define criteria — AI creates a complete assessment template</div></div>'
-      +'<button onclick="document.getElementById(\'aiTplModal\').remove()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px"><i class="ti ti-x"></i></button>'
+        +'<div style="font-size:11px;color:var(--text2)">'+sub+'</div></div>'
+      +'<button onclick="_aiTplClose()" aria-label="Close" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px"><i class="ti ti-x"></i></button>'
     +'</div>'
-    +'<div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">'
-
-      +'<div><label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">Template Name</label>'
-      +'<input id="aiTpl_name" type="text" placeholder="e.g. Automotive Tier-1 Supplier 2026" style="width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text);box-sizing:border-box"></div>'
-
-      +'<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:11px">'
-        +'<div><label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">Industry / Sector</label>'
-        +'<input id="aiTpl_industry" type="text" placeholder="e.g. Automotive, Electronics" style="width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text);box-sizing:border-box"></div>'
-        +'<div><label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">Supplier Type</label>'
-        +'<input id="aiTpl_suptype" type="text" placeholder="e.g. Component manufacturer" style="width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text);box-sizing:border-box"></div>'
-      +'</div>'
-
-      // Focus areas with presets
-      +'<div>'
-        +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">'
-          +'<label style="font-size:12px;font-weight:600;color:var(--text2)">Focus Areas</label>'
-          +'<button type="button" onclick="document.querySelectorAll(\'.aiTplFocusCb\').forEach(function(c){c.checked=false;})" style="font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer">Clear all</button>'
-        +'</div>'
-        +'<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px">'+presetBtns+'</div>'
-        +'<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:5px;max-height:200px;overflow-y:auto;padding-right:4px">'+focusCheckboxes+'</div>'
-        // Custom area input
-        +'<div style="display:flex;gap:7px;margin-top:8px">'
-          +'<input id="aiTpl_customArea" type="text" placeholder="Add custom focus area…" style="flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:var(--r);font-size:12px;background:var(--bg);color:var(--text)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();addAiTplCustomArea();}">'
-          +'<button type="button" onclick="addAiTplCustomArea()" style="padding:7px 12px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:12px;cursor:pointer;white-space:nowrap"><i class="ti ti-plus"></i> Add</button>'
-        +'</div>'
-        +'<div id="aiTpl_customList" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"></div>'
-      +'</div>'
-
-      +'<div><label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">Approach</label>'
-        +'<select id="aiTpl_approach" style="width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text)">'
-          +'<option value="assessment">Assessment — maturity &amp; potential (advisory focus)</option>'
-          +'<option value="mixed" selected>Mixed — maturity + structured checks</option>'
-          +'<option value="audit">Audit — conformity &amp; evidence</option>'
-        +'</select>'
-        +'<div style="font-size:11px;color:var(--text3);margin-top:4px">Controls how the AI phrases checkpoints (maturity question vs. compliance requirement) — fed directly into the prompt.</div>'
-      +'</div>'
-
-      +'<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:11px">'
-        +'<div><label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">Checkpoints per Category</label>'
-        +'<select id="aiTpl_cpcount" style="width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text)">'
-        +'<option value="4">4 checkpoints</option><option value="5" selected>5 checkpoints</option><option value="6">6 checkpoints</option><option value="7">7 checkpoints</option></select></div>'
-        +'<div><label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">Language</label>'
-        +'<select id="aiTpl_lang" style="width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text)">'
-        +'<option value="English">English</option><option value="German">German</option></select></div>'
-      +'</div>'
-
-      +'<label style="display:flex;align-items:center;gap:9px;font-size:13px;cursor:pointer;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2)">'
-        +'<input type="checkbox" id="aiTpl_rubric" checked style="width:15px;height:15px;accent-color:var(--primary)">'
-        +'<div><div style="font-weight:600">Include scoring rubric (0–5)</div>'
-        +'<div style="font-size:11px;color:var(--text2)">AI generates descriptions for each score level per checkpoint</div></div>'
-      +'</label>'
-
-      +'<div><label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">Additional Context <span style="font-weight:400;color:var(--text3)">(optional)</span></label>'
-      +'<textarea id="aiTpl_context" rows="2" placeholder="e.g. LkSG compliance, IATF 16949, high-volume serial production, single-source risk…" style="width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;background:var(--bg);color:var(--text);resize:vertical;box-sizing:border-box"></textarea></div>'
-
-      +'<button onclick="runAiTemplateGen()" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--primary),var(--secondary));color:var(--on-primary);border:none;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">'
-        +'<i class="ti ti-sparkles"></i> Generate Checklist'
-      +'</button>'
-      +'<div id="aiTpl_status" style="display:none;padding:14px 12px;color:var(--text2);font-size:13px">'
-        +'<div style="display:flex;align-items:center;justify-content:center;gap:8px"><i class="ti ti-loader" style="animation:spin 1s linear infinite;font-size:18px"></i><span>AI is creating your checklist… <span id="aiTpl_elapsed" style="color:var(--text3);font-weight:600">0s</span></span></div>'
-        +'<div class="indet-bar"><div></div></div>'
-      +'</div>'
-    +'</div>'
+    +'<div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">'+body+'</div>'
   +'</div>';
-  m.onclick=function(e){if(e.target===m)m.remove();};
-  document.body.appendChild(m);
-  // Default: set "General Manufacturing" preset
-  setAiTplPreset('General Manufacturing');
+}
+function _aiTplClose(){aiTimerStop('aiTpl_elapsed');var m=document.getElementById('aiTplModal');if(m)m.remove();}
+function _aiTplBtn(onclick,icon,label){
+  return '<button onclick="'+onclick+'" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--primary),var(--secondary));color:var(--on-primary);border:none;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">'
+    +'<i class="ti '+icon+'"></i> '+label+'</button>';
+}
+function _aiTplChipStyle(on){
+  return 'padding:5px 10px;border:1px solid '+(on?'var(--primary)':'var(--border)')+';border-radius:20px;background:'+(on?'color-mix(in srgb,var(--primary) 14%,var(--bg))':'var(--bg2)')+';color:var(--text);font-size:11px;cursor:pointer;white-space:nowrap';
+}
+function aiTplToggleChip(b){
+  var on=b.getAttribute('aria-pressed')!=='true';
+  b.setAttribute('aria-pressed',on);b.style.cssText=_aiTplChipStyle(on);
+}
+// AI-provided names end up inside onclick='…' handlers in the editor — keep
+// straight apostrophes out so they cannot break the markup.
+function _aiTplCatName(s){return String(s||'').replace(/'/g,'’').replace(/\s+/g,' ').trim().slice(0,80);}
+
+function _aiTplStep1(errMsg){
+  var w=_aiTplWiz;
+  var chips=AI_FOCUS_CHIPS.map(function(f){
+    var on=w.focus.indexOf(f)!==-1;
+    return '<button type="button" class="aiTplChip" data-f="'+esc(f)+'" aria-pressed="'+on+'" onclick="aiTplToggleChip(this)" style="'+_aiTplChipStyle(on)+'">'+esc(f)+'</button>';
+  }).join('');
+  _aiTplModal(1,
+    '<div><label for="aiTpl_desc" style="'+AI_TPL_LBL+'">What should the checklist assess?</label>'
+      +'<textarea id="aiTpl_desc" rows="3" placeholder="e.g. Automotive Tier-1, plastic injection moulding, IATF 16949, high-volume serial production, single-source risk…" style="'+AI_TPL_INP+';resize:vertical">'+esc(w.desc)+'</textarea>'
+      +'<div style="font-size:11px;color:var(--text3);margin-top:4px">Industry, supplier type, standards, concerns — one or two sentences are enough.</div></div>'
+    +'<div><label style="'+AI_TPL_LBL+'">Must-have focus areas <span style="font-weight:400;color:var(--text3)">(optional)</span></label>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:5px">'+chips+'</div></div>'
+    +'<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:11px">'
+      +'<div><label for="aiTpl_approach" style="'+AI_TPL_LBL+'">Approach</label>'
+        +'<select id="aiTpl_approach" style="'+AI_TPL_INP+'">'
+          +'<option value="assessment"'+(w.approach==='assessment'?' selected':'')+'>Assessment — maturity &amp; potential</option>'
+          +'<option value="audit"'+(w.approach==='audit'?' selected':'')+'>Audit — conformity &amp; evidence</option>'
+        +'</select></div>'
+      +'<div><label for="aiTpl_lang" style="'+AI_TPL_LBL+'">Language</label>'
+        +'<select id="aiTpl_lang" style="'+AI_TPL_INP+'">'
+          +['English','German'].map(function(l){return '<option'+(w.lang===l?' selected':'')+'>'+l+'</option>';}).join('')
+        +'</select></div>'
+    +'</div>'
+    +(errMsg?'<div style="font-size:12px;color:var(--crit);display:flex;gap:6px;align-items:flex-start"><i class="ti ti-alert-triangle" style="margin-top:1px"></i><span>'+esc(errMsg)+'</span></div>':'')
+    +'<div id="aiTpl_action">'+_aiTplBtn('aiTplSuggestCategories()','ti-sparkles','Suggest categories')+'</div>'
+  );
+  var d=document.getElementById('aiTpl_desc');if(d)d.focus();
 }
 
-function setAiTplPreset(name){
-  var areas=AI_PRESETS[name];if(!areas)return;
-  document.querySelectorAll('.aiTplFocusCb').forEach(function(cb){
-    cb.checked=areas.indexOf(cb.value)!==-1;
-  });
-}
-
-function addAiTplCustomArea(){
-  var inp=document.getElementById('aiTpl_customArea');if(!inp)return;
-  var val=inp.value.trim();if(!val)return;
-  inp.value='';
-  var list=document.getElementById('aiTpl_customList');if(!list)return;
-  var id='aiTplCustom_'+Date.now();
-  var tag=document.createElement('div');
-  tag.style.cssText='display:inline-flex;align-items:center;gap:5px;padding:4px 9px;background:linear-gradient(135deg,color-mix(in srgb,var(--primary) 6%,transparent),color-mix(in srgb,var(--secondary) 6%,transparent));border:1px solid color-mix(in srgb,var(--primary) 25%,transparent);border-radius:20px;font-size:12px';
-  tag.innerHTML='<input type="checkbox" id="'+id+'" value="'+val+'" checked class="aiTplFocusCb" style="width:12px;height:12px;accent-color:var(--primary)"><span>'+val+'</span>'
-    +'<button type="button" onclick="this.parentNode.remove()" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:0;line-height:1;font-size:13px">×</button>';
-  list.appendChild(tag);
-}
-
-// Best-effort repair for a truncated/over-long AI JSON response (closes open strings & brackets)
-function balanceJson(raw){
-  var inStr=false,esc=false,stack=[],out='';
-  for(var i=0;i<raw.length;i++){
-    var ch=raw[i];
-    if(inStr){ out+=ch; if(esc){esc=false;} else if(ch==='\\'){esc=true;} else if(ch==='"'){inStr=false;} continue; }
-    if(ch==='"'){ inStr=true; out+=ch; continue; }
-    if(ch==='{'||ch==='['){ stack.push(ch); }
-    else if(ch==='}'||ch===']'){ stack.pop(); }
-    out+=ch;
-  }
-  if(inStr) out+='"';
-  out=out.replace(/\s+$/,'');
-  out=out.replace(/,\s*"[^"]*"$/,'');  // drop a dangling key with no value
-  out=out.replace(/:\s*$/,':null');    // key with colon but no value
-  out=out.replace(/,\s*$/,'');         // trailing comma
-  for(var j=stack.length-1;j>=0;j--){ out+=(stack[j]==='{'?'}':']'); }
-  return out;
-}
-
-var _aiTplTimer=null;
-function _aiTplStop(){ if(_aiTplTimer){clearInterval(_aiTplTimer);_aiTplTimer=null;} }
-function runAiTemplateGen(){
-  var key=getApiKey();if(!key)return;
-  var industry=document.getElementById('aiTpl_industry').value.trim()||'General manufacturing';
-  var supType=document.getElementById('aiTpl_suptype').value.trim()||'Component supplier';
-  var tplName=document.getElementById('aiTpl_name').value.trim();
-  var cpCount=document.getElementById('aiTpl_cpcount').value;
-  var lang=document.getElementById('aiTpl_lang').value;
-  var includeRubric=document.getElementById('aiTpl_rubric').checked;
-  var context=document.getElementById('aiTpl_context').value.trim();
-  var approach=(document.getElementById('aiTpl_approach')||{value:'mixed'}).value;
-  var approachCfg={
-    assessment:{label:'maturity assessment with a consulting focus',
-      cp:'Phrase every checkpoint as a maturity / capability question that reveals how well-established and effective a practice is (e.g. "To what extent is ... systematically established and data-driven?"). Avoid pure yes/no compliance checks — the goal is to surface strengths and development potential.',
-      rubric:'Score 0 = not present, 1 = initial/ad-hoc, 2 = partially established, 3 = established, 4 = well-managed, 5 = best-practice / role model.'},
-    audit:{label:'compliance audit',
-      cp:'Phrase every checkpoint as a concrete, verifiable audit requirement that can be checked against evidence (documents, records).',
-      rubric:'Score 0 = not implemented at all, 3 = largely implemented, Score 5 = fully implemented and exemplary.'},
-    mixed:{label:'blended assessment and audit',
-      cp:'Phrase every checkpoint to capture BOTH maturity and verifiability: a clear, evidence-based question that also reflects how well-established and effective the practice is. Lean towards consulting value (make development potential visible) while staying concrete and checkable.',
-      rubric:'Score 0 = not present, 1 = initial/ad-hoc, 2 = partially established, 3 = established, 4 = well-managed, 5 = best-practice / role model.'}
-  };
-  var ap=approachCfg[approach]||approachCfg.mixed;
-  var focusAreas=[];
-  document.querySelectorAll('.aiTplFocusCb').forEach(function(cb){if(cb.checked)focusAreas.push(cb.value);});
-  if(!focusAreas.length){uiAlert('Please select at least one focus area.');return;}
-  if(!tplName)tplName=industry+' – '+supType+' Assessment';
-
-  var btn=document.querySelector('#aiTplModal button[onclick="runAiTemplateGen()"]');
-  var statusEl=document.getElementById('aiTpl_status');
-  if(btn)btn.style.display='none';
-  if(statusEl)statusEl.style.display='block';
-  var _t0=Date.now(); _aiTplStop();
-  _aiTplTimer=setInterval(function(){var e=document.getElementById('aiTpl_elapsed');if(e)e.textContent=Math.round((Date.now()-_t0)/1000)+'s';},250);
-
-  var rubricInstr=includeRubric
-    ?'For each checkpoint also include a "rubric" object with keys "0" through "5", each a one-sentence description of what that score means for this specific checkpoint, using this maturity logic: '+ap.rubric
-    :'Do NOT include rubric objects.';
-
-  var prompt='Create a professional supplier audit checklist template for the following context:\n\n'
-    +'Industry: '+industry+'\n'
-    +'Supplier type: '+supType+'\n'
-    +'Focus areas (create one category per focus area): '+focusAreas.join(', ')+'\n'
-    +'Evaluation approach: '+ap.label+'\n'
-    +'Checkpoints per category: '+cpCount+'\n'
-    +'Language: '+lang+'\n'
-    +(context?'Additional requirements: '+context+'\n':'')
-    +'\nIMPORTANT: Respond ONLY with a valid JSON object — no explanation, no markdown, no code fences.\n\n'
-    +'The JSON must have this exact structure:\n'
-    +'{\n'
-    +'  "name": "'+tplName+'",\n'
-    +'  "categories": {\n'
-    +'    "Category Name": [\n'
-    +'      {\n'
-    +'        "no": 1,\n'
-    +'        "checkpoint": "Checkpoint phrased per the evaluation approach above, in '+lang+'",\n'
-    +'        "weight": 1'+(includeRubric?',\n        "rubric": {"0":"...","1":"...","2":"...","3":"...","4":"...","5":"..."}':'')+'\n'
-    +'      }\n'
-    +'    ]\n'
-    +'  }\n'
-    +'}\n\n'
+function aiTplSuggestCategories(){
+  var w=_aiTplWiz;if(!w)return;
+  w.desc=document.getElementById('aiTpl_desc').value.trim();
+  w.focus=[].slice.call(document.querySelectorAll('.aiTplChip[aria-pressed="true"]')).map(function(b){return b.getAttribute('data-f');});
+  w.approach=document.getElementById('aiTpl_approach').value;
+  w.lang=document.getElementById('aiTpl_lang').value;
+  if(!w.desc&&!w.focus.length){uiAlert('Describe the supplier or pick at least one focus area.');return;}
+  var ap=AI_APPROACH[w.approach]||AI_APPROACH.assessment;
+  var req=++w.req;
+  var act=document.getElementById('aiTpl_action');
+  if(act)act.innerHTML=aiLoaderHtml('AI is proposing categories…','aiTpl_elapsed');
+  aiTimerStart('aiTpl_elapsed');
+  var prompt='Propose the category structure for a supplier '+ap.label+' checklist.\n\n'
+    +(w.desc?'Context: '+w.desc+'\n':'')
+    +(w.focus.length?'Must cover these focus areas (one category each): '+w.focus.join(', ')+'\n':'')
+    +'Language: '+w.lang+'\n\n'
+    +'Return ONLY this JSON object:\n'
+    +'{"name":"short template name","categories":[{"name":"Category name","hint":"one sentence: what this category examines"}]}\n\n'
     +'Rules:\n'
-    +'- '+ap.cp+'\n'
-    +'- Every checkpoint must be specific and non-vague\n'
-    +'- Use industry-specific terminology relevant to '+industry+'\n'
-    +'- Weights: use 1 for standard checkpoints, 2 for critical/must-have requirements\n'
-    +rubricInstr;
-
-  fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:(document.querySelector('input[name="aiModel"]:checked')||{value:'claude-sonnet-5'}).value,max_tokens:16000,system:'You are an expert in supplier quality management, procurement and supplier maturity assessments. You always respond with valid JSON only — never truncate; if space is tight, produce fewer items but always close every bracket.',messages:[{role:'user',content:prompt}]})
-  })
-  .then(function(r){return r.json();})
-  .then(function(data){
-    if(data.error){_aiTplStop();uiAlert('AI Error: '+data.error.message);if(btn)btn.style.display='';if(statusEl)statusEl.style.display='none';return;}
-    var raw=data.content&&data.content[0]?data.content[0].text:'';
-    // Extract JSON: find outermost { ... }
-    var jsonStart=raw.indexOf('{');
-    var jsonEnd=raw.lastIndexOf('}');
-    if(jsonStart!==-1&&jsonEnd!==-1&&jsonEnd>jsonStart){raw=raw.slice(jsonStart,jsonEnd+1);}
-    else{raw=raw.replace(/^```json\s*/,'').replace(/^```\s*/,'').replace(/\s*```$/,'').trim();}
-    var parsed=null,repaired=false;
-    try{parsed=JSON.parse(raw);}
-    catch(e){
-      try{parsed=JSON.parse(balanceJson(raw));repaired=true;}catch(e2){parsed=null;}
-      if(!parsed){
-        var trunc=(data.stop_reason==='max_tokens');
-        uiAlert('AI returned invalid JSON. Try again.'+(trunc?'\n\nThe response was too long and got cut off — reduce the number of focus areas or checkpoints, or turn off the scoring rubric, then try again.':'')+'\n\nError: '+e.message+'\n\nPreview:\n'+raw.slice(0,400));
-        _aiTplStop();if(btn)btn.style.display='';if(statusEl)statusEl.style.display='none';return;
-      }
-    }
-    _aiTplStop();
-    document.getElementById('aiTplModal').remove();
-    applyAiGenTemplate(parsed);
-    if(repaired)toast('Note: the response was long — the last checkpoint(s) may be incomplete. Please review.','var(--warn)');
-  })
-  .catch(function(err){_aiTplStop();uiAlert('Request failed: '+err.message);if(btn)btn.style.display='';if(statusEl)statusEl.style.display='none';});
+    +'- 5 to 8 categories, unless the must-have focus areas require more\n'
+    +'- Categories must not overlap\n'
+    +'- Category names short (max. 5 words); name, categories and hints in '+w.lang;
+  var stale=function(){return w!==_aiTplWiz||req!==w.req||!document.getElementById('aiTplModal');};
+  callClaude(prompt,AI_TPL_SYSTEM,function(text,info){
+    if(stale())return;
+    aiTimerStop('aiTpl_elapsed');
+    var obj=null;
+    try{obj=JSON.parse(text.slice(text.indexOf('{'),text.lastIndexOf('}')+1));}catch(e){}
+    var list=obj&&Array.isArray(obj.categories)?obj.categories:(jsonArraySalvage(text)||[]);
+    var cats=list.map(function(c){return {name:_aiTplCatName(c&&c.name),hint:String(c&&c.hint||'').trim(),on:true};})
+      .filter(function(c){return c.name;});
+    if(!cats.length){_aiTplStep1('The AI answer could not be read'+(info&&info.truncated?' (it was cut off)':'')+' — please try again.');return;}
+    w.cats=cats;
+    w.name=obj&&obj.name?String(obj.name).trim():'';
+    _aiTplStep2();
+  },null,{maxTokens:1500,onError:function(msg){if(stale())return;aiTimerStop('aiTpl_elapsed');_aiTplStep1(msg);}});
 }
 
-function applyAiGenTemplate(data){
-  if(!data||!data.categories){uiAlert('Invalid template structure from AI.');return;}
-  tplDraft={name:data.name||'AI Generated Template',categories:{}};
-  tplDraftIdx=-1;
-  Object.entries(data.categories).forEach(function([cat,items]){
-    if(!Array.isArray(items))return;
-    tplDraft.categories[cat]=items.map(function(item,i){
-      return {
-        no:item.no||(i+1),
-        checkpoint:item.checkpoint||'',
-        weight:typeof item.weight==='number'?item.weight:1,
-        rubric:item.rubric&&typeof item.rubric==='object'?item.rubric:null
-      };
-    });
+function _aiTplStep2(){
+  var w=_aiTplWiz;
+  var nOn=w.cats.filter(function(c){return c.on;}).length;
+  var rows=w.cats.map(function(c,i){
+    return '<div style="display:flex;align-items:flex-start;gap:9px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:'+(c.on?'var(--bg2)':'var(--bg)')+';opacity:'+(c.on?'1':'.55')+'">'
+      +'<input type="checkbox"'+(c.on?' checked':'')+' onchange="_aiTplWiz.cats['+i+'].on=this.checked;_aiTplStep2()" aria-label="Include category" style="margin-top:8px;width:15px;height:15px;accent-color:var(--primary);flex-shrink:0">'
+      +'<div style="flex:1;min-width:0">'
+        +'<input type="text" value="'+esc(c.name)+'" oninput="_aiTplWiz.cats['+i+'].name=this.value" aria-label="Category name" style="'+AI_TPL_INP+';padding:5px 8px;font-weight:600">'
+        +(c.hint?'<div style="font-size:11px;color:var(--text3);margin-top:3px;line-height:1.4">'+esc(c.hint)+'</div>':'')
+      +'</div>'
+    +'</div>';
+  }).join('');
+  _aiTplModal(2,
+    '<div><label for="aiTpl_name" style="'+AI_TPL_LBL+'">Template name</label>'
+      +'<input id="aiTpl_name" type="text" value="'+esc(w.name)+'" oninput="_aiTplWiz.name=this.value" placeholder="e.g. Automotive Tier-1 Supplier 2026" style="'+AI_TPL_INP+'"></div>'
+    +'<div><label style="'+AI_TPL_LBL+'">Categories <span style="font-weight:400;color:var(--text3)">— untick, rename or add your own</span></label>'
+      +'<div style="display:flex;flex-direction:column;gap:6px">'+rows+'</div>'
+      +'<div style="display:flex;gap:7px;margin-top:8px">'
+        +'<input id="aiTpl_newCat" type="text" placeholder="Add a category…" onkeydown="if(event.key===\'Enter\'){event.preventDefault();aiTplAddCategory();}" style="'+AI_TPL_INP+';flex:1;padding:7px 10px;font-size:12px">'
+        +'<button type="button" class="btn" onclick="aiTplAddCategory()" style="white-space:nowrap"><i class="ti ti-plus"></i> Add</button>'
+      +'</div></div>'
+    +'<div style="font-size:11px;color:var(--text3)">Checkpoints are written per category and appear in the builder as each one finishes. Scoring rubrics can be added there afterwards with one click.</div>'
+    +'<div style="display:flex;gap:8px">'
+      +'<button class="btn" onclick="_aiTplStep1()" style="flex-shrink:0"><i class="ti ti-arrow-left"></i> Back</button>'
+      +'<div style="flex:1">'+_aiTplBtn('aiTplBuild()','ti-sparkles','Generate checkpoints ('+nOn+' '+(nOn===1?'category':'categories')+')')+'</div>'
+    +'</div>'
+  );
+}
+
+function aiTplAddCategory(){
+  var inp=document.getElementById('aiTpl_newCat');if(!inp)return;
+  var n=_aiTplCatName(inp.value);if(!n)return;
+  _aiTplWiz.cats.push({name:n,hint:'',on:true});
+  _aiTplStep2();
+  var again=document.getElementById('aiTpl_newCat');if(again)again.focus();
+}
+
+function aiTplBuild(){
+  var w=_aiTplWiz;if(!w)return;
+  var seen={},cats=[];
+  w.cats.forEach(function(c){
+    var n=_aiTplCatName(c.name);
+    if(c.on&&n&&!seen[n.toLowerCase()]){seen[n.toLowerCase()]=1;cats.push({name:n,hint:c.hint});}
   });
-  renderTplBuilderList();
+  if(!cats.length){uiAlert('Select at least one category.');return;}
+  var ctx={desc:w.desc||w.focus.join(', '),approach:w.approach,lang:w.lang,all:cats.map(function(c){return c.name;})};
+  tplDraft={name:String(w.name||'').trim()||'AI Generated Template',categories:{}};
+  tplDraftIdx=-1;
+  // The AI state rides on the category array itself: it survives a rename
+  // (renameTplCat keeps the arrays) and is dropped by the JSON copy on save.
+  var arrs=cats.map(function(c){
+    var a=[];a._ai={state:'loading',hint:c.hint,ctx:ctx};
+    tplDraft.categories[c.name]=a;return a;
+  });
+  _aiTplClose();_aiTplWiz=null;
+  renderTplBuilderList();renderTplEditor();
+  var tab=document.getElementById('ntab-builder');if(tab)tab.click();
+  arrs.forEach(function(a){_aiTplEnqueue(_aiTplCheckpointJob(a));});
+}
+
+// Small queue so a large template does not fire a dozen requests at once.
+var _aiTplQueue=[],_aiTplRunning=0,AI_TPL_PARALLEL=4;
+function _aiTplEnqueue(job){_aiTplQueue.push(job);_aiTplPump();}
+function _aiTplPump(){
+  while(_aiTplRunning<AI_TPL_PARALLEL&&_aiTplQueue.length){
+    var job=_aiTplQueue.shift();_aiTplRunning++;
+    job(function(){_aiTplRunning--;_aiTplPump();});
+  }
+}
+// Current name of a category array in the open draft (null once it was deleted,
+// saved or the user switched to another template — the answer is then dropped).
+function _aiTplCatOf(arr){
+  if(!tplDraft)return null;
+  var ks=Object.keys(tplDraft.categories);
+  for(var i=0;i<ks.length;i++)if(tplDraft.categories[ks[i]]===arr)return ks[i];
+  return null;
+}
+function _aiTplBusy(state){
+  return !!tplDraft&&Object.keys(tplDraft.categories).some(function(k){var a=tplDraft.categories[k]._ai;return a&&a.state===state;});
+}
+// Results arrive while the user may already be editing — re-rendering the
+// editor would throw away an unsaved field, so wait until focus leaves it.
+var _aiTplRefreshT=null;
+function _aiTplRefresh(){
+  if(_aiTplRefreshT){clearTimeout(_aiTplRefreshT);_aiTplRefreshT=null;}
+  var ed=document.getElementById('tplBuilderEditor');if(!ed||!tplDraft)return;
+  var a=document.activeElement;
+  if(a&&ed.contains(a)&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)){_aiTplRefreshT=setTimeout(_aiTplRefresh,400);return;}
   renderTplEditor();
-  // Switch to builder tab
-  var btn=document.getElementById('ntab-builder');
-  if(btn)btn.click();
-  toast('AI template ready — review and save when done');
+}
+
+function _aiTplCheckpointJob(arr){
+  return function(done){
+    var cat=_aiTplCatOf(arr);
+    if(!cat||!arr._ai){done();return;}
+    var ai=arr._ai,c=ai.ctx,ap=AI_APPROACH[c.approach]||AI_APPROACH.assessment;
+    var others=c.all.filter(function(n){return n!==cat;});
+    var prompt='Write the checkpoints for ONE category of a supplier '+ap.label+' checklist.\n\n'
+      +'Context: '+c.desc+'\n'
+      +'Category: '+cat+(ai.hint?' — '+ai.hint:'')+'\n'
+      +(others.length?'Other categories in this checklist (do not overlap with them): '+others.join(', ')+'\n':'')
+      +'Language: '+c.lang+'\n\n'
+      +'Return ONLY a JSON array with 4 to 6 items: [{"checkpoint":"...","weight":1}]\n\n'
+      +'Rules:\n'
+      +'- '+ap.cp+'\n'
+      +'- Every checkpoint must be specific and non-vague, using terminology that fits the context\n'
+      +'- weight 2 only for critical / must-have requirements, otherwise 1';
+    callClaude(prompt,AI_TPL_SYSTEM,function(text){
+      var items=(jsonArraySalvage(text)||[])
+        .filter(function(x){return x&&typeof x.checkpoint==='string'&&x.checkpoint.trim();})
+        .map(function(x,i){return {no:i+1,checkpoint:x.checkpoint.trim(),weight:Number(x.weight)>=2?2:1,rubric:null};});
+      if(items.length){Array.prototype.splice.apply(arr,[0,arr.length].concat(items));ai.state=null;}
+      else{ai.state='error';ai.msg='The AI answer could not be read.';}
+      _aiTplCheckpointsSettled(arr);done();
+    },null,{maxTokens:2000,onError:function(msg){ai.state='error';ai.msg=msg;_aiTplCheckpointsSettled(arr);done();}});
+  };
+}
+function _aiTplCheckpointsSettled(arr){
+  if(!_aiTplCatOf(arr))return;
+  _aiTplRefresh();
+  if(_aiTplBusy('loading'))return;
+  var failed=Object.keys(tplDraft.categories).filter(function(k){var a=tplDraft.categories[k]._ai;return a&&a.state==='error';}).length;
+  if(failed)toast(failed+' '+(failed===1?'category':'categories')+' could not be generated — use Retry','var(--warn)');
+  else toast('AI checklist ready — review and save when done');
+}
+function aiTplRetryCategory(cat){
+  var arr=tplDraft&&tplDraft.categories[cat];
+  if(!arr||!arr._ai||!arr._ai.ctx)return;
+  if(!getApiKey()){uiAlert('Please enter your Anthropic API key in Settings first.');return;}
+  arr._ai.state='loading';arr._ai.msg='';
+  renderTplEditor();
+  _aiTplEnqueue(_aiTplCheckpointJob(arr));
+}
+
+// ── Rubrics on demand: one request per category for every checkpoint without one
+function _aiTplNeedsRubric(it){
+  if(!it||!String(it.checkpoint||'').trim())return false;
+  return !(it.rubric&&[0,1,2,3,4,5].some(function(s){return String(it.rubric[s]||'').trim();}));
+}
+function aiTplHasMissingRubrics(){
+  return !!tplDraft&&Object.keys(tplDraft.categories).some(function(k){return tplDraft.categories[k].some(_aiTplNeedsRubric);});
+}
+function aiTplGenAllRubrics(){
+  if(!tplDraft)return;
+  if(!getApiKey()){uiAlert('Please enter your Anthropic API key in Settings first.');return;}
+  var n=0;
+  Object.keys(tplDraft.categories).forEach(function(cat){
+    var arr=tplDraft.categories[cat];
+    if(arr._ai&&(arr._ai.state==='loading'||arr._ai.state==='rubric'))return;
+    if(!arr.some(_aiTplNeedsRubric))return;
+    arr._ai=arr._ai||{};arr._ai.state='rubric';n++;
+    _aiTplEnqueue(_aiTplRubricJob(arr));
+  });
+  if(!n){toast('Every checkpoint already has a rubric');return;}
+  renderTplEditor();
+}
+function _aiTplRubricJob(arr){
+  return function(done){
+    var cat=_aiTplCatOf(arr);
+    if(!cat||!arr._ai){done();return;}
+    var ai=arr._ai,c=ai.ctx||{},ap=AI_APPROACH[c.approach]||AI_APPROACH.assessment;
+    var todo=arr.filter(_aiTplNeedsRubric);
+    if(!todo.length){ai.state=null;_aiTplRubricsSettled(arr);done();return;}
+    var prompt='Write a 0–5 scoring rubric for each checkpoint below (category "'+cat+'").\n\n'
+      +(c.desc?'Context: '+c.desc+'\n':'')
+      +'Scoring logic: '+ap.rubric+'\n'
+      +'Language: '+(c.lang||'the same language as the checkpoints')+'\n\n'
+      +'Checkpoints:\n'+todo.map(function(it,k){return (k+1)+'. '+it.checkpoint;}).join('\n')+'\n\n'
+      +'Return ONLY a JSON array with one object per checkpoint, in the same order:\n'
+      +'[{"no":1,"rubric":{"0":"...","1":"...","2":"...","3":"...","4":"...","5":"..."}}]\n'
+      +'Each level is one short sentence specific to that checkpoint.';
+    callClaude(prompt,AI_TPL_SYSTEM,function(text){
+      var hit=0;
+      (jsonArraySalvage(text)||[]).forEach(function(r,k){
+        var it=todo[(parseInt(r&&r.no,10)||k+1)-1];
+        if(!it||!r.rubric||typeof r.rubric!=='object')return;
+        var rb={};for(var s=0;s<=5;s++)rb[s]=String(r.rubric[s]||'').trim();
+        it.rubric=rb;hit++;
+      });
+      ai.state=null;
+      if(hit<todo.length)toast('Rubrics for "'+cat+'" are incomplete — click again to fill the rest','var(--warn)');
+      _aiTplRubricsSettled(arr);done();
+    },null,{maxTokens:4000,onError:function(msg){ai.state=null;toast(msg,'var(--crit)');_aiTplRubricsSettled(arr);done();}});
+  };
+}
+function _aiTplRubricsSettled(arr){
+  if(!_aiTplCatOf(arr))return;
+  _aiTplRefresh();
+  if(!_aiTplBusy('rubric')&&!aiTplHasMissingRubrics())toast('Rubrics added — review them in the editor');
 }
 
 // ── Bare supplier creation (Suppliers tab) — profile only, no checklist ─────
@@ -11239,7 +11304,8 @@ function aiSuggestRubric(cat,idx){
   if(!tplDraft||!tplDraft.categories[cat])return;
   var item=tplDraft.categories[cat][idx];
   if(!item.rubric)item.rubric={0:'',1:'',2:'',3:'',4:'',5:''};
-  var btnId='rubric_gen_'+cat.replace(/\W/g,'_')+'_'+idx;
+  // Same id scheme as renderTplEditor: category position + checkpoint index.
+  var btnId='rubric_gen_'+Object.keys(tplDraft.categories).indexOf(cat)+'_'+idx;
   var btn=document.getElementById(btnId);
   callClaude(
     'Create a scoring rubric for this audit checkpoint:\nCategory: "'+cat+'"\nCheckpoint: "'+item.checkpoint+'"\n\nReturn exactly 6 lines. Each line must start with the score digit and a colon. Example:\n0: No evidence of...\n1: Minimal...\n2: Basic...\n3: Adequate...\n4: Good...\n5: Excellent...\n\nReturn ONLY the 6 lines, nothing else.',
