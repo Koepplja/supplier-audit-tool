@@ -292,6 +292,16 @@ input[type=range]{flex:2;accent-color:var(--primary)}
 .au-sbtn.sel.bmid{background:var(--warn);border-color:var(--warn);color:var(--on-warn)}
 .au-sbtn.sel.bhi{background:var(--good);border-color:var(--good);color:var(--on-good)}
 .au-sbtn.sel.na{background:var(--text3);border-color:var(--text3);color:var(--on-text3)}
+/* Long scales (more than 7 values, e.g. 0–10): smaller buttons so the row incl.
+   N.A. still fits the focus pane on a laptop; on phones a 6-column grid gives two
+   even rows (0–5 / 6–10 + N.A.) instead of a ragged wrap. */
+.au-scorepick.dense{gap:6px}
+.au-scorepick.dense .au-sbtn{width:40px;height:42px;font-size:15px}
+.au-scorepick.dense .au-sbtn.na{width:auto;padding:0 11px;font-size:12px}
+@media (max-width:600px){
+  .au-scorepick.dense{display:grid;grid-template-columns:repeat(6,1fr)}
+  .au-scorepick.dense .au-sbtn,.au-scorepick.dense .au-sbtn.na{width:auto;padding:0}
+}
 .au-kbd{font-size:10.5px;color:var(--text3);margin-left:6px}
 .au-rubric{margin:14px 0;border:1px solid var(--border);border-radius:var(--rl);overflow:hidden}
 .au-rr{display:flex;gap:12px;padding:8px 13px;font-size:12px;border-bottom:1px solid var(--border);align-items:flex-start;cursor:pointer}
@@ -5960,6 +5970,19 @@ function addTplRubric(cat,idx){
   tplDraft.categories[cat][idx].rubric=emptyRubric(tplScale(tplDraft));
   renderTplEditor();
 }
+// Long scales (more than 7 values) show only the rubric line of the chosen score;
+// a toggle row opens all levels. Short scales always show every level.
+function rubricView(ivals,rubricRows,score,allOpen){
+  var isLong=ivals.length>7&&rubricRows.length>1;
+  var open=!isLong||!!allOpen;
+  return {rows:open?rubricRows:rubricRows.filter(function(v){return String(score)===String(v);}),toggle:isLong,open:open};
+}
+function rubricToggleRow(n,open,onclick){
+  return '<div class="au-rr" style="color:var(--text2);font-weight:600" onclick="'+onclick+'">'
+    +'<span class="rn"><i class="ti ti-chevron-'+(open?'up':'down')+'"></i></span>'
+    +'<span>'+(open?'Hide levels':'Show all '+n+' levels')+'</span></div>';
+}
+function auToggleRubricAll(){_auState.rubricAll=!_auState.rubricAll;auRender();}
 function emptyRubric(sc){var rb={};scaleValues(sc).forEach(function(v){rb[v]='';});return rb;}
 
 function removeTplRubric(cat,idx){
@@ -6421,7 +6444,7 @@ function auConsoleHtml(s,flat,round){
     focus='<div class="au-focus"><div class="au-fhead">'
       +'<div class="au-kicker">'+esc(cur.cat)+' · Checkpoint '+posInCat+' of '+catLen+(item.weight!==undefined&&item.weight!==1?' · Weight '+item.weight:'')+(isDefaultScale(isc)?'':' · Scale '+scaleLabel(isc))+'</div>'
       +'<h3>'+esc(item.checkpoint)+'</h3>'
-      +'<div class="au-scorepick">'
+      +'<div class="au-scorepick'+(ivals.length>7?' dense':'')+'">'
         +ivals.map(function(v){
           return '<button class="au-sbtn b'+scoreBand(v,isc.max)+(item.score===v?' sel':'')+'" onclick="auSetScore(\''+esCat+'\','+cur.idx+','+v+')">'+v+'</button>';
         }).join('')
@@ -6429,10 +6452,11 @@ function auConsoleHtml(s,flat,round){
       +'</div>'
       +'</div><div class="au-fbody">'
       +(rubricRows.length
-        ?'<div class="au-rubric">'+rubricRows.map(function(v){
+        ?(function(){var rv=rubricView(ivals,rubricRows,item.score,_auState.rubricAll);
+          return '<div class="au-rubric">'+rv.rows.map(function(v){
             return '<div class="au-rr'+(String(item.score)===String(v)?' hot':'')+'" onclick="auSetScore(\''+esCat+'\','+cur.idx+','+v+')">'
               +'<span class="rn">'+v+'</span><span>'+esc(item.rubric[v])+'</span></div>';
-          }).join('')+'</div>'
+          }).join('')+(rv.toggle?rubricToggleRow(rubricRows.length,rv.open,'auToggleRubricAll()'):'')+'</div>';})()
         :'<div style="font-size:11.5px;color:var(--text3);font-style:italic;margin:12px 0">No scoring rubric defined for this checkpoint.</div>')
       +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">'
         +'<label style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3)">Evidence / Notes</label>'
@@ -8006,7 +8030,13 @@ function renderDetail(){
 // jumping over to the Assessment page.
 // roundId (optional) shows that assessment instead of the reporting one; `from`
 // 'coverage' keeps linked tasks on the Actions page (Coverage opens it too).
+var _cmpRubricAll=false,_cmpLastArgs=null;
+function cmpToggleRubricAll(){
+  _cmpRubricAll=!_cmpRubricAll;
+  if(_cmpLastArgs)openCmpCheckpoint.apply(null,_cmpLastArgs);
+}
 function openCmpCheckpoint(supName,cat,idx,roundId,from){
+  _cmpLastArgs=[supName,cat,idx,roundId,from];
   var s=suppliers.find(function(x){return x.name===supName;});
   if(!s)return;
   var round=roundId!=null?(s.rounds||[]).find(function(x){return x.id===roundId;}):null;
@@ -8026,14 +8056,15 @@ function openCmpCheckpoint(supName,cat,idx,roundId,from){
   var body='<div class="au-focus" style="padding:0;max-height:none;overflow:visible">'
     +'<div class="au-kicker">'+esc(cat)+' · Checkpoint '+posInCat+' of '+catLen+(item.weight!==undefined&&item.weight!==1?' · Weight '+item.weight:'')+(isDefaultScale(isc)?'':' · Scale '+scaleLabel(isc))+'</div>'
     +'<h3>'+esc(item.checkpoint)+'</h3>'
-    +'<div class="au-scorepick" style="pointer-events:none">'
+    +'<div class="au-scorepick'+(ivals.length>7?' dense':'')+'" style="pointer-events:none">'
       +ivals.map(function(v){return '<button class="au-sbtn b'+scoreBand(v,isc.max)+(scoreVal===v?' sel':'')+'">'+v+'</button>';}).join('')
       +'<button class="au-sbtn na'+(scoreVal==='N.A.'?' sel':'')+'">N.A.</button>'
     +'</div>'
     +(rubricRows.length
-      ?'<div class="au-rubric">'+rubricRows.map(function(v){
+      ?(function(){var rv=rubricView(ivals,rubricRows,scoreVal,_cmpRubricAll);
+        return '<div class="au-rubric">'+rv.rows.map(function(v){
           return '<div class="au-rr'+(String(scoreVal)===String(v)?' hot':'')+'" style="cursor:default"><span class="rn">'+v+'</span><span>'+esc(item.rubric[v])+'</span></div>';
-        }).join('')+'</div>'
+        }).join('')+(rv.toggle?rubricToggleRow(rubricRows.length,rv.open,'cmpToggleRubricAll()'):'')+'</div>';})()
       :'<div style="font-size:11.5px;color:var(--text3);font-style:italic;margin:12px 0">No scoring rubric defined for this checkpoint.</div>')
     +'<label style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);display:block;margin:16px 0 5px">Evidence / Notes</label>'
     +(item.notes&&String(item.notes).trim()
@@ -16554,7 +16585,7 @@ var HELP={
       'Filter by area or search, e.g. for a supplier name.',
       'Click <b>Show details</b> to see the single changes, e.g. old and new scores.'],
     tips:['Small changes to the same item within 10 minutes are combined into one entry.',
-      'The history is saved with the project. It starts from the moment this feature was added.']},
+      'The history is saved with the project.']},
 
   dashboard:{title:'Dashboard',icon:'ti-layout-dashboard',group:'Modules',crumb:'Dashboard',
     intro:'Your starting point: how all suppliers are doing at a glance.',
@@ -16581,14 +16612,12 @@ var HELP={
   audit:{title:'Scoring an assessment',icon:'ti-clipboard-check',group:'Modules',crumb:'Assessment › Assessments › Assessment',
     intro:'Here you score one supplier, checkpoint by checkpoint.',
     steps:['Pick the supplier and assessment at the top if needed.',
-      'In <b>Score</b> view, give each checkpoint a value on the checklist’s rating scale (0–5 unless the checklist sets another) and add notes or files.',
-      'Switch to <b>Table</b> for a compact overview, or <b>Details</b> for date, assessor and type.',
+      'In <b>Score</b> view, rate each checkpoint and add notes or files.',
+      'Switch to <b>Table</b> for an overview, or <b>Details</b> for date and assessor.',
       'When everything is scored, press <b>Complete assessment</b>.'],
-    tips:['Keyboard in Score view: the <b>digits</b> of the scale to score (on a scale up to 10, type <b>1</b> then <b>0</b> for 10), <b>N</b> for N.A., <b>↑ / ↓</b> for the previous / next checkpoint.',
-      'The score in percent is the score divided by the top of the scale — 0 is always 0 %, so on a 1–5 scale a 1 counts as 20 %.',
-      'The bar at the top shows how many checkpoints are still open.',
-      'A completed assessment is read-only. Press <b>Reopen</b> to change it, then complete it again.',
-      'With two or more completed assessments, <b>Compare</b> shows what changed.']},
+    tips:['Keys: <b>digits</b> to score, <b>N</b> for N.A., <b>↑ / ↓</b> to move.',
+      'A completed assessment is read-only — press <b>Reopen</b> to change it.',
+      'With two completed assessments, <b>Compare</b> shows what changed.']},
   detail:{title:'Analysis',icon:'ti-chart-arcs',group:'Modules',crumb:'Assessment › Analysis',
     intro:'Find the strengths and weak points of a supplier, down to single checkpoints.',
     steps:['Choose a supplier — or keep “All Suppliers”.',
@@ -16598,25 +16627,19 @@ var HELP={
   new:{title:'Checklists',icon:'ti-list-check',group:'Modules',crumb:'Assessment › Checklists',
     intro:'The library of checklists your assessments are built on.',
     steps:['Press <b>New Template</b> and add categories and checkpoints.',
-      'Set the <b>Rating scale</b> under the name: whole numbers from 0 or 1 up to 2–10 (default 0–5), plus N.A. Scoring rubrics get one line per level.',
-      'Or use <b>AI Generate Checklist</b> to get a first draft from a short description.',
-      'Already have an Excel checklist? Upload it in the <b>Excel Import</b> tab. A preview opens, where you choose whether it becomes a <b>checklist template</b> or a <b>supplier assessment</b> with scores.'],
-    tips:['<b>AI Import</b> reads almost any Excel layout: one sheet per category, one sheet per supplier, or a <b>supplier comparison</b> with a score column per supplier. Check the mapping and the live preview before importing.',
-      'The import keeps the file’s scale when it is a whole-number scale up to 10; anything else (percent, …) and text ratings such as i.O. / n.i.O. or OK / NOK are converted to the rating scale you pick in the dialog. Every value can be adjusted there.',
-      'Heading rows inside the checkpoint list become categories. Weight and scoring-criteria columns are taken over.',
-      'Importing a supplier that already exists adds a <b>new assessment</b> — earlier assessments and the profile are kept. The date and auditor are read from the file when present.',
-      'If a checklist with the same name exists, you choose whether to replace it or keep both.',
-      'Weights decide how much a category or checkpoint counts in the score (default 1, 0 = excluded).',
-      'Changing a checklist does not change assessments that already use it — only a new rating scale is passed on to its assessments that are not rated yet.',
-      'The rating scale is fixed as soon as one assessment with this checklist has a rating.',
-      'The <b>copy</b> icon next to a checklist duplicates it — categories, checkpoints, weights, rubrics and scale — as “… (copy)”, ready to edit. A copy has no assessments yet, so its scale can be changed.']},
+      'Set the <b>Rating scale</b> below the name (default 0–5).',
+      'Or let <b>AI Generate Checklist</b> draft one for you.',
+      'Have an Excel file? Upload it under <b>Excel Import</b> — as a checklist or a supplier assessment.'],
+    tips:['Excel Import reads most layouts — check the preview before importing.',
+      'Importing an existing supplier adds a new assessment; its history is kept.',
+      'Weights set how much a checkpoint counts (0 = excluded).',
+      'The scale is fixed once an assessment is rated — use the <b>copy</b> icon to start a new version.']},
   monitoring:{title:'Portfolio',icon:'ti-chart-dots',group:'Modules',crumb:'Monitoring › Portfolio',
     intro:'All suppliers in one matrix: score tier against criticality.',
     steps:['Find suppliers in the top rows — they have the lowest scores.',
       'Click a supplier to see its details and rate its criticality.',
       'Use <b>Configure risk model</b> to define the criticality factors.'],
-    tips:['The criticality columns appear once at least one supplier is rated on a factor.',
-      'Exports name the criticality factors in a small footnote (*), so readers see what the axis is based on.']},
+    tips:['Criticality columns appear once a supplier is rated on a factor.']},
   kpis:{title:'KPIs',icon:'ti-activity-heartbeat',group:'Modules',crumb:'Monitoring › KPIs',
     intro:'Measured performance per supplier over time, e.g. delivery reliability.',
     steps:['Set up your indicators once with <b>Configure KPIs</b>.',
@@ -16636,9 +16659,9 @@ var HELP={
       'Link the checkpoints the action fixes, set owner, due date and priority.',
       'Update the status as work progresses: Open → In Progress → Done.',
       'Or press <b>AI Suggestions</b> to get proposals for low-scoring checkpoints.'],
-    tips:['<b>List</b> to work through tasks, <b>Gantt</b> for the timeline, <b>Coverage</b> to see which checkpoints have an action.',
-      'In <b>Coverage</b>, click a checkpoint to see its score, rubric, notes, evidence and linked tasks for the assessment shown — and add a task right there. Click a task to open it.',
-      'Review AI suggestions before adding — you can edit everything afterwards.']},
+    tips:['<b>List</b> for tasks, <b>Gantt</b> for the timeline, <b>Coverage</b> for checkpoints with an action.',
+      'In <b>Coverage</b>, click a checkpoint for its details or to add a task.',
+      'Review AI suggestions before adding them.']},
   calendar:{title:'Calendar',icon:'ti-calendar',group:'Modules',crumb:'Calendar',
     intro:'All assessment dates and action deadlines on one calendar.',
     steps:['Browse months with the arrows, or press <b>Today</b>.',
@@ -16651,17 +16674,14 @@ var HELP={
       'Choose the format tab: PowerPoint, Excel or Word.',
       'Select one supplier or several, and the content you want.',
       'Press the export button — the file downloads.'],
-    tips:['<b>Generate for all suppliers</b> writes the summaries and findings for every supplier at once.',
-      'The calendar export (.ics) is at the bottom of this page.',
-      'Wherever criticality appears (risk matrix slide, Word risk matrix, Excel register), a footnote (*) lists the criticality factors.',
-      'In Excel, rows with longer text (notes, checkpoints, completion proof) grow to fit, so nothing is cut off.']},
+    tips:['<b>Generate for all suppliers</b> writes all summaries and findings in one go.',
+      'The calendar export (.ics) is at the bottom of this page.']},
   imp:{title:'Import',icon:'ti-file-import',group:'Modules',crumb:'Import / Export › Import',
     intro:'Save the whole project to a file, or load one back in.',
-    steps:['<b>Save Project</b> downloads everything as one .json file named after the project and today’s date — a good backup. It includes suppliers with all assessment rounds, attached files and photos, checklists, actions, KPIs, maps, settings and the activity log.',
-      '<b>Load Project</b> opens such a file again. It <b>replaces all data</b> in the project that is open right now, and the change is synced to the cloud — you are asked to confirm first. Files that are not Supplier Loop projects are rejected.'],
-    tips:['Photos and attachments are stored inside the .json file itself (no separate ZIP). Photos are already reduced when they are added (max. 1200 px, JPEG), so saving and loading never lowers their quality further.',
-      'The AI API key is not written to the file; after loading, the key you already entered stays in place.',
-      'Checklists and supplier scores from Excel are imported under Assessment › Checklists › Excel Import.']},
+    steps:['<b>Save Project</b> downloads everything as one file — a full backup incl. photos and files.',
+      '<b>Load Project</b> opens such a file and <b>replaces all data</b> in the open project.'],
+    tips:['Your AI API key is not saved in the file.',
+      'Excel checklists and scores are imported under Assessment › Checklists.']},
   settings:{title:'Settings',icon:'ti-adjustments-horizontal',group:'Modules',crumb:'Settings',
     intro:'Look and feel, score tiers, AI and cloud sync.',
     steps:['<b>Appearance</b>: switch light / dark mode and the brand colours.',
