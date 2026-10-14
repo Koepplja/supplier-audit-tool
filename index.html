@@ -257,7 +257,7 @@ input[type=range]{flex:2;accent-color:var(--primary)}
 .covlink{transition:stroke-opacity .15s,stroke-width .15s}
 .covnode:hover .cnbg{fill:var(--bg2)}
 .covcat-hit{cursor:pointer}
-.covnode-task{cursor:pointer}
+.covnode-task,.covnode-cp{cursor:pointer}
 
 .au-console{display:grid;grid-template-columns:minmax(220px,290px) minmax(0,1fr);background:var(--bg);border:1px solid var(--border-soft);border-radius:var(--rl);box-shadow:var(--shadow-sm);overflow:hidden}
 .au-rail{border-right:1px solid var(--border);overflow-y:auto;max-height:min(68vh,620px)}
@@ -274,9 +274,9 @@ input[type=range]{flex:2;accent-color:var(--primary)}
 .au-cprow:hover{background:var(--bg2)}
 .au-cprow.on{background:var(--bg2);border-left-color:var(--primary)}
 .au-cprow .sd{width:23px;height:23px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-variant-numeric:tabular-nums;background:var(--bg3);color:var(--text3);border:1px solid var(--border)}
-.au-cprow .sd.s0,.au-cprow .sd.s1{background:var(--crit-bg);color:var(--crit);border-color:transparent}
-.au-cprow .sd.s2,.au-cprow .sd.s3{background:var(--warn-bg);color:var(--warn);border-color:transparent}
-.au-cprow .sd.s4,.au-cprow .sd.s5{background:var(--good-bg);color:var(--good);border-color:transparent}
+.au-cprow .sd.slo{background:var(--crit-bg);color:var(--crit);border-color:transparent}
+.au-cprow .sd.smid{background:var(--warn-bg);color:var(--warn);border-color:transparent}
+.au-cprow .sd.shi{background:var(--good-bg);color:var(--good);border-color:transparent}
 .au-cprow .tx{font-size:12.5px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .au-cprow.on .tx{font-weight:600}
 
@@ -287,9 +287,10 @@ input[type=range]{flex:2;accent-color:var(--primary)}
 .au-sbtn{width:46px;height:46px;border:1.5px solid var(--border2);border-radius:9px;background:var(--bg);color:var(--text);font-size:16px;font-weight:700;cursor:pointer;font-variant-numeric:tabular-nums;transition:transform .08s,border-color .12s}
 .au-sbtn:hover{transform:translateY(-1px);border-color:var(--primary)}
 .au-sbtn.na{width:auto;padding:0 13px;font-size:12px;color:var(--text2)}
-.au-sbtn.sel.v0,.au-sbtn.sel.v1{background:var(--crit);border-color:var(--crit);color:var(--on-crit)}
-.au-sbtn.sel.v2,.au-sbtn.sel.v3{background:var(--warn);border-color:var(--warn);color:var(--on-warn)}
-.au-sbtn.sel.v4,.au-sbtn.sel.v5{background:var(--good);border-color:var(--good);color:var(--on-good)}
+/* Colour band from scoreBand(): lo / mid / hi share of the checklist's scale */
+.au-sbtn.sel.blo{background:var(--crit);border-color:var(--crit);color:var(--on-crit)}
+.au-sbtn.sel.bmid{background:var(--warn);border-color:var(--warn);color:var(--on-warn)}
+.au-sbtn.sel.bhi{background:var(--good);border-color:var(--good);color:var(--on-good)}
 .au-sbtn.sel.na{background:var(--text3);border-color:var(--text3);color:var(--on-text3)}
 .au-kbd{font-size:10.5px;color:var(--text3);margin-left:6px}
 .au-rubric{margin:14px 0;border:1px solid var(--border);border-radius:var(--rl);overflow:hidden}
@@ -374,9 +375,10 @@ input[type="color"].cp-swatch::-moz-color-swatch{border:none;border-radius:calc(
 .au-seg button{appearance:none;border:none;border-right:1px solid var(--border);background:var(--bg);color:var(--text2);width:28px;height:28px;font-size:12.5px;font-weight:700;cursor:pointer;font-variant-numeric:tabular-nums;font-family:inherit}
 .au-seg button:last-child{border-right:none}
 .au-seg button:hover{background:var(--bg2)}
-.au-seg button.on0,.au-seg button.on1{background:var(--crit);color:var(--on-crit)}
-.au-seg button.on2,.au-seg button.on3{background:var(--warn);color:var(--on-warn)}
-.au-seg button.on4,.au-seg button.on5{background:var(--good);color:var(--on-good)}
+.au-seg button.onlo{background:var(--crit);color:var(--on-crit)}
+.au-seg button.onmid{background:var(--warn);color:var(--on-warn)}
+.au-seg button.onhi{background:var(--good);color:var(--on-good)}
+.au-seg.dense button{width:22px;font-size:11.5px}
 .au-seg button.onna{background:var(--text3);color:var(--on-text3)}
 /* Risk factors reuse the assessment's segmented control, but 1–3 means risk
    (low is good) rather than a score, so they get their own state colours. */
@@ -2730,7 +2732,7 @@ function categoriesFromTemplate(tpl){
       return {no:it.no,cid:it.cid,checkpoint:it.checkpoint,weight:it.weight!==undefined?it.weight:1,rubric:it.rubric||null,score:null,notes:'',files:[]};
     });
   });
-  return cats;
+  return stampScale(cats,tplScale(tpl));
 }
 
 // ── Audit types ────────────────────────────────────────────────────────────
@@ -2866,7 +2868,7 @@ var I18N={
     critical:'Critical',medium:'Medium',good:'Good',reset:'Reset',
     detTitle:'Analysis',supplier:'Supplier',allSuppliers:'All Suppliers',allCats:'All Categories',
     dataTitle:'Data Control',selectSup:'-- Select supplier --',saveBtn:'Save',
-    dataInfo:'Edit scores (0-5 or N.A.) and notes directly, then click Save.',
+    dataInfo:'Edit scores (within the checklist scale or N.A.) and notes directly, then click Save.',
     settingsReport:'Report Header',auditorLbl:'Assessor Name',companyLbl:'Company',projectLbl:'Project',dateAuto:'Date is set automatically.',
     settingsLang:'Language',settingsThresh:'Traffic Light Thresholds',greenFrom:'Green from',yellowFrom:'Yellow from',redAuto:'Red below yellow (automatic)',applyBtn:'Apply',
     settingsWeights:'Category Weighting',weightsInfo:'0 = disabled - 1.0 = normal - 3.0 = triple',resetBtn:'Reset',afterImport:'Available after import',
@@ -2906,7 +2908,7 @@ var I18N={
     filterBarAmpel:'Traffic light:',filterBarCat:'Category:',filterBarSup:'Supplier:',
     filterNoCat:'No category matches the filter',filterNoSup:'No supplier matches the filter',
     catScoreTitle:'Score per Category',phAuditor:'Jane Smith',phCompany:'P3 Group',phProject:'Supplier Assessment 2025',
-    dataInfoText:'Edit scores (0-5 or N.A.) and notes directly, then click Save.',
+    dataInfoText:'Edit scores (within the checklist scale or N.A.) and notes directly, then click Save.',
     berichtskopf:'Report Header',spracheLbl:'Language',ampelLbl:'Traffic Light Thresholds',
     gewichtLbl:'Category Weighting',gewichtInfo:'0 = disabled - 1.0 = normal - 3.0 = triple',
     apiKeyLbl:'API Key (AI Analysis)',apiKeyInfo2:'Anthropic API key. Create at anthropic.com/api',
@@ -3145,11 +3147,13 @@ function dotScale(frac,n,color,w,h){
   }
   return '<span class="dots">'+out+'</span>';
 }
-// 0–5 checkpoint score as five cells, coloured by the tier that score maps to.
-function scoreDots(score,w,h){
+// Checkpoint score as one cell per scale step (five on 0–5), coloured by the
+// tier that score maps to. Scales above 6 steps keep five cells, filled
+// proportionally, so a 0–10 score stays the same width as a 0–5 one.
+function scoreDots(score,w,h,max){
   if(score==null||score===''||score==='N.A.'||isNaN(Number(score)))return '<span class="dots"></span>';
-  var v=Number(score);
-  return dotScale(v/5,5,sc(v/5*100),w||13,h||13);
+  var v=Number(score);max=max||5;
+  return dotScale(v/max,max<=6?max:5,sc(v/max*100),w||13,h||13);
 }
 // TIERS as ascending bands [{lo,hi,color,label}] — 0–55, 55–70, 70–85, 85–100
 // for the default ramp. Derived from TIERS, so a project with custom thresholds
@@ -3338,7 +3342,7 @@ function compareBodyHtml(s){
             +chosen.map(function(r){
               var it=(r.categories[cat]||[])[idx];
               var v=it?it.score:null;
-              var bc=v==null||v==='N.A.'?'na':(v>=4?'high':v>=2.5?'mid':'low');
+              var bc=v==null||v==='N.A.'?'na':scoreBadgeCls(it);
               var note=it&&it.notes?'<div style="font-size:10px;color:var(--text2);margin-top:2px;max-width:160px" title="'+esc(it.notes)+'">'+esc(it.notes)+'</div>':'';
               return '<td style="text-align:center;vertical-align:top;padding:6px 8px"><span class="badge '+bc+'">'+(v==null?'—':v)+'</span>'+note+'</td>';
             }).join('')
@@ -3387,9 +3391,71 @@ function calcScore(s,cat){
   const cats=cat?{[cat]:s.categories[cat]}:s.categories;
   Object.entries(cats).forEach(([c,items])=>{
     if(!items)return;const w=weights[c]!==undefined?weights[c]:1;
-    items.forEach(item=>{if(item.score!==null&&item.score!=='N.A.'&&typeof item.score==='number'){var iw=item.weight!==undefined?item.weight:1;tot+=item.score*w*iw;pos+=5*w*iw;}});
+    items.forEach(item=>{if(item.score!==null&&item.score!=='N.A.'&&typeof item.score==='number'){var iw=item.weight!==undefined?item.weight:1;tot+=item.score*w*iw;pos+=itemMax(item)*w*iw;}});
   });
   return pos===0?null:Math.round((tot/pos)*100);
+}
+
+// ── Rating scale ─────────────────────────────────────────────────────────────
+// A checklist defines its own whole-number scale: From 0 or 1, To 2–10 (default
+// 0–5). Assessments built from it carry the scale on every checkpoint (`smin` /
+// `smax`, stored only when they differ from 0 / 5), so any code holding a single
+// checkpoint can read it and old data stays valid as 0–5. Percent is always
+// score ÷ max — 0 is 0 %, and on a 1–5 scale a 1 is 20 %.
+var DEFAULT_SCALE={min:0,max:5};
+function normScale(sc){
+  var mn=sc&&Number(sc.min)===1?1:0;
+  var mx=sc&&sc.max!=null?parseInt(sc.max,10):5;
+  if(!(mx>=2&&mx<=10&&mx>mn))mx=5;
+  return {min:mn,max:mx};
+}
+function isDefaultScale(sc){return sc.min===0&&sc.max===5;}
+function scaleValues(sc){var o=[];for(var v=sc.min;v<=sc.max;v++)o.push(v);return o;}
+function scaleLabel(sc){return sc.min+'–'+sc.max;}
+function itemScale(it){return normScale({min:it&&it.smin,max:it&&it.smax!=null?it.smax:5});}
+function itemMax(it){return itemScale(it).max;}
+// Scale of an assessment / category set — every checkpoint carries the same one.
+function catsScale(cats){
+  var keys=Object.keys(cats||{});
+  for(var i=0;i<keys.length;i++){var a=cats[keys[i]];if(a&&a.length)return itemScale(a[0]);}
+  return normScale(null);
+}
+function roundScale(r){return catsScale(r&&r.categories);}
+// Distinct scales across suppliers' reporting assessments (exports, legends).
+function scalesInUse(sups){
+  var seen={},out=[];
+  (sups||[]).forEach(function(s){var sc=catsScale(s&&s.categories),k=scaleLabel(sc);if(!seen[k]){seen[k]=1;out.push(sc);}});
+  return out.length?out:[normScale(null)];
+}
+function tplScale(t){return normScale(t&&t.scale);}
+function stampScale(cats,sc){
+  sc=normScale(sc);
+  Object.keys(cats||{}).forEach(function(c){
+    (cats[c]||[]).forEach(function(it){
+      if(sc.min===1)it.smin=1;else delete it.smin;
+      if(sc.max!==5)it.smax=sc.max;else delete it.smax;
+    });
+  });
+  return cats;
+}
+// The score on the classic 0–5 footing — keeps the fixed thresholds (critical
+// ≤ 2, strong ≥ 4, …) meaning the same share of the scale on every scale.
+function score5(it){return it&&typeof it.score==='number'?it.score/itemMax(it)*5:null;}
+function scorePct(it){return it&&typeof it.score==='number'?it.score/itemMax(it)*100:null;}
+// Colour band of one value: lowest two fifths / middle two fifths / top fifth —
+// exactly 0–1 / 2–3 / 4–5 on the default scale.
+function scoreBand(v,max){var p=v/max;return p<0.4?'lo':p<0.8?'mid':'hi';}
+// Badge class used by the comparison tables (high ≥ 4, mid ≥ 2.5 on a 0–5 footing).
+function scoreBadgeCls(it){
+  var v5=score5(it);
+  return v5==null?'na':(v5>=4?'high':v5>=2.5?'mid':'low');
+}
+// A checklist's scale is fixed once any assessment built from it has a rating.
+function tplScaleLocked(name){
+  if(!name)return false;
+  return suppliers.some(function(s){
+    return (s.rounds||[]).some(function(r){return r.templateName===name&&roundStats(r).scored>0;});
+  });
 }
 
 
@@ -3612,8 +3678,22 @@ function isAuditSheet(data){const f=data.slice(0,6).flat().filter(Boolean).map(v
 var _stdImport=null;
 function showStdImportModal(sup,filename){
   var on={};Object.keys(sup.categories).forEach(function(c){on[c]=true;});
-  _stdImport={sup:sup,filename:filename,name:sup.name,on:on,date:''};
+  // Scale guess: 0–5 unless the file holds scores above 5 (then 0–10).
+  var hi=0;Object.keys(sup.categories).forEach(function(c){sup.categories[c].forEach(function(it){if(typeof it.score==='number'&&it.score>hi)hi=it.score;});});
+  _stdImport={sup:sup,filename:filename,name:sup.name,on:on,date:'',scale:normScale({min:0,max:hi>5?10:5})};
   renderStdImportModal();
+}
+function stdImpScale(part,v){
+  var sc=_stdImport.scale;sc[part]=parseInt(v,10);if(sc.max<=sc.min)sc.max=sc.min+1;
+  _stdImport.scale=normScale(sc);renderStdImportModal();
+}
+// From / To pickers for a whole-number rating scale; `fn(part,value)` is called on change.
+function scalePickerHtml(sc,fn,selStyle){
+  var maxOpts='';
+  for(var m=Math.max(2,sc.min+1);m<=10;m++)maxOpts+='<option value="'+m+'"'+(m===sc.max?' selected':'')+'>'+m+'</option>';
+  return 'from <select onchange="'+fn+'(\'min\',this.value)" style="'+selStyle+'">'
+      +[0,1].map(function(v){return '<option value="'+v+'"'+(v===sc.min?' selected':'')+'>'+v+'</option>';}).join('')
+    +'</select> to <select onchange="'+fn+'(\'max\',this.value)" style="'+selStyle+'">'+maxOpts+'</select>';
 }
 function stdImpMode(v){_importMode=v;renderStdImportModal();}
 function stdImpToggle(i,v){var c=Object.keys(_stdImport.sup.categories)[i];_stdImport.on[c]=v;renderStdImportModal();}
@@ -3630,7 +3710,8 @@ function renderStdImportModal(){
   var cats=st.sup.categories,catNames=Object.keys(cats);
   var all=[];catNames.forEach(function(c){if(st.on[c])cats[c].forEach(function(it){all.push(it);});});
   var scored=all.filter(function(it){return it.score!==null&&it.score!==undefined;}).length;
-  var outOfScale=all.filter(function(it){return typeof it.score==='number'&&(it.score<0||it.score>5);}).length;
+  var ssc=st.scale;
+  var outOfScale=all.filter(function(it){return typeof it.score==='number'&&(it.score<ssc.min||it.score>ssc.max||it.score!==Math.round(it.score));}).length;
   function seg(val,label,sub){
     var on=(isTpl?'template':'supplier')===val;
     return '<button onclick="stdImpMode(\''+val+'\')" style="flex:1;min-width:150px;text-align:left;padding:9px 12px;border:none;cursor:pointer;background:'+(on?'var(--primary)':'var(--bg)')+';color:'+(on?'var(--on-primary)':'var(--text)')+'">'
@@ -3652,7 +3733,9 @@ function renderStdImportModal(){
     +(!isTpl?'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--text2);margin-bottom:14px">Assessment date <input type="date" value="'+esc(st.date)+'" oninput="_stdImport.date=this.value" style="'+_IMP_INP+'"><span style="color:var(--text3)">empty = today</span></div>':'')
     +'<div style="font-size:12px;color:var(--text2);margin-bottom:8px"><b>'+all.length+'</b> checkpoints in <b>'+catNames.filter(function(c){return st.on[c];}).length+'</b> categor'+(catNames.filter(function(c){return st.on[c];}).length===1?'y':'ies')
       +(!isTpl?' · <b>'+scored+'</b> scored':'')+'</div>'
-    +(!isTpl&&outOfScale?'<div style="font-size:11.5px;color:var(--warn);margin-bottom:8px"><i class="ti ti-alert-triangle"></i> '+outOfScale+' score'+(outOfScale!==1?'s are':' is')+' outside 0–5. The Standard Import takes scores as they are — use the AI Import to convert another scale.</div>':'');
+    +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--text2);margin-bottom:10px"><i class="ti ti-ruler-measure" style="color:var(--text3)"></i><span style="font-weight:600">Rating scale</span> '
+      +scalePickerHtml(ssc,'stdImpScale',_IMP_SEL+';font-size:12px')+'<span style="color:var(--text3)">· whole numbers plus N.A.</span></div>'
+    +(!isTpl&&outOfScale?'<div style="font-size:11.5px;color:var(--warn);margin-bottom:8px"><i class="ti ti-alert-triangle"></i> '+outOfScale+' score'+(outOfScale!==1?'s are':' is')+' not a whole number from '+ssc.min+' to '+ssc.max+'. The Standard Import takes scores as they are — check the scale, or use the AI Import to convert another scale.</div>':'');
   h+=catNames.map(function(c,i){
     var items=cats[c],on=!!st.on[c];
     return '<div style="border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px;overflow:hidden'+(on?'':';opacity:.55')+'">'
@@ -3696,6 +3779,7 @@ async function confirmStdImport(){
   var isTpl=getImportMode()==='template';
   var keepBoth=isTpl?await askTemplateConflict([name]):false;
   var mo=document.getElementById('aiModal');if(mo)mo.remove();
+  stampScale(cats,st.scale);
   _stdImport=null;
   if(isTpl){
     ensureTemplateFromImport(name,cats,keepBoth);
@@ -3797,7 +3881,7 @@ function _colIdx(v){if(v==null||v==='')return null;var n=parseInt(v,10);return i
 function _rubricCols(rb){
   if(!rb||typeof rb!=='object')return null;
   var out={},any=false;
-  for(var s=0;s<=5;s++){out[s]=_colIdx(rb[s]);if(out[s]!=null)any=true;}
+  for(var s=0;s<=10;s++){var c=_colIdx(rb[s]);if(c!=null){out[s]=c;any=true;}}
   return any?out:null;
 }
 function _isoOrEmpty(v){var s=v==null?'':String(v);return /^\d{4}-\d{2}-\d{2}/.test(s)?s.slice(0,10):'';}
@@ -3807,22 +3891,29 @@ function _impNum(raw){
   var s=String(raw).trim();
   return /^[-+]?\d+([.,]\d+)?\s*%?$/.test(s)?Number(s.replace('%','').replace(',','.')):NaN;
 }
-function _toFive(n,min,max){
-  var v=(min===0&&max===5)?n:(n-min)/(max-min)*5;
-  return Math.max(0,Math.min(5,Math.round(v)));
+// A number on the file's min–max scale → a whole number on the target scale
+// (the checklist's rating scale). Identical scales pass straight through.
+function _toScale(n,min,max,t){
+  var v=(min===t.min&&max===t.max)?n:t.min+(n-min)/(max-min)*(t.max-t.min);
+  return Math.max(t.min,Math.min(t.max,Math.round(v)));
 }
-// Mapped value of a text rating: a 0-5 number, 'N.A.', '' (= leave unscored),
-// or undefined when nothing recognises it.
+// Target scale for a file scale: the same one when the tool supports it
+// (whole numbers, from 0 or 1, up to 10), otherwise the default 0–5.
+function _impDefaultTarget(min,max){
+  return ((min===0||min===1)&&max===Math.round(max)&&max>=2&&max<=10&&max>min)?{min:min,max:max}:normScale(null);
+}
+// Mapped value of a text rating: a number on the target scale, 'N.A.', ''
+// (= leave unscored), or undefined when nothing recognises it.
 function _impTextVal(k,scale){
   if(Object.prototype.hasOwnProperty.call(scale.text,k))return scale.text[k];
-  for(var v in IMP_TEXT_DEFAULTS){if(IMP_TEXT_DEFAULTS[v].indexOf(k)>=0)return v==='N.A.'?'N.A.':Number(v);}
+  for(var v in IMP_TEXT_DEFAULTS){if(IMP_TEXT_DEFAULTS[v].indexOf(k)>=0)return v==='N.A.'?'N.A.':_toScale(Number(v),0,5,scale.target);}
   return undefined;
 }
 function _impScore(raw,scale){
   if(raw==null||raw instanceof Date)return {v:null};
   var s=String(raw).trim();if(!s)return {v:null};
   var n=_impNum(raw);
-  if(isFinite(n))return {v:_toFive(n,scale.min,scale.max)};
+  if(isFinite(n))return {v:_toScale(n,scale.min,scale.max,scale.target)};
   var t=_impTextVal(_normTxt(s),scale);
   if(t===undefined)return {v:null,unknown:s};
   return {v:t===''?null:t};
@@ -3854,7 +3945,7 @@ function aiImportExcel(file){
       +'- isChecklist: true if the sheet holds a list of checkpoints / questions / requirements — WITH OR WITHOUT scores (an empty questionnaire counts). false for cover pages, instructions, indexes, summaries, charts, master data. Give a short "reason" when false.\n'
       +'- hasScores: true if scores / ratings are filled in.\n'
       +'- headerRow: 0-based row index of the column header row.\n'
-      +'- columns (0-based column index or null): category, no (checkpoint number), checkpoint (question / requirement text), score (rating / result), notes (comment / evidence / finding), weight (per-checkpoint weighting factor), rubric (if columns describe what each score level means: map level 0-5 to its column, e.g. {"0":5,"1":6,"2":7,"3":8,"4":9,"5":10}; else null).\n'
+      +'- columns (0-based column index or null): category, no (checkpoint number), checkpoint (question / requirement text), score (rating / result), notes (comment / evidence / finding), weight (per-checkpoint weighting factor), rubric (if columns describe what each score level means: map each score level to its column, e.g. {"0":5,"1":6,"2":7,"3":8,"4":9,"5":10}; else null).\n'
       +'- sections: how category headings appear INSIDE the checkpoint column, if at all: "none" | "noNumber" (heading rows have an empty number column) | "topLevelNumber" (headings are numbered 1, 2 … while checkpoints are 1.1, 1.2 …).\n'
       +'- supplierName, auditDate (YYYY-MM-DD), auditor: from the sheet name or the rows above the header (cover block) if present, else null.\n'
       +'- matrixSuppliers: if the sheet is a SUPPLIER COMPARISON MATRIX — one checkpoint list with a separate score column per supplier — list them: [{"name":"Supplier A","score":3,"notes":4}] (notes = that supplier\'s comment column or null). Otherwise [].\n\n'
@@ -3910,16 +4001,17 @@ function showAiImportModal(wb,rowsBySheet,result,filename){
   var sc=result.scale||{},min=Number(sc.min),max=Number(sc.max);
   if(!isFinite(min))min=0;
   if(!isFinite(max)||max<=min){min=0;max=5;}
+  var target=_impDefaultTarget(min,max);
   var text={};
   Object.keys(sc.text||{}).forEach(function(k){
     var v=sc.text[k];
-    text[_normTxt(k)]=String(v).toUpperCase()==='N.A.'?'N.A.':(isFinite(Number(v))&&v!==''&&v!=null?_toFive(Number(v),min,max):'');
+    text[_normTxt(k)]=String(v).toUpperCase()==='N.A.'?'N.A.':(isFinite(Number(v))&&v!==''&&v!=null?_toScale(Number(v),min,max,target):'');
   });
   var first=sheets.find(function(m){return m.isChecklist&&(m.date||m.auditor);})||{};
   _aiImportState={wb:wb,rows:rowsBySheet,sheets:sheets,layout:layout,filename:filename||'',
     combinedName:(filename||'Imported').replace(/\.[^.]+$/,''),
     meta:{date:first.date||'',auditor:first.auditor||''},
-    scale:{min:min,max:max,text:text},_tv:[]};
+    scale:{min:min,max:max,text:text,target:target,targetSet:false},_tv:[]};
   renderAiImportModal();
 }
 
@@ -3946,7 +4038,7 @@ function _impParseRows(st,m,forcedCat){
     var rb=null;
     if(m.rubric){
       var any=false;rb={};
-      for(var s=0;s<=5;s++){var t=m.rubric[s]!=null?_cellText(r[m.rubric[s]]):'';rb[s]=t;if(t)any=true;}
+      scaleValues(st.scale.target).forEach(function(s){var t=m.rubric[s]!=null?_cellText(r[m.rubric[s]]):'';rb[s]=t;if(t)any=true;});
       if(!any)rb=null;
     }
     var w=1;
@@ -3963,7 +4055,7 @@ function _impBuildCats(parsed,scoreCol,notesCol,scale,withScores){
       score:withScores&&scoreCol!=null?_impScore(p.row[scoreCol],scale).v:null,
       notes:withScores&&notesCol!=null?_cellText(p.row[notesCol]):'',files:[]});
   });
-  return cats;
+  return stampScale(cats,scale.target);
 }
 function _impCatName(m){return (m.catName||'').trim()||m.sheet;}
 // What will be created: one entry per supplier (assessment mode) or checklist
@@ -4036,9 +4128,9 @@ function setAiImportLayout(v){_aiImportState.layout=v;_impRe();}
 function aiImpCol(i,f,v){_aiImportState.sheets[i].columns[f]=_colIdx(v);_impRe();}
 function aiImpRubric(i,lvl,v){
   var m=_aiImportState.sheets[i];
-  if(!m.rubric)m.rubric={0:null,1:null,2:null,3:null,4:null,5:null};
+  if(!m.rubric)m.rubric={};
   m.rubric[lvl]=_colIdx(v);
-  if(![0,1,2,3,4,5].some(function(s){return m.rubric[s]!=null;}))m.rubric=null;
+  if(!Object.keys(m.rubric).some(function(s){return m.rubric[s]!=null;}))m.rubric=null;
   _impRe();
 }
 // re=true re-renders (selects, checkboxes); text fields only update state, so a
@@ -4061,36 +4153,64 @@ function aiImpTop(f,v){
   if(f==='combinedName'){st.combinedName=v;_impSetBadge('aiimp_b_top',v);}
   else st.meta[f]=v;
 }
-function aiImpScale(v){var p=String(v).split('|');_aiImportState.scale.min=Number(p[0]);_aiImportState.scale.max=Number(p[1]);_impRe();}
+// Scale in the file. Until the target is picked by hand it follows the file.
+function aiImpScale(v){
+  var p=String(v).split('|'),sc=_aiImportState.scale;
+  sc.min=Number(p[0]);sc.max=Number(p[1]);
+  if(!sc.targetSet)_aiImpRetarget(_impDefaultTarget(sc.min,sc.max));
+  _impRe();
+}
+// Target = the rating scale the imported checklist / assessment gets.
+function aiImpTarget(part,v){
+  var sc=_aiImportState.scale,t={min:sc.target.min,max:sc.target.max};
+  t[part]=parseInt(v,10);if(t.max<=t.min)t.max=t.min+1;
+  sc.targetSet=true;
+  _aiImpRetarget(normScale(t));
+  _impRe();
+}
+// Mapped text ratings move with the target, keeping their share of the scale.
+function _aiImpRetarget(t){
+  var sc=_aiImportState.scale,o=sc.target;
+  Object.keys(sc.text).forEach(function(k){var v=sc.text[k];if(typeof v==='number')sc.text[k]=_toScale(v,o.min,o.max,t);});
+  sc.target=t;
+}
 function aiImpText(idx,v){
   var st=_aiImportState,t=st._tv[idx];if(!t)return;
   st.scale.text[t.key]=v==='N.A.'?'N.A.':(v===''?'':Number(v));
   _impRe();
 }
 
-function _impScaleHtml(st){
-  var tv=_impTextValues(st);st._tv=tv.text;
-  var sc=st.scale;
+// `withFile` = the file carries scores, so its own scale and text ratings matter;
+// a structure-only import just picks the checklist's rating scale.
+function _impScaleHtml(st,withFile){
+  var tv=withFile?_impTextValues(st):{text:[],lo:null,hi:null};st._tv=tv.text;
+  var sc=st.scale,tg=sc.target;
   var presets=[[0,5],[1,5],[0,3],[0,4],[1,4],[0,10],[1,10],[0,100]];
   if(!presets.some(function(p){return p[0]===sc.min&&p[1]===sc.max;}))presets.push([sc.min,sc.max]);
-  function lab(p){return p[0]+' – '+p[1]+(p[0]===0&&p[1]===5?' (same as the tool)':p[0]===0&&p[1]===10?' (e.g. VDA 6.3)':p[0]===0&&p[1]===100?' (percent)':'');}
+  function lab(p){return p[0]+' – '+p[1]+(p[0]===0&&p[1]===10?' (e.g. VDA 6.3)':p[0]===0&&p[1]===100?' (percent)':'');}
   var h='<div style="border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:14px">'
     +'<div style="font-size:12.5px;font-weight:700;margin-bottom:8px"><i class="ti ti-adjustments-horizontal" style="color:var(--text3)"></i> Score scale</div>'
-    +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--text2)">Scale in the file '
-      +'<select onchange="aiImpScale(this.value)" style="'+_IMP_SEL+';font-size:12px">'
-        +presets.map(function(p){return '<option value="'+p[0]+'|'+p[1]+'"'+(p[0]===sc.min&&p[1]===sc.max?' selected':'')+'>'+lab(p)+'</option>';}).join('')
-      +'</select> → converted to the tool’s 0 – 5'
-      +(tv.lo!=null?'<span style="color:var(--text3)">· numbers found in the file: '+tv.lo+' – '+tv.hi+'</span>':'')
+    +(withFile
+      ?'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--text2);margin-bottom:6px">Scale in the file '
+        +'<select onchange="aiImpScale(this.value)" style="'+_IMP_SEL+';font-size:12px">'
+          +presets.map(function(p){return '<option value="'+p[0]+'|'+p[1]+'"'+(p[0]===sc.min&&p[1]===sc.max?' selected':'')+'>'+lab(p)+'</option>';}).join('')
+        +'</select>'
+        +(tv.lo!=null?'<span style="color:var(--text3)">· numbers found in the file: '+tv.lo+' – '+tv.hi+'</span>':'')
+      +'</div>'
+      :'')
+    +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--text2)">'+(withFile?'Stored on the rating scale':'Rating scale of the checklist')+' '
+      +scalePickerHtml(tg,'aiImpTarget',_IMP_SEL+';font-size:12px')
+      +(withFile&&(sc.min!==tg.min||sc.max!==tg.max)?'<span style="color:var(--text3)">· scores are converted and rounded</span>':'')
     +'</div>';
   if(tv.hi!=null&&(tv.hi>sc.max||tv.lo<sc.min))
-    h+='<div style="font-size:11.5px;color:var(--warn);margin-top:6px"><i class="ti ti-alert-triangle"></i> Some numbers lie outside '+sc.min+' – '+sc.max+'. They are capped at 0 or 5 — check the scale.</div>';
+    h+='<div style="font-size:11.5px;color:var(--warn);margin-top:6px"><i class="ti ti-alert-triangle"></i> Some numbers lie outside '+sc.min+' – '+sc.max+'. They are capped at '+tg.min+' or '+tg.max+' — check the scale.</div>';
   if(tv.text.length){
     var unknown=0;
     h+='<div style="font-size:11px;font-weight:600;color:var(--text2);margin:10px 0 4px">Text ratings found in the file</div>'
       +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px">'
       +tv.text.map(function(t,idx){
         var v=_impTextVal(t.key,sc);if(v===undefined)unknown++;
-        var opts=[['','not scored'],['N.A.','N.A.'],['0','0'],['1','1'],['2','2'],['3','3'],['4','4'],['5','5']];
+        var opts=[['','not scored'],['N.A.','N.A.']].concat(scaleValues(tg).map(function(n){return [String(n),String(n)];}));
         var cur=v===undefined?'':String(v);
         return '<div style="display:flex;align-items:center;gap:6px;font-size:12px;padding:4px 8px;border:1px solid '+(v===undefined?'var(--warn)':'var(--border)')+';border-radius:6px">'
           +'<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(t.label)+'">“'+esc(t.label)+'” <span style="color:var(--text3)">×'+t.count+'</span></span>'
@@ -4132,11 +4252,12 @@ function _impSheetCard(st,m,i,isTpl){
     +field('Weight col',colSel(m.columns.weight,'aiImpCol('+i+',\'weight\',this.value)'))
     +field('Headings in checkpoint col','<select onchange="aiImpSheet('+i+',\'sections\',this.value,true)" style="'+_IMP_SEL+'">'+secOpts.map(function(o){return '<option value="'+o[0]+'"'+(m.sections===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>')
   +'</div>';
-  var rbSet=m.rubric?[0,1,2,3,4,5].filter(function(s){return m.rubric[s]!=null;}).length:0;
+  var tvals=scaleValues(st.scale.target);
+  var rbSet=m.rubric?tvals.filter(function(s){return m.rubric[s]!=null;}).length:0;
   var rubric='<details ontoggle="_aiImportState.sheets['+i+']._rbOpen=this.open"'+(m._rbOpen?' open':'')+' style="margin-bottom:8px">'
-    +'<summary style="font-size:11.5px;color:var(--text2);cursor:pointer">Scoring criteria columns (what each score 0–5 means)'+(rbSet?' · <b>'+rbSet+' mapped</b>':'')+'</summary>'
+    +'<summary style="font-size:11.5px;color:var(--text2);cursor:pointer">Scoring criteria columns (what each score '+scaleLabel(st.scale.target)+' means)'+(rbSet?' · <b>'+rbSet+' mapped</b>':'')+'</summary>'
     +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-top:6px">'
-      +[0,1,2,3,4,5].map(function(s){return field('Score '+s,colSel(m.rubric?m.rubric[s]:null,'aiImpRubric('+i+','+s+',this.value)'));}).join('')
+      +tvals.map(function(s){return field('Score '+s,colSel(m.rubric?m.rubric[s]:null,'aiImpRubric('+i+','+s+',this.value)'));}).join('')
     +'</div></details>';
   // Supplier columns of a comparison matrix
   var mx='';
@@ -4242,7 +4363,7 @@ function renderAiImportModal(){
       +' Auditor <input type="text" value="'+esc(st.meta.auditor)+'" oninput="aiImpTop(\'auditor\',this.value)" placeholder="optional" style="'+_IMP_INP+';width:160px"></div>';
   }
   var anyScore=!isTpl&&audit.some(function(i){var m=st.sheets[i];return m.on&&_impScoreCols(st,m).length;});
-  if(anyScore)h+=_impScaleHtml(st);
+  if(anyScore||isTpl)h+=_impScaleHtml(st,anyScore);
   if(!audit.length)h+='<div style="color:var(--text2);font-size:13px;padding:12px 0">No checklist sheets detected. Use <b>Include</b> on a sheet above if the AI missed it.</div>';
   h+=audit.map(function(i){return _impSheetCard(st,st.sheets[i],i,isTpl);}).join('');
   var n=_impTargets(st).length;
@@ -4303,8 +4424,10 @@ function ensureTemplateFromImport(name,cats,keepBoth){
   _assignCids(tplCats);
   var tplName=_tplImportName(name);
   if(keepBoth){var base=tplName,n=2;while(templates.some(function(t){return t.name===tplName;}))tplName=base+' '+(n++);}
-  var tpl={name:tplName,categories:tplCats};
+  var tpl={name:tplName,scale:catsScale(cats),categories:tplCats};
   var ti=templates.findIndex(function(t){return t.name===tplName;});
+  // Replacing a checklist whose assessments are already rated keeps its scale.
+  if(ti>=0&&tplScaleLocked(tplName))tpl.scale=tplScale(templates[ti]);
   if(ti>=0)templates[ti]=tpl;else templates.push(tpl);
   if(typeof renderTplBuilderList==='function')renderTplBuilderList();
 }
@@ -4313,6 +4436,7 @@ function ensureTemplateFromImport(name,cats,keepBoth){
 var ACT_PRIO_COLOR={High:'var(--crit)',Medium:'var(--warn)',Low:'var(--good)'};
 var ACT_STATUS_COLOR={Open:'var(--crit)','In Progress':'var(--warn)',Done:'var(--positive)'};
 
+// `score` is on the 0–5 footing — callers pass score5(item).
 function priorityFromScore(score){
   if(score===null||score==='N.A.')return 'Medium';
   if(score<=1)return 'High';
@@ -4808,7 +4932,7 @@ function _actApplyAutoPriority(){
   if(!sup)return;
   var scores=_actCps.map(function(x){
     var it=(sup.categories[x.category]||[]).find(function(i){return i.checkpoint===x.checkpoint;});
-    return it&&typeof it.score==='number'?it.score:null;
+    return score5(it);
   }).filter(function(v){return v!=null;});
   if(scores.length)document.getElementById('actPriority').value=priorityFromScore(Math.min.apply(null,scores));
 }
@@ -4854,7 +4978,7 @@ function renderActCpPicker(){
       var idx=_actPickList.length;_actPickList.push({cat:cat,cp:item.checkpoint});
       var on=_actCpSel(cat,item.checkpoint);
       var sv=item.score;
-      var badge=(sv!==null&&sv!==undefined&&sv!=='')?'<span style="font-size:10.5px;font-weight:700;flex-shrink:0;color:'+(sv==='N.A.'?'var(--text3)':sc((Number(sv)/5)*100))+'">'+sv+(sv==='N.A.'?'':'/5')+'</span>':'';
+      var badge=(sv!==null&&sv!==undefined&&sv!=='')?'<span style="font-size:10.5px;font-weight:700;flex-shrink:0;color:'+(sv==='N.A.'?'var(--text3)':sc((Number(sv)/itemMax(item))*100))+'">'+sv+(sv==='N.A.'?'':'/'+itemMax(item))+'</span>':'';
       var note=(item.notes||'').trim();
       h+='<label style="display:flex;gap:9px;padding:8px 12px;border-bottom:1px solid var(--border);cursor:pointer;align-items:flex-start'+(on?';background:color-mix(in srgb,var(--primary) 7%,transparent)':'')+'">'
         +'<input type="checkbox" '+(on?'checked':'')+' onchange="toggleActCpByIdx('+idx+')" style="margin-top:2px;width:15px;height:15px;accent-color:var(--primary);flex-shrink:0;cursor:pointer">'
@@ -5187,7 +5311,7 @@ function renderCoverage(){
     y+=headH;
     if(!isCol){
       items.forEach(function(item,ii){
-        var node={cat:cat,cp:item.checkpoint,num:cpRef(item,ii),score:item.score,key:cpNodes.length,y:y};
+        var node={cat:cat,idx:(cats[cat]||[]).indexOf(item),cp:item.checkpoint,num:cpRef(item,ii),score:item.score,max:itemMax(item),key:cpNodes.length,y:y};
         cpIndex[cat+'||'+item.checkpoint]=node;
         cpNorm[cat+'||'+covNorm(item.checkpoint)]=node;
         var nk=covNorm(item.checkpoint);(cpNameIdx[nk]=cpNameIdx[nk]||[]).push(node);
@@ -5296,12 +5420,12 @@ function renderCoverage(){
   });
   cpNodes.forEach(function(n){
     var scoreNum=(typeof n.score==='number')?n.score:null;
-    var stripe=scoreNum!=null?sc(scoreNum/5*100):'var(--text3)';
-    svg+='<g class="covnode" onmouseover="covHi(\'cp\',\'cp'+n.key+'\')">'
+    var stripe=scoreNum!=null?sc(scoreNum/n.max*100):'var(--text3)';
+    svg+='<g class="covnode covnode-cp" onmouseover="covHi(\'cp\',\'cp'+n.key+'\')" onclick="covOpenCheckpoint('+n.key+')">'
       +'<rect class="cnbg" x="'+LX+'" y="'+n.y+'" width="'+NODEW+'" height="'+rowH+'" rx="7" fill="var(--card)" stroke="var(--border)" stroke-width="1"/>'
       +'<rect x="'+LX+'" y="'+(n.y+4)+'" width="4" height="'+(rowH-8)+'" rx="2" fill="'+stripe+'"/>'
       +'<text x="'+(LX+14)+'" y="'+(n.y+rowH/2+4)+'" font-size="12" fill="var(--text)">'+(n.num?'<tspan fill="var(--text3)" font-weight="600" style="font-variant-numeric:tabular-nums">'+esc2(n.num)+'</tspan> ':'')+esc2(shortName(n.cp,38))+'</text>'
-      +(scoreNum!=null?'<text x="'+(LX+NODEW-10)+'" y="'+(n.y+rowH/2+4)+'" font-size="10.5" text-anchor="end" fill="var(--text3)" style="font-variant-numeric:tabular-nums">'+n.score+'/5</text>':'')
+      +(scoreNum!=null?'<text x="'+(LX+NODEW-10)+'" y="'+(n.y+rowH/2+4)+'" font-size="10.5" text-anchor="end" fill="var(--text3)" style="font-variant-numeric:tabular-nums">'+n.score+'/'+n.max+'</text>':'')
     +'</g>';
   });
 
@@ -5332,11 +5456,20 @@ function renderCoverage(){
   el.innerHTML='<div class="covdiag">'
     +'<div class="covdiag-head">'
       +'<div><div class="covdiag-title">'+esc(_covSup)+'</div>'
-        +'<div class="covdiag-sub">'+cpNodes.length+' of '+_covLastCats.reduce(function(a,c){return a+(cats[c]||[]).length;},0)+' checkpoints shown · '+tasks.length+' task'+(tasks.length===1?'':'s')+' · click a task to open it</div></div>'
+        +'<div class="covdiag-sub">'+cpNodes.length+' of '+_covLastCats.reduce(function(a,c){return a+(cats[c]||[]).length;},0)+' checkpoints shown · '+tasks.length+' task'+(tasks.length===1?'':'s')+' · click a checkpoint or task to open it</div></div>'
       +'<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">'+legend+toggleAll+'</div>'
     +'</div>'
     +'<div class="covdiag-scroll">'+svg+'</div>'
   +'</div>';
+  _covLastCpNodes=cpNodes;_covLastRoundId=chosen?chosen.id:null;
+}
+// Checkpoint node → the same read-only checkpoint popup as in Analysis, for the
+// assessment Coverage is showing (which may not be the reporting one).
+var _covLastCpNodes=[],_covLastRoundId=null;
+function covOpenCheckpoint(key){
+  var n=_covLastCpNodes[key];
+  if(!n||n.idx<0)return;
+  openCmpCheckpoint(_covSup,n.cat,n.idx,_covLastRoundId,'coverage');
 }
 function covHi(kind,key){
   document.querySelectorAll('#actionsCoverage .covlink').forEach(function(l){
@@ -5621,15 +5754,33 @@ function renderTplBuilderList(){
     return '<div onclick="editTemplate('+i+')" style="padding:10px 12px;border-radius:var(--r);cursor:pointer;margin-bottom:6px;border:2px solid '+(isActive?'var(--primary)':'var(--border)')+';background:'+(isActive?'var(--info-bg)':'var(--bg)')+'">'
       +'<div style="display:flex;justify-content:space-between;align-items:center">'
         +'<div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(t.name)+'</div>'
-        +'<button onclick="event.stopPropagation();deleteTemplate('+i+')" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:2px"><i class="ti ti-trash" style="font-size:13px"></i></button>'
+        +'<div style="display:flex;gap:2px;flex-shrink:0">'
+          +'<button onclick="event.stopPropagation();duplicateTemplate('+i+')" title="Duplicate" aria-label="Duplicate checklist" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:2px"><i class="ti ti-copy" style="font-size:13px"></i></button>'
+          +'<button onclick="event.stopPropagation();deleteTemplate('+i+')" title="Delete" aria-label="Delete checklist" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:2px"><i class="ti ti-trash" style="font-size:13px"></i></button>'
+        +'</div>'
       +'</div>'
-      +'<div style="font-size:11px;color:var(--text2);margin-top:3px">'+cats.length+' categories · '+total+' checkpoints</div>'
+      +'<div style="font-size:11px;color:var(--text2);margin-top:3px">'+cats.length+' categories · '+total+' checkpoints · scale '+scaleLabel(tplScale(t))+'</div>'
       +'</div>';
   }).join('');
 }
 
+// Full copy of a checklist — categories, checkpoints, weights, rubrics, rating
+// scale — saved right below the original as "Name (copy)" and opened for editing.
+// The copy has no assessments yet, so its rating scale can be changed freely.
+function duplicateTemplate(i){
+  var t=templates[i];if(!t)return;
+  var copy=JSON.parse(JSON.stringify(t));
+  var base=t.name+' (copy)',name=base,n=2;
+  while(templates.some(function(x){return x.name===name;}))name=t.name+' (copy '+(n++)+')';
+  copy.name=name;
+  copy.scale=tplScale(t);
+  templates.splice(i+1,0,copy);
+  editTemplate(i+1);
+  toast('Checklist duplicated — “'+name+'”');
+}
+
 function startNewTemplate(){
-  tplDraft={name:'',categories:{}};
+  tplDraft={name:'',scale:normScale(null),categories:{}};
   tplDraftIdx=-1;
   renderTplBuilderList();
   renderTplEditor();
@@ -5638,7 +5789,7 @@ function startNewTemplate(){
 function editTemplate(i){
   var t=templates[i];
   // Deep copy
-  tplDraft={name:t.name,categories:{}};
+  tplDraft={name:t.name,scale:tplScale(t),categories:{}};
   Object.entries(t.categories).forEach(function([cat,items]){
     tplDraft.categories[cat]=items.map(function(item){return {no:item.no,cid:item.cid,checkpoint:item.checkpoint,rubric:item.rubric||null,weight:item.weight!==undefined?item.weight:1};});
   });
@@ -5647,16 +5798,44 @@ function editTemplate(i){
   renderTplEditor();
 }
 
+// Rating scale of the checklist being edited. Fixed once an assessment built
+// from this checklist has a rating — those scores only mean something on the
+// scale they were given on.
+function tplDraftScaleLocked(){
+  return tplDraftIdx>=0&&!!templates[tplDraftIdx]&&tplScaleLocked(templates[tplDraftIdx].name);
+}
+function setTplScale(part,v){
+  if(!tplDraft||tplDraftScaleLocked())return;
+  var sc=tplScale(tplDraft);
+  sc[part]=parseInt(v,10);
+  if(sc.max<=sc.min)sc.max=sc.min+1;
+  tplDraft.scale=normScale(sc);
+  renderTplEditor();
+}
+function tplScaleHtml(){
+  var sc=tplScale(tplDraft),locked=tplDraftScaleLocked();
+  var sel='padding:4px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:12px;font-family:inherit';
+  return '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:-6px 0 16px;font-size:12px;color:var(--text2)">'
+    +'<i class="ti ti-ruler-measure" style="color:var(--text3);font-size:14px"></i><span style="font-weight:600">Rating scale</span>'
+    +(locked
+      ?'<span style="font-weight:700;color:var(--text);font-variant-numeric:tabular-nums">'+scaleLabel(sc)+'</span>'
+        +'<span style="color:var(--text3);display:inline-flex;align-items:center;gap:4px"><i class="ti ti-lock"></i> Fixed — assessments with this checklist are already rated</span>'
+      :scalePickerHtml(sc,'setTplScale',sel)
+        +'<span style="color:var(--text3)">· plus N.A. · fixed once the first assessment is rated</span>')
+  +'</div>';
+}
 function renderTplEditor(){
   var el=document.getElementById('tplBuilderEditor');if(!el||!tplDraft)return;
   var cats=Object.keys(tplDraft.categories);
+  var tsc=tplScale(tplDraft),tvals=scaleValues(tsc);
   var h='<div class="card">'
     +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'
       +'<input id="tplDraftName" type="text" value="'+esc(tplDraft.name)+'" placeholder="Template name..." oninput="tplDraft.name=this.value" style="flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:var(--r);font-size:14px;font-weight:600;background:var(--bg);color:var(--text)">'
-      +(aiTplHasMissingRubrics()?'<button class="btn" onclick="aiTplGenAllRubrics()" title="Generate a 0–5 scoring rubric for every checkpoint that has none"><i class="ti ti-sparkles"></i> Rubrics with AI</button>':'')
+      +(aiTplHasMissingRubrics()?'<button class="btn" onclick="aiTplGenAllRubrics()" title="Generate a '+scaleLabel(tsc)+' scoring rubric for every checkpoint that has none"><i class="ti ti-sparkles"></i> Rubrics with AI</button>':'')
       +'<button class="btn primary" onclick="commitTemplate()"><i class="ti ti-device-floppy"></i> Save</button>'
       +(tplDraftIdx>=0?'<button class="btn" onclick="cancelTplEdit()"><i class="ti ti-x"></i> Cancel</button>':'')
-    +'</div>';
+    +'</div>'
+    +tplScaleHtml();
 
   if(!cats.length){
     h+='<div style="text-align:center;padding:24px;color:var(--text2);font-size:13px">No categories yet — add one below</div>';
@@ -5698,15 +5877,15 @@ function renderTplEditor(){
                   +'<button onclick="removeTplRubric(\''+esc(cat)+'\','+ii+')" style="background:none;border:none;cursor:pointer;color:var(--crit);font-size:11px;padding:3px 6px;border-radius:4px">Remove</button>'
                 +'</div>'
               +'</div>'
-              +[0,1,2,3,4,5].map(function(s){
+              +tvals.map(function(s){
                 return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">'
-                  +'<span style="font-size:11px;font-weight:700;color:var(--primary-fg);min-width:14px;text-align:right">'+s+'</span>'
+                  +'<span style="font-size:11px;font-weight:700;color:var(--primary-fg);min-width:16px;text-align:right">'+s+'</span>'
                   +'<input type="text" value="'+esc((item.rubric[s])||'')+'" onchange="updateTplRubric(\''+esc(cat)+'\','+ii+','+s+',this.value)" placeholder="Description for score '+s+'..." style="flex:1;border:1px solid var(--border);background:var(--bg);font-size:11px;color:var(--text);padding:3px 7px;border-radius:4px">'
                   +'</div>';
               }).join('')
               +'</div>'
             :'<div style="padding:8px;background:var(--bg2);border-radius:6px;margin-top:4px;margin-bottom:4px;text-align:center">'
-              +'<button onclick="addTplRubric(\''+esc(cat)+'\','+ii+')" style="background:none;border:none;cursor:pointer;color:var(--primary-fg);font-size:12px;display:inline-flex;align-items:center;gap:4px"><i class="ti ti-plus"></i> Add scoring rubric (0–5)</button>'
+              +'<button onclick="addTplRubric(\''+esc(cat)+'\','+ii+')" style="background:none;border:none;cursor:pointer;color:var(--primary-fg);font-size:12px;display:inline-flex;align-items:center;gap:4px"><i class="ti ti-plus"></i> Add scoring rubric ('+scaleLabel(tsc)+')</button>'
               +'</div>';
           return '<div style="border-bottom:1px solid var(--border)">'
             +'<div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0">'
@@ -5778,9 +5957,10 @@ function updateTplCheckpoint(cat,idx,val){
 
 function addTplRubric(cat,idx){
   if(!tplDraft||!tplDraft.categories[cat])return;
-  tplDraft.categories[cat][idx].rubric={0:'',1:'',2:'',3:'',4:'',5:''};
+  tplDraft.categories[cat][idx].rubric=emptyRubric(tplScale(tplDraft));
   renderTplEditor();
 }
+function emptyRubric(sc){var rb={};scaleValues(sc).forEach(function(v){rb[v]='';});return rb;}
 
 function removeTplRubric(cat,idx){
   if(!tplDraft||!tplDraft.categories[cat])return;
@@ -5791,7 +5971,7 @@ function removeTplRubric(cat,idx){
 function updateTplRubric(cat,idx,score,val){
   if(!tplDraft||!tplDraft.categories[cat])return;
   var item=tplDraft.categories[cat][idx];
-  if(!item.rubric)item.rubric={0:'',1:'',2:'',3:'',4:'',5:''};
+  if(!item.rubric)item.rubric=emptyRubric(tplScale(tplDraft));
   item.rubric[score]=val;
 }
 
@@ -5814,6 +5994,32 @@ async function commitTemplate(){
   if(hasEmpty&&!(await uiConfirm({title:'Save template?',message:'Some checkpoints are empty. You can still save now.',confirmText:'Save',danger:false,icon:'ti-device-floppy'})))return;
   tplDraft.name=name;
   if(!Object.keys(tplDraft.categories).length){uiAlert('Please add at least one category.');return;}
+  // Scale: a locked checklist keeps the one it has. Rubric texts for levels
+  // outside the scale are dropped.
+  var old=tplDraftIdx>=0?templates[tplDraftIdx]:null;
+  var sc=(old&&tplScaleLocked(old.name))?tplScale(old):tplScale(tplDraft);
+  tplDraft.scale=sc;
+  Object.keys(tplDraft.categories).forEach(function(c){
+    tplDraft.categories[c].forEach(function(it){
+      if(!it.rubric)return;
+      Object.keys(it.rubric).forEach(function(k){var n=Number(k);if(!(n>=sc.min&&n<=sc.max))delete it.rubric[k];});
+    });
+  });
+  // Assessments planned with this checklist and not rated yet follow the new scale.
+  if(old&&scaleLabel(tplScale(old))!==scaleLabel(sc)){
+    suppliers.forEach(function(s){
+      (s.rounds||[]).forEach(function(r){
+        if(r.templateName===old.name&&roundStats(r).scored===0){
+          stampScale(r.categories,sc);
+          Object.keys(r.categories||{}).forEach(function(c){
+            (r.categories[c]||[]).forEach(function(it){
+              if(it.rubric)Object.keys(it.rubric).forEach(function(k){var n=Number(k);if(!(n>=sc.min&&n<=sc.max))delete it.rubric[k];});
+            });
+          });
+        }
+      });
+    });
+  }
   if(tplDraftIdx>=0){
     templates[tplDraftIdx]=JSON.parse(JSON.stringify(tplDraft));
     toast('Template "'+name+'" updated');
@@ -5881,7 +6087,7 @@ function renderTemplatePreview(){
   var cats=Object.keys(tpl.categories);
   var total=cats.reduce(function(s,c){return s+tpl.categories[c].length;},0);
   el.innerHTML='<div style="background:var(--bg2);border-radius:var(--r);padding:10px;margin-top:4px">'
-    +'<div style="font-weight:600;margin-bottom:8px;font-size:12px">'+cats.length+' Categories &nbsp;·&nbsp; '+total+' Checkpoints</div>'
+    +'<div style="font-weight:600;margin-bottom:8px;font-size:12px">'+cats.length+' Categories &nbsp;·&nbsp; '+total+' Checkpoints &nbsp;·&nbsp; Scale '+scaleLabel(tplScale(tpl))+'</div>'
     +cats.map(function(c){
       return '<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--border);font-size:12px">'
         +'<span>'+esc(c)+'</span><span style="color:var(--text2)">'+tpl.categories[c].length+' criteria</span></div>';
@@ -5973,7 +6179,7 @@ function frLoadDemo(){
 // ── Step-by-Step Audit Wizard ─────────────────────────────────────────────────
 // ══ Audit & Score console ═════════════════════════════════════════════════════
 // Desktop-native scoring: a rail listing every checkpoint of the active round next to
-// a focus pane (rubric open, notes, files, compact score picker + keyboard 0-5/N).
+// a focus pane (rubric open, notes, files, compact score picker + keyboard digits/N).
 // A "Table" view offers the same data as a dense ledger grid for fast bulk entry.
 // roundId is the console's own cursor — it edits that audit directly and never
 // goes through supplier.categories, which mirrors the reporting audit instead.
@@ -6003,9 +6209,10 @@ function auFlat(source){
   });
   return out;
 }
-function auScoreClass(v){
-  if(v===null||v===undefined||v===''||v==='N.A.')return '';
-  return 's'+v;
+function auScoreClass(item){
+  var v=item&&item.score;
+  if(typeof v!=='number')return '';
+  return 's'+scoreBand(v,itemMax(item));
 }
 function auScoreLabel(v){
   if(v==='N.A.')return 'NA';
@@ -6148,8 +6355,8 @@ function auRender(){
 function auRenderCoverage(s,flat,round){
   var total=flat.length;
   var scored=flat.filter(function(f){return f.item.score!==null&&f.item.score!==undefined&&f.item.score!=='';}).length;
-  var critical=flat.filter(function(f){return typeof f.item.score==='number'&&f.item.score<=2;}).length;
-  var strong=flat.filter(function(f){return typeof f.item.score==='number'&&f.item.score>=4;}).length;
+  var critical=flat.filter(function(f){var v=score5(f.item);return v!=null&&v<=2;}).length;
+  var strong=flat.filter(function(f){var v=score5(f.item);return v!=null&&v>=4;}).length;
   var mid=scored-critical-strong;
   // A score is only a result once the audit is closed — until then the progress
   // bar and the scored count carry the information.
@@ -6189,7 +6396,7 @@ function auConsoleHtml(s,flat,round){
     }
     var on=(f.cat===_auState.cat&&f.idx===_auState.idx);
     rail+='<div class="au-cprow'+(on?' on':'')+'" onclick="auFocus(\''+esc(f.cat).replace(/'/g,"\\'")+'\','+f.idx+')" title="'+esc(f.item.checkpoint)+'">'
-      +'<span class="sd '+auScoreClass(f.item.score)+'">'+auScoreLabel(f.item.score)+'</span>'
+      +'<span class="sd '+auScoreClass(f.item)+'">'+auScoreLabel(f.item.score)+'</span>'
       +'<span class="tx">'+esc(f.item.checkpoint)+'</span>'
       +cpTaskIndicator(tasksForCheckpoint(s.name,f.cat,f.item.checkpoint))
     +'</div>';
@@ -6206,16 +6413,17 @@ function auConsoleHtml(s,flat,round){
     var posInCat=cur.idx+1,catLen=(rcats[cur.cat]||[]).length;
     var esCat=esc(cur.cat).replace(/'/g,"\\'");
     var esSn=esc(s.name).replace(/'/g,"\\'");
-    var rubricRows=[0,1,2,3,4,5].filter(function(v){return item.rubric&&item.rubric[v]&&String(item.rubric[v]).trim();});
+    var isc=itemScale(item),ivals=scaleValues(isc);
+    var rubricRows=ivals.filter(function(v){return item.rubric&&item.rubric[v]&&String(item.rubric[v]).trim();});
     var files=item.files||[];
     // Three parts: head (checkpoint + score buttons) and foot (Prev/Next) stay
     // in view; only the body (criteria, notes, files, tasks) scrolls.
     focus='<div class="au-focus"><div class="au-fhead">'
-      +'<div class="au-kicker">'+esc(cur.cat)+' · Checkpoint '+posInCat+' of '+catLen+(item.weight!==undefined&&item.weight!==1?' · Weight '+item.weight:'')+'</div>'
+      +'<div class="au-kicker">'+esc(cur.cat)+' · Checkpoint '+posInCat+' of '+catLen+(item.weight!==undefined&&item.weight!==1?' · Weight '+item.weight:'')+(isDefaultScale(isc)?'':' · Scale '+scaleLabel(isc))+'</div>'
       +'<h3>'+esc(item.checkpoint)+'</h3>'
       +'<div class="au-scorepick">'
-        +[0,1,2,3,4,5].map(function(v){
-          return '<button class="au-sbtn v'+v+(item.score===v?' sel':'')+'" onclick="auSetScore(\''+esCat+'\','+cur.idx+','+v+')">'+v+'</button>';
+        +ivals.map(function(v){
+          return '<button class="au-sbtn b'+scoreBand(v,isc.max)+(item.score===v?' sel':'')+'" onclick="auSetScore(\''+esCat+'\','+cur.idx+','+v+')">'+v+'</button>';
         }).join('')
         +'<button class="au-sbtn na'+(item.score==='N.A.'?' sel':'')+'" onclick="auSetScore(\''+esCat+'\','+cur.idx+',\'N.A.\')">N.A.</button>'
       +'</div>'
@@ -6316,7 +6524,8 @@ function auLedgerHtml(s,round){
       +items.map(function(item,idx){
         var files=item.files||[];
         var key=auLedgerKey(cat,idx);
-        var rubricRows=[0,1,2,3,4,5].filter(function(v){return item.rubric&&item.rubric[v]&&String(item.rubric[v]).trim();});
+        var isc=itemScale(item),ivals=scaleValues(isc);
+        var rubricRows=ivals.filter(function(v){return item.rubric&&item.rubric[v]&&String(item.rubric[v]).trim();});
         var critOpen=!!_auState.critOpen[key];
         var criteriaBlock=rubricRows.length
           ?'<div class="criteria" id="auCrit_'+key+'"'+(critOpen?'':' style="display:none"')+'>'+rubricRows.map(function(v){
@@ -6332,9 +6541,9 @@ function auLedgerHtml(s,round){
           +'<td class="num" title="Report reference">'+cpRef(item,idx)+'</td>'
           +'<td class="cp"><div class="t">'+esc(item.checkpoint)+'</div>'+criteriaBlock+'</td>'
           +'<td><div style="display:flex;align-items:center;gap:7px">'
-            +'<div class="au-seg" data-cat="'+esc(cat)+'" data-idx="'+idx+'">'
-            +[0,1,2,3,4,5].map(function(v){
-              return '<button data-v="'+v+'" class="'+(item.score===v?'on'+v:'')+'" onclick="auSetScore(\''+esCat+'\','+idx+','+v+')">'+v+'</button>';
+            +'<div class="au-seg'+(ivals.length>7?' dense':'')+'" data-cat="'+esc(cat)+'" data-idx="'+idx+'" data-max="'+isc.max+'">'
+            +ivals.map(function(v){
+              return '<button data-v="'+v+'" class="'+(item.score===v?'on'+scoreBand(v,isc.max):'')+'" onclick="auSetScore(\''+esCat+'\','+idx+','+v+')">'+v+'</button>';
             }).join('')
             +'<button data-v="N.A." class="'+(item.score==='N.A.'?'onna':'')+'" style="width:auto;padding:0 8px;font-size:10.5px" onclick="auSetScore(\''+esCat+'\','+idx+',\'N.A.\')">NA</button>'
           +'</div>'+critBtn+'</div></td>'
@@ -6504,6 +6713,7 @@ function auToggleCat(cat,ci){
 function auSetScore(cat,idx,val){if(auLocked())return;
   var s=auSupplier(),r=auRound(),cats=auCats();
   if(!s||!r||!cats[cat]||!cats[cat][idx])return;
+  if(typeof val==='number'){var isc=itemScale(cats[cat][idx]);if(val<isc.min||val>isc.max)return;}
   cats[cat][idx].score=val;
   markRoundStarted(s,r); // planned -> in progress on the first score
   syncActiveCategoriesMirror(s); // matters while a supplier has no completed audit yet
@@ -6515,7 +6725,7 @@ function auSetScore(cat,idx,val){if(auLocked())return;
     if(seg){
       seg.querySelectorAll('button').forEach(function(b){b.className='';});
       var btn=seg.querySelector('button[data-v="'+val+'"]');
-      if(btn)btn.className=(val==='N.A.'?'onna':'on'+val);
+      if(btn)btn.className=(val==='N.A.'?'onna':'on'+scoreBand(val,Number(seg.dataset.max)||5));
     }
     auRenderCoverage(s,auFlat(r),r);
   } else {
@@ -6654,7 +6864,10 @@ function auNav(dir){
   auRender();
 }
 
-// Keyboard scoring — only while the Audit page is open and focus isn't in a text field
+// Keyboard scoring — only while the Audit page is open and focus isn't in a text field.
+// Digits within the checkpoint's scale score directly; on a scale up to 10, "1"
+// followed quickly by "0" gives 10.
+var _auLastDigit={k:null,t:0};
 document.addEventListener('keydown',function(e){
   var page=document.getElementById('page-audit');
   if(!page||!page.classList.contains('active'))return;
@@ -6662,7 +6875,14 @@ document.addEventListener('keydown',function(e){
   var t=e.target.tagName;
   if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT'||e.target.isContentEditable)return;
   if(e.ctrlKey||e.metaKey||e.altKey)return;
-  if(e.key>='0'&&e.key<='5'){auSetScore(_auState.cat,_auState.idx,parseInt(e.key));e.preventDefault();}
+  if(e.key.length===1&&e.key>='0'&&e.key<='9'){
+    var it=((auCats()||{})[_auState.cat]||[])[_auState.idx];
+    if(!it)return;
+    var isc=itemScale(it),d=parseInt(e.key,10),now=Date.now();
+    var v=(d===0&&isc.max>=10&&_auLastDigit.k===1&&now-_auLastDigit.t<800)?10:d;
+    _auLastDigit={k:d,t:now};
+    if(v>=isc.min&&v<=isc.max){auSetScore(_auState.cat,_auState.idx,v);e.preventDefault();}
+  }
   else if(e.key==='n'||e.key==='N'){auSetScore(_auState.cat,_auState.idx,'N.A.');e.preventDefault();}
   else if(e.key==='ArrowDown'){auNav(1);e.preventDefault();}
   else if(e.key==='ArrowUp'){auNav(-1);e.preventDefault();}
@@ -6947,10 +7167,17 @@ function aiTplRetryCategory(cat){
   _aiTplEnqueue(_aiTplCheckpointJob(arr));
 }
 
+// Level meanings for the rubric prompt: the approach's own wording on 0–5, a
+// proportional reading of it on any other scale.
+function rubricLogic(ap,sc){
+  if(isDefaultScale(sc))return ap.rubric;
+  return 'Whole-number scale '+scaleLabel(sc)+': '+sc.min+' = lowest level, '+sc.max+' = highest level, the levels in between rise in even steps. '
+    +'For orientation, the same logic on a 0–5 scale reads: '+ap.rubric;
+}
 // ── Rubrics on demand: one request per category for every checkpoint without one
 function _aiTplNeedsRubric(it){
   if(!it||!String(it.checkpoint||'').trim())return false;
-  return !(it.rubric&&[0,1,2,3,4,5].some(function(s){return String(it.rubric[s]||'').trim();}));
+  return !(it.rubric&&scaleValues(tplScale(tplDraft)).some(function(s){return String(it.rubric[s]||'').trim();}));
 }
 function aiTplHasMissingRubrics(){
   return !!tplDraft&&Object.keys(tplDraft.categories).some(function(k){return tplDraft.categories[k].some(_aiTplNeedsRubric);});
@@ -6976,26 +7203,27 @@ function _aiTplRubricJob(arr){
     var ai=arr._ai,c=ai.ctx||{},ap=AI_APPROACH[c.approach]||AI_APPROACH.assessment;
     var todo=arr.filter(_aiTplNeedsRubric);
     if(!todo.length){ai.state=null;_aiTplRubricsSettled(arr);done();return;}
-    var prompt='Write a 0–5 scoring rubric for each checkpoint below (category "'+cat+'").\n\n'
+    var tsc=tplScale(tplDraft),tvals=scaleValues(tsc);
+    var prompt='Write a '+scaleLabel(tsc)+' scoring rubric for each checkpoint below (category "'+cat+'").\n\n'
       +(c.desc?'Context: '+c.desc+'\n':'')
-      +'Scoring logic: '+ap.rubric+'\n'
+      +'Scoring logic: '+rubricLogic(ap,tsc)+'\n'
       +'Language: '+(c.lang||'the same language as the checkpoints')+'\n\n'
       +'Checkpoints:\n'+todo.map(function(it,k){return (k+1)+'. '+it.checkpoint;}).join('\n')+'\n\n'
       +'Return ONLY a JSON array with one object per checkpoint, in the same order:\n'
-      +'[{"no":1,"rubric":{"0":"...","1":"...","2":"...","3":"...","4":"...","5":"..."}}]\n'
+      +'[{"no":1,"rubric":{'+tvals.map(function(v){return '"'+v+'":"..."';}).join(',')+'}}]\n'
       +'Each level is one short sentence specific to that checkpoint.';
     callClaude(prompt,AI_TPL_SYSTEM,function(text){
       var hit=0;
       (jsonArraySalvage(text)||[]).forEach(function(r,k){
         var it=todo[(parseInt(r&&r.no,10)||k+1)-1];
         if(!it||!r.rubric||typeof r.rubric!=='object')return;
-        var rb={};for(var s=0;s<=5;s++)rb[s]=String(r.rubric[s]||'').trim();
+        var rb={};tvals.forEach(function(s){rb[s]=String(r.rubric[s]||'').trim();});
         it.rubric=rb;hit++;
       });
       ai.state=null;
       if(hit<todo.length)toast('Rubrics for "'+cat+'" are incomplete — click again to fill the rest','var(--warn)');
       _aiTplRubricsSettled(arr);done();
-    },null,{maxTokens:4000,onError:function(msg){ai.state=null;toast(msg,'var(--crit)');_aiTplRubricsSettled(arr);done();}});
+    },null,{maxTokens:tvals.length>6?7000:4000,onError:function(msg){ai.state=null;toast(msg,'var(--crit)');_aiTplRubricsSettled(arr);done();}});
   };
 }
 function _aiTplRubricsSettled(arr){
@@ -7648,8 +7876,8 @@ function renderDetail(){
       var hasAnyPhoto=items.some(function(it){return it.images&&it.images.length;});
       h+='<div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:10px">'+esc(cat)+'</div><div style="overflow-x:auto"><table class="data-table"><colgroup><col class="col-no"><col class="col-cp"><col style="width:130px"><col class="col-notes">'+(hasAnyPhoto?'<col class="col-photos">':'')+'<col style="width:62px"></colgroup><thead><tr><th>#</th><th>Checkpoint</th><th>Score</th><th>Evidence / Notes</th>'+(hasAnyPhoto?'<th>Photos</th>':'')+'<th class="cp-task-col">Tasks</th></tr></thead><tbody>';
       items.forEach(function(item,idx){
-        var p2=item.score;
-        var bc=p2==='N.A.'||p2===null?'na':(p2>=4?'high':p2>=2.5?'mid':'low');
+        var p2=item.score,pmax=itemMax(item);
+        var bc=p2==='N.A.'||p2===null?'na':scoreBadgeCls(item);
         var imgs=item.files||[];
         var photoCell=hasAnyPhoto
           ?(imgs.length
@@ -7665,10 +7893,11 @@ function renderDetail(){
         h+='<tr class="cp-row" title="Open checkpoint details" data-sup="'+esc(sn)+'" data-cat="'+esc(cat)+'" data-idx="'+idx+'" onclick="openCmpCheckpoint(this.dataset.sup,this.dataset.cat,+this.dataset.idx)">'
           +'<td style="color:var(--text3)">'+((item.no!=null&&item.no!=='')?esc(String(item.no)):(idx+1))+'</td>'
           +'<td>'+esc(item.checkpoint)+'</td>'
-          // Five cells for a five-point scale — the scale itself is visible, so
-          // you read "3 of 5" without needing the denominator spelled out.
-          +'<td><div style="display:flex;align-items:center;gap:8px">'+scoreDots(p2,12,12)
-            +'<span style="font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums;color:'+(p2===null||p2==='N.A.'?'var(--text3)':sc(Number(p2)/5*100))+'">'+(p2===null?'--':p2)+'</span></div></td>'
+          // One cell per scale step — the scale itself is visible, so you read
+          // "3 of 5" without needing the denominator spelled out. Longer scales
+          // (more than six steps) show the denominator instead.
+          +'<td><div style="display:flex;align-items:center;gap:8px">'+scoreDots(p2,12,12,pmax)
+            +'<span style="font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums;color:'+(p2===null||p2==='N.A.'?'var(--text3)':sc(Number(p2)/pmax*100))+'">'+(p2===null?'--':p2)+(typeof p2==='number'&&pmax>6?'<span style="color:var(--text3);font-weight:500">/'+pmax+'</span>':'')+'</span></div></td>'
           +'<td style="font-size:12px;color:var(--text2)">'+esc(item.notes||'')+'</td>'
           +photoCell
           +'<td class="cp-task-col">'+(cpTasks.length?cpTaskIndicator(cpTasks):'<span style="color:var(--text3)">—</span>')+'</td>'
@@ -7741,7 +7970,7 @@ function renderDetail(){
           +cmpSups.map(function(s){
             var it=s.categories[cf]&&s.categories[cf][idx];
             var v=it?it.score:null;
-            var bc=v==='N.A.'?'na':v===null?'na':(v>=4?'high':v>=2.5?'mid':'low');
+            var bc=v==='N.A.'?'na':v===null?'na':scoreBadgeCls(it);
             var note=it&&it.notes?'<div style="font-size:10px;color:var(--text2);margin-top:2px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(it.notes||'')+'">'+esc(it.notes||'')+'</div>':'';
             // Clicking a cell opens the full assessment Score view for that supplier's
             // checkpoint (full note + evidence) without leaving Analysis.
@@ -7775,22 +8004,30 @@ function renderDetail(){
 // read-only: the note is truncated to a single line in the comparison heatmap,
 // so clicking a cell opens the full note, rubric and evidence in place — without
 // jumping over to the Assessment page.
-function openCmpCheckpoint(supName,cat,idx){
+// roundId (optional) shows that assessment instead of the reporting one; `from`
+// 'coverage' keeps linked tasks on the Actions page (Coverage opens it too).
+function openCmpCheckpoint(supName,cat,idx,roundId,from){
   var s=suppliers.find(function(x){return x.name===supName;});
-  if(!s||!s.categories||!s.categories[cat])return;
-  var item=s.categories[cat][idx];
+  if(!s)return;
+  var round=roundId!=null?(s.rounds||[]).find(function(x){return x.id===roundId;}):null;
+  if(roundId!=null&&!round)roundId=null;
+  var cats=round?round.categories:s.categories;
+  if(!cats||!cats[cat])return;
+  var item=cats[cat][idx];
   if(!item)return;
+  from=from==='coverage'?'coverage':'analysis';
   var esSn=esc(supName).replace(/'/g,"\\'");
   var esCat=esc(cat).replace(/'/g,"\\'");
-  var catLen=s.categories[cat].length, posInCat=idx+1;
+  var catLen=cats[cat].length, posInCat=idx+1;
   var scoreVal=item.score;
-  var rubricRows=[0,1,2,3,4,5].filter(function(v){return item.rubric&&item.rubric[v]&&String(item.rubric[v]).trim();});
+  var isc=itemScale(item),ivals=scaleValues(isc);
+  var rubricRows=ivals.filter(function(v){return item.rubric&&item.rubric[v]&&String(item.rubric[v]).trim();});
   var files=item.files||[];
   var body='<div class="au-focus" style="padding:0;max-height:none;overflow:visible">'
-    +'<div class="au-kicker">'+esc(cat)+' · Checkpoint '+posInCat+' of '+catLen+(item.weight!==undefined&&item.weight!==1?' · Weight '+item.weight:'')+'</div>'
+    +'<div class="au-kicker">'+esc(cat)+' · Checkpoint '+posInCat+' of '+catLen+(item.weight!==undefined&&item.weight!==1?' · Weight '+item.weight:'')+(isDefaultScale(isc)?'':' · Scale '+scaleLabel(isc))+'</div>'
     +'<h3>'+esc(item.checkpoint)+'</h3>'
     +'<div class="au-scorepick" style="pointer-events:none">'
-      +[0,1,2,3,4,5].map(function(v){return '<button class="au-sbtn v'+v+(scoreVal===v?' sel':'')+'">'+v+'</button>';}).join('')
+      +ivals.map(function(v){return '<button class="au-sbtn b'+scoreBand(v,isc.max)+(scoreVal===v?' sel':'')+'">'+v+'</button>';}).join('')
       +'<button class="au-sbtn na'+(scoreVal==='N.A.'?' sel':'')+'">N.A.</button>'
     +'</div>'
     +(rubricRows.length
@@ -7806,13 +8043,13 @@ function openCmpCheckpoint(supName,cat,idx){
       ?'<label style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);display:block;margin:16px 0 5px">Evidence files <span style="color:var(--text3);font-weight:500">('+files.length+')</span></label>'
         +'<div class="dropzone-files">'+files.map(function(f,fi){
           return '<div class="filecard">'
-            +fileThumbHtml(f,'openImgViewer(\''+esSn+'\',\''+esCat+'\','+idx+','+fi+',null)').replace(/width:44px;height:44px/,'width:34px;height:34px')
+            +fileThumbHtml(f,'openImgViewer(\''+esSn+'\',\''+esCat+'\','+idx+','+fi+','+(roundId!=null?roundId:'null')+')').replace(/width:44px;height:44px/,'width:34px;height:34px')
             +'<div class="fmeta"><div class="fname" title="'+esc(f.name||'')+'">'+esc(f.name||'')+'</div><div class="fsize">'+(humanFileSize(f.size)||'—')+'</div></div>'
             +'<a href="'+f.data+'" download="'+esc(f.name||'file')+'" title="Download"><i class="ti ti-download"></i></a>'
           +'</div>';
         }).join('')+'</div>'
       :'')
-    +cpTasksHtml(supName,cat,idx,tasksForCheckpoint(supName,cat,item.checkpoint),{from:'analysis'})
+    +cpTasksHtml(supName,cat,idx,tasksForCheckpoint(supName,cat,item.checkpoint),{from:from,roundId:roundId})
   +'</div>';
   var m=document.getElementById('cmpCheckpointModal');
   if(!m){
@@ -7824,7 +8061,7 @@ function openCmpCheckpoint(supName,cat,idx){
   }
   m.innerHTML='<div style="background:var(--bg);border-radius:var(--rl);padding:24px;width:640px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg)">'
     +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px">'
-      +'<div style="font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;min-width:0"><i class="ti ti-building-factory-2" style="color:var(--text3);flex-shrink:0"></i><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(supName)+'</span></div>'
+      +'<div style="font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;min-width:0"><i class="ti ti-building-factory-2" style="color:var(--text3);flex-shrink:0"></i><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(supName)+(round&&round.label?'<span style="font-weight:500;color:var(--text3)"> · '+esc(round.label)+'</span>':'')+'</span></div>'
       +'<button onclick="closeCmpCheckpoint()" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--text2);flex-shrink:0"><i class="ti ti-x"></i></button>'
     +'</div>'
     +body
@@ -7880,7 +8117,9 @@ function cpTasksHtml(sup,cat,idx,tasks,opts){
     var stc=ACT_STATUS_COLOR[a.status]||'var(--text3)';
     var open=opts.from==='assessment'
       ?'openTaskFromAssessment('+a.id+')'
-      :'jumpToTaskFromCheckpoint('+a.id+',\''+esSn+'\',\''+esCat+'\','+idx+')';
+      :opts.from==='coverage'
+        ?'openTaskFromCoverage('+a.id+',\''+esSn+'\',\''+esCat+'\','+idx+','+(opts.roundId!=null?opts.roundId:'null')+')'
+        :'jumpToTaskFromCheckpoint('+a.id+',\''+esSn+'\',\''+esCat+'\','+idx+')';
     return '<div class="cp-task-row" onclick="'+open+'" title="Open this task">'
       +'<span style="font-size:11px;font-weight:600;color:var(--text3);font-variant-numeric:tabular-nums;white-space:nowrap">'+esc(a.ref||'—')+'</span>'
       +'<span style="flex:1;min-width:0;font-size:12.5px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(a.title||'')+'</span>'
@@ -7916,18 +8155,27 @@ function _cpItemAt(sup,cat,idx,roundId){
 }
 function newTaskForCheckpoint(sup,cat,idx,roundId,from){
   var item=_cpItemAt(sup,cat,idx,roundId);if(!item)return;
-  if(from==='analysis')closeCmpCheckpoint();
+  if(from==='analysis'||from==='coverage')closeCmpCheckpoint();
   openActionModal();
   document.getElementById('actSupplier').value=sup;
   _actCps=[{category:cat,checkpoint:item.checkpoint}];
-  if(typeof item.score==='number')document.getElementById('actPriority').value=priorityFromScore(item.score);
+  if(typeof item.score==='number')document.getElementById('actPriority').value=priorityFromScore(score5(item));
   renderActCpChips();renderActCpPicker();
   _actPresetRound=roundId;
-  _actOnClose=from==='analysis'?function(){openCmpCheckpoint(sup,cat,idx);}:auRender;
+  _actOnClose=from==='analysis'?function(){openCmpCheckpoint(sup,cat,idx);}
+    :from==='coverage'?function(){openCmpCheckpoint(sup,cat,idx,roundId,'coverage');}
+    :auRender;
   var t=document.getElementById('actTitle');if(t)t.focus();
 }
 // Existing task opened from the scoring console — edit in place, stay on the audit.
 function openTaskFromAssessment(id){openActionModal(id);_actOnClose=auRender;}
+// Existing task opened from a Coverage checkpoint popup — Coverage already sits on
+// the Actions page, so the task opens in place and closing it returns to the popup.
+function openTaskFromCoverage(id,sup,cat,idx,roundId){
+  closeCmpCheckpoint();
+  openActionModal(id);
+  _actOnClose=function(){openCmpCheckpoint(sup,cat,idx,roundId,'coverage');};
+}
 
 // ── Image handling ────────────────────────────────────────────────────────────
 var _imgTarget=null; // {sup, cat, idx}
@@ -9294,7 +9542,7 @@ function rptScoredCheckpoints(round,cat){
   return ((round&&round.categories&&round.categories[cat])||[])
     .map(function(it,i){return {cid:(typeof it.cid==='number'?it.cid:null),
       no:it.no!=null?it.no:i+1,checkpoint:it.checkpoint||'',
-      score:it.score,notes:(it.notes||'').trim()};})
+      score:it.score,max:itemMax(it),notes:(it.notes||'').trim()};})
     .filter(function(it){return it.cid!=null&&it.score!=null&&it.score!=='';});
 }
 // ══════════════════════════════════════════════════════════════════════════
@@ -9695,11 +9943,11 @@ function generateCategoryDetail(cat,onDone,ctx){
         var mine=scored.filter(function(c){return subgroupIndexOf(groups,c.cid)===gi;});
         return 'SUB-CATEGORY '+(gi+1)+': '+(g.name||('Group '+(gi+1)))+'\n'
           +(mine.length?mine.map(function(c){
-              return '  #'+c.cid+' ['+c.score+'/5] '+c.checkpoint+(c.notes?'\n      note: '+c.notes:'');
+              return '  #'+c.cid+' ['+c.score+'/'+c.max+'] '+c.checkpoint+(c.notes?'\n      note: '+c.notes:'');
             }).join('\n'):'  (no scored checkpoints)');
       }).join('\n\n')
     : scored.map(function(c){
-        return '#'+c.cid+' ['+c.score+'/5] '+c.checkpoint+(c.notes?'\n    note: '+c.notes:'');
+        return '#'+c.cid+' ['+c.score+'/'+c.max+'] '+c.checkpoint+(c.notes?'\n    note: '+c.notes:'');
       }).join('\n');
   var btn=ctx?null:document.getElementById('rcGenCat_'+_rcSafeId(cat));
   callClaude(
@@ -9954,7 +10202,7 @@ function generateReportContent(which,ctx){
   var findings=Object.keys(r.categories||{}).map(function(cat){
     var cs=calcScore(s,cat);
     var notes=(r.categories[cat]||[]).filter(function(i){return i.notes&&i.notes.trim();})
-      .map(function(i){return '   - ['+i.score+'/5] '+i.notes;}).join('\n');
+      .map(function(i){return '   - ['+i.score+(typeof i.score==='number'?'/'+itemMax(i):'')+'] '+i.notes;}).join('\n');
     return cat+': '+(cs!=null?cs+'%':'n/a')+(notes?'\n'+notes:'');
   }).join('\n');
   // The open tasks feed the roll-up. Without them "actions" would be invented
@@ -11868,18 +12116,22 @@ function showAiModal(title,content){
 function aiSuggestRubric(cat,idx){
   if(!tplDraft||!tplDraft.categories[cat])return;
   var item=tplDraft.categories[cat][idx];
-  if(!item.rubric)item.rubric={0:'',1:'',2:'',3:'',4:'',5:''};
+  var tsc=tplScale(tplDraft),tvals=scaleValues(tsc);
+  if(!item.rubric)item.rubric=emptyRubric(tsc);
   // Same id scheme as renderTplEditor: category position + checkpoint index.
   var btnId='rubric_gen_'+Object.keys(tplDraft.categories).indexOf(cat)+'_'+idx;
   var btn=document.getElementById(btnId);
+  var example=isDefaultScale(tsc)
+    ?'0: No evidence of...\n1: Minimal...\n2: Basic...\n3: Adequate...\n4: Good...\n5: Excellent...'
+    :tsc.min+': Lowest level...\n…\n'+tsc.max+': Highest level...';
   callClaude(
-    'Create a scoring rubric for this audit checkpoint:\nCategory: "'+cat+'"\nCheckpoint: "'+item.checkpoint+'"\n\nReturn exactly 6 lines. Each line must start with the score digit and a colon. Example:\n0: No evidence of...\n1: Minimal...\n2: Basic...\n3: Adequate...\n4: Good...\n5: Excellent...\n\nReturn ONLY the 6 lines, nothing else.',
+    'Create a scoring rubric on the whole-number scale '+scaleLabel(tsc)+' for this audit checkpoint:\nCategory: "'+cat+'"\nCheckpoint: "'+item.checkpoint+'"\n\nReturn exactly '+tvals.length+' lines, one per score from '+tsc.min+' to '+tsc.max+'. Each line must start with the score number and a colon. Example:\n'+example+'\n\nReturn ONLY the '+tvals.length+' lines, nothing else.',
     'You are a supplier audit expert creating concise, professional evaluation rubrics.',
     function(text){
       var lines=text.trim().split('\n');
       lines.forEach(function(line){
-        var m=line.match(/^([0-5])\s*[:.\-]\s*(.+)/);
-        if(m)item.rubric[parseInt(m[1])]=m[2].trim();
+        var m=line.match(/^(\d{1,2})\s*[:.\-]\s*(.+)/);
+        if(m){var v=parseInt(m[1],10);if(v>=tsc.min&&v<=tsc.max)item.rubric[v]=m[2].trim();}
       });
       renderTplEditor();
     },
@@ -11991,7 +12243,7 @@ function _renderAiActPicker(){
     var total=(typeof actions!=='undefined'?actions:[]).filter(function(a){return a.supplier===s.name;}).length;
     var weak=0,r=reportingAudit(s);
     if(r)Object.keys(r.categories||{}).forEach(function(c){
-      (r.categories[c]||[]).forEach(function(i){if(typeof i.score==='number'&&i.score<=3)weak++;});});
+      (r.categories[c]||[]).forEach(function(i){var v=score5(i);if(v!=null&&v<=3)weak++;});});
     var on=!!_aiActPick.sups[s.name];
     var esn=esc(s.name).replace(/'/g,"\\'");
     return '<label style="display:flex;align-items:center;gap:10px;padding:9px 10px;border:1px solid '
@@ -12077,8 +12329,9 @@ function _aiActForSupplier(s,done){
   var weak=[];
   Object.keys(r.categories||{}).forEach(function(cat){
     (r.categories[cat]||[]).forEach(function(it){
-      if(typeof it.score==='number'&&it.score<=3)
-        weak.push({cat:cat,cid:it.cid,score:it.score,cp:it.checkpoint,notes:(it.notes||'').trim()});
+      var v5=score5(it);
+      if(v5!=null&&v5<=3)
+        weak.push({cat:cat,cid:it.cid,score:it.score,max:itemMax(it),cp:it.checkpoint,notes:(it.notes||'').trim()});
     });
   });
   if(!weak.length){done([],null);return;}
@@ -12086,7 +12339,7 @@ function _aiActForSupplier(s,done){
   var findings=Object.keys(byCat).map(function(cat){
     return cat+' ('+(calcScore(s,cat)!=null?calcScore(s,cat)+'%':'n/a')+')\n'
       +byCat[cat].map(function(w){
-        return '  #'+w.cid+' ['+w.score+'/5] '+w.cp+(w.notes?'\n      note: '+w.notes:'');
+        return '  #'+w.cid+' ['+w.score+'/'+w.max+'] '+w.cp+(w.notes?'\n      note: '+w.notes:'');
       }).join('\n');
   }).join('\n');
   var existing=(typeof actions!=='undefined'?actions:[]).filter(function(a){return a.supplier===s.name;});
@@ -13164,7 +13417,7 @@ async function exportExcel(){
         items.forEach(function(item,ii){
           const row=ws.getRow(detStart+2+dri);const bg=dri%2===0?'FFFFFF':LGRAY;
           const sc3=item.score;
-          const scPct=typeof sc3==='number'?Math.round((sc3/5)*100):null;
+          const scPct=typeof sc3==='number'?Math.round((sc3/itemMax(item))*100):null;
           const scHex2=scoreHex(scPct);
 
           dataCell(row.getCell(1),ii===0?cat:'',bg,{font:{size:8,color:{argb:'FF666666'}},align:{vertical:'middle',indent:1}});
@@ -13313,7 +13566,8 @@ async function exportExcel(){
   if(exOpts.raw){
     const ws=wb.addWorksheet('Raw Data',{tabColor:{argb:'FF17806E'}});
     ws.views=[{state:'frozen',ySplit:4}];
-    const cols=['Supplier','Category','#','Checkpoint','Score (0-5)','Score %','Weight','Tier','Notes / Evidence','Assessment','Date'];
+    const used=scalesInUse(sel);
+    const cols=['Supplier','Category','#','Checkpoint',used.length===1?'Score ('+scaleLabel(used[0])+')':'Score','Score %','Weight','Tier','Notes / Evidence','Assessment','Date'];
     titleBlock(ws,'Raw Data — '+project,'One row per checkpoint   |   As of '+today,cols.length);
     ws.getRow(3).height=8;
     cols.forEach(function(h,i){
@@ -13330,7 +13584,7 @@ async function exportExcel(){
         items.forEach(function(item){
           const row=ws.getRow(5+rr);const bg=rr%2===0?'FFFFFF':LGRAY;
           const sc=item.score;
-          const scPct=typeof sc==='number'?Math.round((sc/5)*100):null;
+          const scPct=typeof sc==='number'?Math.round((sc/itemMax(item))*100):null;
           dataCell(row.getCell(1),s.name,bg,{font:{size:9,bold:true},align:{vertical:'middle',indent:1}});
           dataCell(row.getCell(2),cat,bg,{font:{size:9,color:{argb:'FF555555'}},align:{vertical:'middle',indent:1}});
           dataCell(row.getCell(3),item.no,bg,{font:{size:9,color:{argb:'FF888888'}},align:{horizontal:'center'}});
@@ -13370,9 +13624,13 @@ async function exportExcel(){
       c.alignment={vertical:'middle',horizontal:'left',indent:1};ws.getRow(r).height=22;
     }
     let r=4;
-    // Score scale
+    // Score scale — the 0–5 meanings only when every exported supplier uses 0–5;
+    // otherwise the scales in use, which carry no level descriptions.
     sectionHdr(r++,'Score scale');
-    const scale=[['0','No evidence / not implemented'],['1','Minimal / initial'],['2','Basic / partial'],['3','Adequate / defined'],['4','Good / established'],['5','Excellent / best practice']];
+    const used=scalesInUse(sel);
+    const scale=(used.length===1&&isDefaultScale(used[0]))
+      ?[['0','No evidence / not implemented'],['1','Minimal / initial'],['2','Basic / partial'],['3','Adequate / defined'],['4','Good / established'],['5','Excellent / best practice']]
+      :used.map(function(sc){return [scaleLabel(sc),'Whole numbers from '+sc.min+' to '+sc.max+' — percent = score ÷ '+sc.max];});
     scale.forEach(function(row){
       const rw=ws.getRow(r++);
       dataCell(rw.getCell(1),row[0],'FFFFFF',{font:{bold:true,size:10},align:{horizontal:'center'}});
@@ -13615,9 +13873,12 @@ async function exportWord(){
     return '<table width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;table-layout:fixed"><tr>'+c+'</tr></table>';
   }
   // 0–5 score as five small coloured cells (a one-row table).
-  function dots(score){
-    var f=(score==null||score==='N.A.'||isNaN(Number(score)))?-1:Number(score),c='';
-    for(var i=0;i<5;i++)c+='<td width="11" style="width:11px;height:9px;font-size:1px;line-height:1px;background:'+(i<f?A:C.dot)+';border:1px solid '+C.page+'">&nbsp;</td>';
+  // One cell per scale step; scales above six steps get five cells, rounded.
+  function dots(score,max){
+    max=max||5;
+    var n=max<=6?max:5;
+    var f=(score==null||score==='N.A.'||isNaN(Number(score)))?-1:Math.round(Number(score)/max*n),c='';
+    for(var i=0;i<n;i++)c+='<td width="11" style="width:11px;height:9px;font-size:1px;line-height:1px;background:'+(i<f?A:C.dot)+';border:1px solid '+C.page+'">&nbsp;</td>';
     return '<table cellspacing="0" cellpadding="0" style="border-collapse:collapse;display:inline-block"><tr>'+c+'</tr></table>';
   }
   function panel(t){return '<p class=plabel>'+esc(String(t).toUpperCase())+'</p>';}
@@ -13873,8 +14134,8 @@ async function exportWord(){
         // Dots and the numeric score sit in their own 2-cell table so Word always
         // keeps them on one line (an inline-block table can drop to the next row).
         var scoreCell='<table cellspacing="0" cellpadding="0" style="border-collapse:collapse"><tr valign=middle>'
-          +'<td style="padding:0">'+dots(it.score)+'</td>'
-          +'<td style="padding:0 0 0 7pt"><span class=sv>'+(it.score==null?'—':(it.score==='N.A.'?'N.A.':it.score))+'</span></td>'
+          +'<td style="padding:0">'+dots(it.score,itemMax(it))+'</td>'
+          +'<td style="padding:0 0 0 7pt"><span class=sv>'+(it.score==null?'—':(it.score==='N.A.'?'N.A.':it.score+(itemMax(it)>6?'/'+itemMax(it):'')))+'</span></td>'
           +'</tr></table>';
         return '<tr valign=top><td class="ct num" width="6%">'+esc(String(it.no))+'</td>'
           +'<td class="ct cptxt" width="42%">'+esc(it.checkpoint)+'</td>'
@@ -14206,11 +14467,12 @@ function rptTierBar(slide,x,y,w,h,pct,accent){
     slide.addShape('line',{x:x+w*(b.lo/100),y:y,w:0,h:h,line:{color:RB_C.bg,width:0.75}});   // a cut in the bar, so slide-coloured
   });
 }
-// 0–5 checkpoint score as five cells — discrete data, nothing rounded. Filled
-// cells in the accent, empty ones neutral.
-function rptScoreDots(slide,x,y,score,cell,accent){
-  cell=cell||0.11;
-  var gap=0.03,filled=(score==null||score==='N.A.'||isNaN(Number(score)))?-1:Number(score);
+// Checkpoint score as five cells — on 0–5 discrete data, nothing rounded; other
+// scales fill the five cells by share (score ÷ max), rounded. Filled cells in
+// the accent, empty ones neutral.
+function rptScoreDots(slide,x,y,score,cell,accent,max){
+  cell=cell||0.11;max=max||5;
+  var gap=0.03,filled=(score==null||score==='N.A.'||isNaN(Number(score)))?-1:Math.round(Number(score)/max*5);
   for(var i=0;i<5;i++){
     slide.addShape('rect',{x:x+i*(cell+gap),y:y,w:cell,h:cell,
       fill:{color:i<filled?accent:RB_C.track},line:{type:'none'}});
@@ -14805,7 +15067,7 @@ function rptActionOriginData(s){
     var key=e?('cid'+(e.item.cid!=null?e.item.cid:e.name)):('txt'+_aoNorm(cpName));
     if(g.cpByKey[key])return g.cpByKey[key];
     var node=e
-      ?{id:key,name:e.name,score:e.score,num:e.num,sort:e.sort}
+      ?{id:key,name:e.name,score:e.score,max:itemMax(e.item),num:e.num,sort:e.sort}
       :{id:key,name:cpName,score:null,num:'',sort:1e9};
     g.cpByKey[key]=node;g.cps.push(node);return node;
   }
@@ -14850,7 +15112,7 @@ function _aoCheckpoint(sl,x,y,w,h,cp,A){
   if(cp.num)runs.push({text:cp.num+'  ',options:{color:RB_C.foot,bold:true}});
   runs.push({text:name,options:{color:RB_C.textDark}});
   sl.addText(runs,{x:x+0.09,y:y,w:tw,h:h,fontSize:AO_FS,margin:0,fontFace:'Montserrat',valign:'middle',lineSpacingMultiple:1.02});
-  rptScoreDots(sl,x+w-dotsW-0.03,y+(h-0.04)/2,cp.score,0.04,A);
+  rptScoreDots(sl,x+w-dotsW-0.03,y+(h-0.04)/2,cp.score,0.04,A,cp.max);
 }
 function _aoTask(sl,x,y,w,h,t,A,showLabel){
   var st=t.status,textCol=RB_C.textDark;
@@ -14889,7 +15151,7 @@ function _aoLink(sl,x1,y1,x2,y2,A){
     px=bx;py=by;
   }
 }
-function _aoLegend(sl,C,A){
+function _aoLegend(sl,C,A,max){
   var ly=C.y+C.h-0.19,lx=C.x,tc=RB_C.foot;
   function label(t,w){sl.addText(t,{x:lx+0.21,y:ly-0.02,w:w,h:0.15,fontSize:6,color:tc,fontFace:'Montserrat',valign:'middle',margin:0});}
   // Open
@@ -14907,7 +15169,7 @@ function _aoLegend(sl,C,A){
   sl.addText('High priority',{x:lx+0.11,y:ly-0.02,w:0.9,h:0.15,fontSize:6,color:tc,fontFace:'Montserrat',valign:'middle',margin:0});lx+=0.92;
   // Score dots
   rptScoreDots(sl,lx,ly+0.03,3,0.04,A);
-  sl.addText('Score /5',{x:lx+0.36,y:ly-0.02,w:0.7,h:0.15,fontSize:6,color:tc,fontFace:'Montserrat',valign:'middle',margin:0});lx+=1.02;
+  sl.addText('Score /'+(max||5),{x:lx+0.36,y:ly-0.02,w:0.7,h:0.15,fontSize:6,color:tc,fontFace:'Montserrat',valign:'middle',margin:0});lx+=1.02;
   // Link
   sl.addShape('line',{x:lx,y:ly+0.05,w:0.22,h:0,line:{color:A,width:1,transparency:50}});
   sl.addText('finding → action',{x:lx+0.28,y:ly-0.02,w:1.1,h:0.15,fontSize:6,color:tc,fontFace:'Montserrat',valign:'middle',margin:0});
@@ -14952,7 +15214,8 @@ async function rptActionOriginDiagram(pres,ctx,s){
       ry2=yy+catGap;
     });
     pageTasks.forEach(function(t){t.linkIds.forEach(function(cid){if(cpY[cid]!=null&&taskY[t.id]!=null)_aoLink(sl,Lx+colW,cpY[cid],Rx,taskY[t.id],A);});});
-    _aoLegend(sl,C,A);
+    var pgMax=5;pg.some(function(g){var c=g.cps.find(function(x){return x.max;});if(c){pgMax=c.max;return true;}return false;});
+    _aoLegend(sl,C,A,pgMax);
   }
 }
 // ── Module: Category Detail (one slide per category, paginated) ──────────
@@ -16318,10 +16581,11 @@ var HELP={
   audit:{title:'Scoring an assessment',icon:'ti-clipboard-check',group:'Modules',crumb:'Assessment › Assessments › Assessment',
     intro:'Here you score one supplier, checkpoint by checkpoint.',
     steps:['Pick the supplier and assessment at the top if needed.',
-      'In <b>Score</b> view, give each checkpoint a value from 0 to 5 and add notes or files.',
+      'In <b>Score</b> view, give each checkpoint a value on the checklist’s rating scale (0–5 unless the checklist sets another) and add notes or files.',
       'Switch to <b>Table</b> for a compact overview, or <b>Details</b> for date, assessor and type.',
       'When everything is scored, press <b>Complete assessment</b>.'],
-    tips:['Keyboard in Score view: <b>0–5</b> to score, <b>N</b> for N.A., <b>↑ / ↓</b> for the previous / next checkpoint.',
+    tips:['Keyboard in Score view: the <b>digits</b> of the scale to score (on a scale up to 10, type <b>1</b> then <b>0</b> for 10), <b>N</b> for N.A., <b>↑ / ↓</b> for the previous / next checkpoint.',
+      'The score in percent is the score divided by the top of the scale — 0 is always 0 %, so on a 1–5 scale a 1 counts as 20 %.',
       'The bar at the top shows how many checkpoints are still open.',
       'A completed assessment is read-only. Press <b>Reopen</b> to change it, then complete it again.',
       'With two or more completed assessments, <b>Compare</b> shows what changed.']},
@@ -16334,15 +16598,18 @@ var HELP={
   new:{title:'Checklists',icon:'ti-list-check',group:'Modules',crumb:'Assessment › Checklists',
     intro:'The library of checklists your assessments are built on.',
     steps:['Press <b>New Template</b> and add categories and checkpoints.',
+      'Set the <b>Rating scale</b> under the name: whole numbers from 0 or 1 up to 2–10 (default 0–5), plus N.A. Scoring rubrics get one line per level.',
       'Or use <b>AI Generate Checklist</b> to get a first draft from a short description.',
       'Already have an Excel checklist? Upload it in the <b>Excel Import</b> tab. A preview opens, where you choose whether it becomes a <b>checklist template</b> or a <b>supplier assessment</b> with scores.'],
     tips:['<b>AI Import</b> reads almost any Excel layout: one sheet per category, one sheet per supplier, or a <b>supplier comparison</b> with a score column per supplier. Check the mapping and the live preview before importing.',
-      'The AI Import converts other score scales (0–10, VDA, percent) and text ratings such as i.O. / n.i.O. or OK / NOK to the tool’s 0–5. Every value can be adjusted in the dialog.',
+      'The import keeps the file’s scale when it is a whole-number scale up to 10; anything else (percent, …) and text ratings such as i.O. / n.i.O. or OK / NOK are converted to the rating scale you pick in the dialog. Every value can be adjusted there.',
       'Heading rows inside the checkpoint list become categories. Weight and scoring-criteria columns are taken over.',
       'Importing a supplier that already exists adds a <b>new assessment</b> — earlier assessments and the profile are kept. The date and auditor are read from the file when present.',
       'If a checklist with the same name exists, you choose whether to replace it or keep both.',
       'Weights decide how much a category or checkpoint counts in the score (default 1, 0 = excluded).',
-      'Changing a checklist does not change assessments that already use it.']},
+      'Changing a checklist does not change assessments that already use it — only a new rating scale is passed on to its assessments that are not rated yet.',
+      'The rating scale is fixed as soon as one assessment with this checklist has a rating.',
+      'The <b>copy</b> icon next to a checklist duplicates it — categories, checkpoints, weights, rubrics and scale — as “… (copy)”, ready to edit. A copy has no assessments yet, so its scale can be changed.']},
   monitoring:{title:'Portfolio',icon:'ti-chart-dots',group:'Modules',crumb:'Monitoring › Portfolio',
     intro:'All suppliers in one matrix: score tier against criticality.',
     steps:['Find suppliers in the top rows — they have the lowest scores.',
@@ -16370,6 +16637,7 @@ var HELP={
       'Update the status as work progresses: Open → In Progress → Done.',
       'Or press <b>AI Suggestions</b> to get proposals for low-scoring checkpoints.'],
     tips:['<b>List</b> to work through tasks, <b>Gantt</b> for the timeline, <b>Coverage</b> to see which checkpoints have an action.',
+      'In <b>Coverage</b>, click a checkpoint to see its score, rubric, notes, evidence and linked tasks for the assessment shown — and add a task right there. Click a task to open it.',
       'Review AI suggestions before adding — you can edit everything afterwards.']},
   calendar:{title:'Calendar',icon:'ti-calendar',group:'Modules',crumb:'Calendar',
     intro:'All assessment dates and action deadlines on one calendar.',
