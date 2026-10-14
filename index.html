@@ -179,10 +179,10 @@ select,input[type=text],input[type=number]{padding:7px 10px;border:1px solid var
 .db-kpi-val{font-size:24px;font-weight:800;line-height:1.1}
 .db-kpi-lbl{font-size:11px;color:var(--text2);margin-top:3px;line-height:1.3}
 .db-grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin-bottom:14px}
-.db-grid3{display:grid;grid-template-columns:3fr 2fr;gap:14px;margin-bottom:14px}
+.db-grid3{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:14px;margin-bottom:14px}
 .db-row-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .15s}
 .db-row-card:hover{border-color:color-mix(in srgb,var(--primary) 33%,transparent);background:var(--bg2)}
-@media(max-width:900px){.db-kpi-row{grid-template-columns:repeat(2,minmax(0,1fr))}.db-grid2,.db-grid3{grid-template-columns:1fr}}
+@media(max-width:900px){.db-kpi-row{grid-template-columns:repeat(2,minmax(0,1fr))}.db-grid2,.db-grid3{grid-template-columns:minmax(0,1fr)}}
 .data-table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
 .data-table col.col-no{width:38px}.data-table col.col-cp{width:auto}.data-table col.col-score{width:90px}.data-table col.col-weight{width:72px}.data-table col.col-notes{width:32%}.data-table col.col-photos{width:88px}
 .data-table th{text-align:left;padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text2);font-weight:500;font-size:12px;background:var(--bg2)}
@@ -233,7 +233,7 @@ input[type=range]{flex:2;accent-color:var(--primary)}
 .pagehead h2{font-family:Georgia,"Iowan Old Style","Times New Roman",serif;font-size:19px;font-weight:400;letter-spacing:-.01em;margin:0;line-height:1.3;display:flex;align-items:center;gap:9px}
 .pagehead h2 i{color:var(--primary-fg);font-size:17px;flex-shrink:0}
 .pagehead-sub{color:var(--text2);font-size:12.5px;margin-top:5px;line-height:1.4;max-width:70ch}
-.pagehead-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex-shrink:0}
+.pagehead-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex-shrink:0;max-width:100%;min-width:0}
 
 /* ── Audit console (desktop-native scoring) ─────────────────────────────────── */
 .au-coverage{display:flex;gap:18px;align-items:center;flex-wrap:wrap;padding:14px 18px;background:var(--bg);border:1px solid var(--border-soft);border-radius:var(--rl);box-shadow:var(--shadow-sm);margin-bottom:14px}
@@ -392,7 +392,17 @@ input[type="color"].cp-swatch::-moz-color-swatch{border:none;border-radius:calc(
 .au-ni:hover{border-color:var(--border)}
 .au-ni:focus{outline:none;border-color:var(--primary);background:var(--bg)}
 
+/* Score view fits the window (height set by auFitConsole): rail and checkpoint
+   body scroll on their own, score buttons and Prev/Next never leave the screen. */
+@media(min-width:901px){
+  .au-console .au-rail{max-height:none;min-height:0}
+  .au-console .au-focus{max-height:none;min-height:0;padding:0;display:flex;flex-direction:column;overflow:hidden}
+  .au-fhead{padding:20px 24px 4px}
+  .au-fbody{flex:1;min-height:0;overflow-y:auto;padding:0 24px 8px}
+  .au-console .au-foot{margin-top:0;padding:10px 24px 14px;border-top:1px solid var(--border-soft,var(--border))}
+}
 @media(max-width:900px){
+  .au-fhead,.au-fbody{padding:0}
   .au-console{grid-template-columns:1fr}
   .au-rail{border-right:none;border-bottom:1px solid var(--border);max-height:210px}
   .au-focus{max-height:none}
@@ -856,6 +866,140 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
 .cat-pct,.au-cv .n,.db-kpi-val,.metric-value,.sup-score-big{font-variant-numeric:tabular-nums}
 
 @media(max-width:900px){.main{padding:18px}}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE LAYER — appended last on purpose. The design blocks above
+   re-declare .main/.topbar/.section-title/... without media queries and used
+   to silently undo the phone rules (e.g. content ended up behind the bottom
+   bar). Anything that has to win per screen size lives here.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Safety net: one too-wide element must never widen the whole page — phone
+   browsers then grow the layout viewport and everything "shifts" sideways.
+   clip (not hidden) keeps position:sticky working. Real overflow is still
+   fixed at the source; wide tables scroll inside their own wrapper. */
+#appRoot{overflow-x:clip}
+
+/* Label + field rows: the field keeps a usable width and drops below its
+   label when the row gets tight, instead of shrinking to a sliver. */
+.input-row{flex-wrap:wrap}
+.input-row>input,.input-row>select{min-width:140px}
+
+/* Top nav density steps — set by fitPrimaryNav() only while the buttons would
+   overflow; labels then live in the button tooltips. */
+.topbar.nav-c1 #primaryNav .nav-btn:is([data-nav="calendar"],[data-nav="export"],[data-nav="settings"]) span{display:none}
+.topbar.nav-c2 #primaryNav .nav-btn:not(.active) span,.topbar.nav-c3 #primaryNav .nav-btn span{display:none}
+.topbar.nav-c2 .logo-tag,.topbar.nav-c3 .logo-tag{display:none}
+.topbar.nav-c2 #primaryNav .nav-btn,.topbar.nav-c3 #primaryNav .nav-btn{padding-left:10px;padding-right:10px}
+.topbar.nav-c2,.topbar.nav-c3{gap:10px}
+#primaryNav.nav-fitting .nav-btn{transition:none!important}
+
+/* "More" sheet (phone only) — sits under the bottom bar so "More" stays tappable */
+.more-sheet{position:fixed;inset:0;z-index:190;background:rgba(5,8,25,.5);opacity:0;pointer-events:none;transition:opacity .18s}
+.more-sheet.open{opacity:1;pointer-events:auto}
+.more-panel{position:absolute;left:0;right:0;bottom:0;background:var(--bg);border-radius:16px 16px 0 0;box-shadow:var(--shadow-lg);
+  padding:8px max(12px,env(safe-area-inset-right)) calc(66px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));
+  transform:translateY(24px);transition:transform .2s}
+.more-sheet.open .more-panel{transform:none}
+.more-grip{width:36px;height:4px;border-radius:2px;background:var(--border2);margin:2px auto 10px}
+.more-item{display:flex;align-items:center;gap:14px;width:100%;min-height:50px;padding:10px 14px;border:none;background:none;border-radius:10px;
+  color:var(--text);font:inherit;font-size:15px;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent}
+.more-item i{font-size:21px;color:var(--text2)}
+.more-item:active{background:var(--bg2)}
+.more-item.active{background:var(--bg2);font-weight:600}
+.more-item.active i{color:var(--primary-fg)}
+@media(min-width:769px){.more-sheet{display:none}}
+
+/* ── Phone ─────────────────────────────────────────────────────────────── */
+@media(max-width:768px){
+  .topbar{padding:env(safe-area-inset-top) max(12px,env(safe-area-inset-right)) 0 max(12px,env(safe-area-inset-left))}
+  .subnav{padding:7px 12px}
+  #navBackBar{padding:7px 12px}
+  .main{padding:14px max(12px,env(safe-area-inset-right)) calc(80px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+  .section-title{font-size:16px}
+  .data-table td{padding:8px 6px}
+  .pagehead{gap:10px;margin-bottom:14px}
+  .tpl-builder-grid{grid-template-columns:minmax(0,1fr)!important}
+
+  /* Bottom bar: same navy as the top bar, six fixed slots, home-indicator safe */
+  .mobile-nav{background:var(--bar);border-top:1px solid rgba(255,255,255,.08);overflow:visible;
+    height:calc(58px + env(safe-area-inset-bottom));
+    padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+  .mobile-nav .nav-btn{flex:1 1 0;min-width:0;padding:6px 2px;gap:3px;-webkit-tap-highlight-color:transparent}
+  .mobile-nav .nav-btn span{font-size:10px;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  .mobile-nav .nav-btn.active{box-shadow:inset 0 2px 0 var(--bar-active)}
+
+  .toast{left:12px;right:12px;bottom:calc(70px + env(safe-area-inset-bottom));justify-content:center}
+}
+/* Date fields — the browser's own picker icon is drawn black (invisible in dark
+   mode) and its tooltip follows the OS language. Chromium/Safari get our own
+   theme-coloured icon instead (click handled in JS via showPicker); the picker
+   popup itself follows the app theme through color-scheme. */
+input:is([type=date],[type=month],[type=week],[type=datetime-local]){color-scheme:light}
+:root[data-theme="dark"] input:is([type=date],[type=month],[type=week],[type=datetime-local]){color-scheme:dark}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) input:is([type=date],[type=month],[type=week],[type=datetime-local]){color-scheme:dark}}
+@supports selector(::-webkit-calendar-picker-indicator){
+  input:is([type=date],[type=month],[type=week],[type=datetime-local])::-webkit-calendar-picker-indicator{display:none}
+  input:is([type=date],[type=month],[type=week],[type=datetime-local]){
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235a6473' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z'/%3E%3Cpath d='M16 3v4M8 3v4M4 11h16'/%3E%3C/svg%3E")!important;
+    background-repeat:no-repeat!important;background-position:right 8px center!important;background-size:15px 15px!important;padding-right:30px!important}
+  :root[data-theme="dark"] input:is([type=date],[type=month],[type=week],[type=datetime-local]){
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239aa4d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z'/%3E%3Cpath d='M16 3v4M8 3v4M4 11h16'/%3E%3C/svg%3E")!important}
+  @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) input:is([type=date],[type=month],[type=week],[type=datetime-local]){
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239aa4d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z'/%3E%3Cpath d='M16 3v4M8 3v4M4 11h16'/%3E%3C/svg%3E")!important}}
+}
+
+/* Completed assessment = read-only (set by auRender). Scores show the chosen
+   value only, edit tools disappear; viewing, downloads and tasks stay. */
+.au-locked :is(.au-scorepick,.au-seg,.au-rubric){pointer-events:none}
+.au-locked .au-scorepick .au-sbtn:not(.sel),.au-locked .au-seg button:not([class*="on"]){opacity:.4}
+.au-locked :is(.note-tool,#auGnAiBtn,.dropzone-empty,.dropzone-hint,.au-lfiles-add),
+.au-locked .filecard button[title="Delete"]{display:none!important}
+.au-locked :is(.au-notes,.au-ni,#auGnNote){cursor:default}
+.au-locked .dropzone:has(.dropzone-empty){display:none}
+.au-locked label:has(+ .dropzone .dropzone-empty){display:none!important}
+
+/* Help panel — slides in from the right and leaves the page usable beside it */
+.help-btn i{font-size:18px}
+.help-btn.on{color:var(--bar-active)!important}
+.help-panel{position:fixed;top:0;right:0;bottom:0;width:380px;max-width:100%;z-index:1550;background:var(--bg);border-left:1px solid var(--border);
+  box-shadow:var(--shadow-lg);display:flex;flex-direction:column;transform:translateX(100%);visibility:hidden;transition:transform .2s,visibility .2s}
+.help-panel.open{transform:none;visibility:visible}
+.help-head{display:flex;align-items:center;gap:8px;padding:14px 16px 10px;font-size:15px;font-weight:600}
+.help-head button{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px;padding:2px}
+.help-tabs{display:flex;gap:4px;padding:0 16px 10px;border-bottom:1px solid var(--border)}
+.help-tabs button{border:none;background:none;cursor:pointer;font:inherit;font-size:12.5px;color:var(--text2);padding:5px 11px;border-radius:20px}
+.help-tabs button.on{background:var(--bg2);color:var(--text);font-weight:600}
+.help-body{flex:1;overflow-y:auto;padding:16px;font-size:13px;line-height:1.55;color:var(--text)}
+.help-body h3{font-size:16px;margin:0 0 6px}
+.help-body h4{font-size:12px;font-weight:700;color:var(--text2);margin:16px 0 6px}
+.help-body p{margin:0 0 8px;color:var(--text2)}
+.help-body ol,.help-body ul{margin:0;padding-left:20px}
+.help-body li{margin-bottom:5px}
+.help-crumb{font-size:11px;color:var(--text3);margin-bottom:4px}
+.help-link{background:none;border:none;cursor:pointer;color:var(--primary-fg);font:inherit;font-size:12.5px;padding:0}
+.help-toc-group{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin:14px 0 4px}
+.help-toc-group:first-child{margin-top:0}
+.help-toc button{display:flex;align-items:center;gap:10px;width:100%;border:none;background:none;cursor:pointer;font:inherit;font-size:13px;color:var(--text);
+  text-align:left;padding:8px 10px;border-radius:var(--r)}
+.help-toc button:hover{background:var(--bg2)}
+.help-toc button i{color:var(--text2);font-size:16px}
+.help-terms dt{font-weight:600;margin-top:10px}
+.help-terms dd{margin:2px 0 0;color:var(--text2)}
+.act-row{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--border-soft,var(--border))}
+.act-time{width:38px;flex-shrink:0;font-size:12px;color:var(--text3);font-variant-numeric:tabular-nums;padding-top:1px}
+.act-ic{font-size:15px;color:var(--text2);padding-top:2px}
+.act-main{flex:1;min-width:0;overflow-wrap:anywhere}
+.act-main b{font-weight:600}
+.act-meta{font-size:11.5px;color:var(--text3);margin-top:2px}
+.act-det{margin:6px 0 0;padding-left:16px;font-size:12px;color:var(--text2)}
+.act-det li{margin-bottom:3px}
+@media(max-width:768px){.help-panel{width:100%;border-left:none}}
+
+/* Touch screens: a tap leaves :hover stuck on the last button — no hover tint there */
+@media(hover:none){
+  .nav-btn:not(.active):hover{background:transparent!important;color:var(--bar-idle)!important}
+}
 </style>
 </head>
 <body>
@@ -933,7 +1077,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
       </svg>
       <span style="display:flex;flex-direction:column;line-height:1.05;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
         <span style="font-weight:600;font-size:15px;letter-spacing:.01em;color:#ffffff">Supplier <span style="color:#c4f230">Loop</span></span>
-        <span style="font-size:9px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:#7fd4c2;margin-top:2px">from insight to impact</span>
+        <span class="logo-tag" style="font-size:9px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:#7fd4c2;margin-top:2px">from insight to impact</span>
       </span>
     </span>
   </div>
@@ -949,6 +1093,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
     <button class="nav-btn" data-nav="calendar" onclick="openNav('calendar')"><i class="ti ti-calendar"></i> <span>Calendar</span></button>
     <button class="nav-btn" data-nav="export" onclick="openNav('export')" style="margin-left:auto"><i class="ti ti-download"></i> <span>Import / Export</span></button>
     <button class="nav-btn" data-nav="settings" onclick="openNav('settings')"><i class="ti ti-adjustments-horizontal"></i> <span>Settings</span></button>
+    <button class="nav-btn help-btn" id="actBtn" onclick="toggleActivity()" title="Activity" aria-label="Activity"><i class="ti ti-history"></i></button>
+    <button class="nav-btn help-btn" id="helpBtn" onclick="toggleHelp()" title="Help" aria-label="Help"><i class="ti ti-help-circle"></i></button>
   </nav>
 </div>
 <div id="subNav" class="subnav" style="display:none"></div>
@@ -1009,7 +1155,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
 
   <!-- Tab: Template Builder -->
   <div class="etab-content active" id="ntab-builder-content">
-    <div style="display:grid;grid-template-columns:280px minmax(0,1fr);gap:16px;max-width:1100px">
+    <div class="tpl-builder-grid" style="display:grid;grid-template-columns:280px minmax(0,1fr);gap:16px;max-width:1100px">
 
       <!-- Left: template list -->
       <div>
@@ -1028,15 +1174,6 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
 
   <!-- Tab: Excel Import -->
   <div class="etab-content" id="ntab-import-content">
-    <div style="max-width:900px;margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <span style="font-size:12px;font-weight:600;color:var(--text2)">Import as:</span>
-      <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;padding:6px 11px;border:1px solid var(--border);border-radius:20px">
-        <input type="radio" name="importMode" value="supplier" checked style="accent-color:var(--primary)"> Supplier assessment <span style="color:var(--text3);font-size:11px">(with scores)</span>
-      </label>
-      <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;padding:6px 11px;border:1px solid var(--border);border-radius:20px">
-        <input type="radio" name="importMode" value="template" style="accent-color:var(--primary)"> Checklist / template <span style="color:var(--text3);font-size:11px">(structure only)</span>
-      </label>
-    </div>
     <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-bottom:12px;max-width:900px">
       <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()"
         ondragover="ev=event;ev.preventDefault();ev.currentTarget.classList.add('drag')"
@@ -1049,7 +1186,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
       <div class="upload-zone" onclick="document.getElementById('aiFileInput').click()" style="margin:0;border-color:var(--primary);background:var(--bg2)">
         <i class="ti ti-sparkles" style="color:var(--primary-fg)"></i>
         <div style="font-size:14px;font-weight:600;margin-bottom:4px;color:var(--primary-fg)">AI Import <span style="font-size:10px;font-weight:700;background:var(--primary);color:var(--on-primary);padding:2px 6px;border-radius:4px;vertical-align:middle">NEW</span></div>
-        <div style="font-size:12px;color:var(--text2)">Any Excel structure · AI detects sheets, skips cover/index tabs, maps columns automatically</div>
+        <div style="font-size:12px;color:var(--text2)">Any Excel structure · one sheet per category or supplier, or a supplier comparison · converts score scales · preview before import</div>
       </div>
     </div>
     <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none" onchange="handleFile(this.files[0]);this.value=''">
@@ -1106,7 +1243,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
   </div>
 </div>
 
-<!-- KPI-Erfassung — the recurring manual data-entry ritual for Monitoring. One
+<!-- KPI entry — the recurring manual data-entry ritual for Monitoring. One
      period, all suppliers, all KPIs in a single table instead of clicking
      through a per-supplier dropdown one value at a time. -->
 <div id="kpiEntryModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1600;align-items:center;justify-content:center;padding:16px">
@@ -1560,14 +1697,14 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
     </div>
   </div>
 
-  <!-- Corporate Design -->
+  <!-- Design -->
   <div class="card" style="margin-bottom:14px">
-    <div style="font-size:14px;font-weight:600;margin-bottom:12px"><i class="ti ti-palette"></i> Corporate Design</div>
+    <div style="font-size:14px;font-weight:600;margin-bottom:12px"><i class="ti ti-palette"></i> Design</div>
     <div id="expVariants" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px"></div>
     <div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)">
       <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:10px"><i class="ti ti-info-circle"></i> Report Header</div>
       <div style="display:flex;flex-wrap:wrap;gap:10px">
-        <div class="input-row" style="flex:1;min-width:160px"><label>Assessor Name</label><input type="text" id="auditorName" placeholder="Max Mustermann" style="flex:1"></div>
+        <div class="input-row" style="flex:1;min-width:160px"><label>Assessor Name</label><input type="text" id="auditorName" placeholder="Jane Smith" style="flex:1"></div>
         <div class="input-row" style="flex:1;min-width:160px"><label>Company</label><input type="text" id="companyName" placeholder="P3 Group" style="flex:1"></div>
         <div class="input-row" style="flex:1;min-width:160px"><label>Project</label><input type="text" id="projectName" placeholder="Supplier Assessment 2025" style="flex:1"></div>
       </div>
@@ -1658,7 +1795,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
         </label>
         <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;padding:7px 12px;border:1px solid var(--border);border-radius:20px">
           <input type="radio" name="reportSlideStyle" value="dark" onchange="setReportSlideStyle('dark')" style="accent-color:var(--primary)">
-          <span style="width:14px;height:14px;border-radius:3px;background:#0a0e2a;border:1px solid #2e3a70;display:inline-block;position:relative"><span style="position:absolute;left:2px;right:2px;bottom:2px;height:2px;background:#a2f233"></span></span> Dark
+          <span style="width:14px;height:14px;border-radius:3px;background:#0a0e2a;border:1px solid #2e3a70;display:inline-block;position:relative"><span style="position:absolute;left:2px;right:2px;bottom:2px;height:2px;background:#a2f233"></span></span> Dark <span style="font-size:11px;color:var(--text3)">· accent fixed lime</span>
         </label>
       </div>
 
@@ -1696,7 +1833,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
         </label>
         <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;padding:7px 12px;border:1px solid var(--border);border-radius:20px">
           <input type="radio" name="reportXlStyle" value="dark" onchange="setReportXlStyle('dark')" style="accent-color:var(--primary)">
-          <span style="width:14px;height:14px;border-radius:3px;background:#0a0e2a;border:1px solid #2e3a70;display:inline-block;position:relative"><span style="position:absolute;left:2px;right:2px;bottom:2px;height:2px;background:#a2f233"></span></span> Dark
+          <span style="width:14px;height:14px;border-radius:3px;background:#0a0e2a;border:1px solid #2e3a70;display:inline-block;position:relative"><span style="position:absolute;left:2px;right:2px;bottom:2px;height:2px;background:#a2f233"></span></span> Dark <span style="font-size:11px;color:var(--text3)">· accent fixed lime</span>
         </label>
       </div>
       <button class="btn primary" onclick="exportExcel()"><i class="ti ti-file-spreadsheet"></i> <span>Export Excel</span></button>
@@ -1716,7 +1853,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
         </label>
         <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;padding:7px 12px;border:1px solid var(--border);border-radius:20px">
           <input type="radio" name="reportDocStyle" value="dark" onchange="setReportDocStyle('dark')" style="accent-color:var(--primary)">
-          <span style="width:14px;height:14px;border-radius:3px;background:#0a0e2a;border:1px solid #2e3a70;display:inline-block;position:relative"><span style="position:absolute;left:2px;right:2px;bottom:2px;height:2px;background:#a2f233"></span></span> Dark
+          <span style="width:14px;height:14px;border-radius:3px;background:#0a0e2a;border:1px solid #2e3a70;display:inline-block;position:relative"><span style="position:absolute;left:2px;right:2px;bottom:2px;height:2px;background:#a2f233"></span></span> Dark <span style="font-size:11px;color:var(--text3)">· accent fixed lime</span>
         </label>
       </div>
       <div style="font-size:11.5px;color:var(--text3);margin:-8px 0 16px">Dark uses Word's page color. To keep it when printing or saving as PDF, enable <i>Print background colors and images</i> in Word (File → Options → Display).</div>
@@ -1741,7 +1878,6 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
   </div>
   <div class="card" style="margin-bottom:14px">
     <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:10px"><i class="ti ti-device-floppy"></i> Project Data</div>
-    <p style="font-size:12px;color:var(--text2);margin-bottom:12px">Save the entire project (suppliers, templates, actions, settings) to a file, or load one back in.</p>
     <div class="filter-row" style="margin-bottom:0">
       <button class="btn success" onclick="saveProject()"><i class="ti ti-device-floppy"></i> <span>Save Project</span></button>
       <button class="btn" onclick="document.getElementById('projectInput').click()"><i class="ti ti-folder-open"></i> <span>Load Project</span></button>
@@ -1755,10 +1891,20 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
   <button class="nav-btn" data-nav="assessment" onclick="openNav('assessment')"><i class="ti ti-clipboard-check"></i><span>Assess</span></button>
   <button class="nav-btn" data-nav="monitoring" onclick="openNav('monitoring')"><i class="ti ti-activity-heartbeat"></i><span>Monitor</span></button>
   <button class="nav-btn" data-nav="steering" onclick="openNav('steering')"><i class="ti ti-route"></i><span>Steer</span></button>
-  <button class="nav-btn" data-nav="calendar" onclick="openNav('calendar')"><i class="ti ti-calendar"></i><span>Calendar</span></button>
-  <button class="nav-btn" data-nav="export" onclick="openNav('export')"><i class="ti ti-download"></i> <span>Import / Export</span></button>
-  <button class="nav-btn" data-nav="settings" onclick="openNav('settings')"><i class="ti ti-adjustments-horizontal"></i><span>Settings</span></button>
+  <button class="nav-btn" id="mobileMoreBtn" onclick="toggleMoreSheet()" aria-haspopup="true" aria-expanded="false"><i class="ti ti-dots"></i><span>More</span></button>
 </nav>
+<!-- "More" sheet — the bottom bar holds the five core modules; the rest live here
+     so nothing scrolls or gets cut off on a phone. -->
+<div id="moreSheet" class="more-sheet" onclick="if(event.target===this)closeMoreSheet()">
+  <div class="more-panel" role="menu">
+    <div class="more-grip"></div>
+    <button class="more-item" data-nav="calendar" onclick="closeMoreSheet();openNav('calendar')"><i class="ti ti-calendar"></i><span>Calendar</span></button>
+    <button class="more-item" data-nav="export" onclick="closeMoreSheet();openNav('export')"><i class="ti ti-download"></i><span>Import / Export</span></button>
+    <button class="more-item" data-nav="settings" onclick="closeMoreSheet();openNav('settings')"><i class="ti ti-adjustments-horizontal"></i><span>Settings</span></button>
+    <button class="more-item" onclick="closeMoreSheet();openActivity()"><i class="ti ti-history"></i><span>Activity</span></button>
+    <button class="more-item" onclick="closeMoreSheet();openHelp()"><i class="ti ti-help-circle"></i><span>Help</span></button>
+  </div>
+</div>
 <div class="toast" id="toast"><i class="ti ti-check"></i> <span id="toastMsg"></span></div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -1837,6 +1983,7 @@ function checkSession(){
 
 // Collect the full app state — same shape as the existing local save/load file format
 function collectProjectData(){
+  if(typeof actTick==='function')actTick(); // log the latest changes before they are saved
   var auditor=document.getElementById('auditorName');
   var company=document.getElementById('companyName');
   var project=document.getElementById('projectName');
@@ -1846,7 +1993,7 @@ function collectProjectData(){
     v:'9',suppliers,weights,threshGreen,threshYellow,tiers:TIERS,tierColorMode,
     templates,actions,actionIdCounter,
     selectedTheme,calColors,kpiCatalog,riskModel,reportBuilder,
-    themeMode,brandColors,supplierInfoCatalog,maps,
+    themeMode,brandColors,supplierInfoCatalog,maps,activityLog,
     auditor:auditor?auditor.value:'',
     company:company?company.value:'',
     project:project?project.value:'',
@@ -1987,6 +2134,8 @@ function applyProjectData(d){
   if(typeof renderKpiCatalogEditor==='function')renderKpiCatalogEditor();
   if(typeof renderRiskModelEditor==='function')renderRiskModelEditor();
   if(typeof renderSupplierInfoCatalogEditor==='function')renderSupplierInfoCatalogEditor();
+  activityLog=Array.isArray(d.activityLog)?d.activityLog:[];
+  if(typeof actResetBaseline==='function')actResetBaseline();
   updateBadgeColors();
   refreshDashboardIfVisible();
 }
@@ -2013,7 +2162,7 @@ function renderProjectPicker(list){
   if(typeof closeProjectMenu==='function')closeProjectMenu();
   document.getElementById('appRoot').style.display='none';
   var rows=list.length?list.map(function(p){
-    var when=p.updated_at?new Date(p.updated_at).toLocaleString():'';
+    var when=p.updated_at?new Date(p.updated_at).toLocaleString('en-GB'):'';
     return '<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--border-soft);border-radius:var(--r);margin-bottom:8px;background:var(--bg2)">'
       +'<div style="flex:1;cursor:pointer" onclick="openProject(\''+p.id+'\')"><div style="font-size:14px;font-weight:600;color:var(--text)">'+esc(p.name||'Untitled Project')+'</div><div style="font-size:11px;color:var(--text3)">Last updated '+esc(when)+'</div></div>'
       +'<button class="btn sm" onclick="openProject(\''+p.id+'\')"><i class="ti ti-folder-open"></i> Open</button>'
@@ -2089,7 +2238,7 @@ function renderProjectMenu(list){
   var rows=(list&&list.length)?list.map(function(p){
     var cur=p.id===_currentProjectId;
     var nm=esc((p.name||'').replace(/'/g,"\\'"));
-    var when=p.updated_at?new Date(p.updated_at).toLocaleDateString():'';
+    var when=p.updated_at?new Date(p.updated_at).toLocaleDateString('en-GB'):'';
     return '<div class="pm-row'+(cur?' cur':'')+'">'
       +'<button class="pm-open" onclick="openProject(\''+p.id+'\')">'
         +'<i class="ti ti-'+(cur?'folder-check':'folder')+'"></i>'
@@ -2151,7 +2300,7 @@ function cloudSave(){
   supa.from('projects').update({data:data,name:_currentProjectName,updated_at:new Date().toISOString()}).eq('id',_currentProjectId).then(function(res){
     _cloudSaving=false;
     if(res.error){toast('Cloud save error: '+res.error.message,'var(--crit)');return;}
-    updateCloudStatusUI('Last synced '+new Date().toLocaleTimeString());
+    updateCloudStatusUI('Last synced '+new Date().toLocaleTimeString('en-GB'));
   });
 }
 function cloudSyncNow(){ cloudSave(); toast('Syncing…'); }
@@ -2380,6 +2529,7 @@ function renderAppearanceInputs(){
   renderBrandDefaultButtons();
 }
 var suppliers=[],weights={},charts={},templates=[],actions=[];
+var activityLog=[];  // change history — written by the Activity module (end of file), saved with the project
 // ── Module 2/3 data model (KPI catalog + risk model; per-supplier kpis/risk/development live inside supplier objects) ──
 // Levels follow Gunasekaran, Patel & McGaughey (2004): strategic = high-level
 // comparative measures, tactical = process-level measures, operational =
@@ -2707,62 +2857,6 @@ var threshGreen=85,threshYellow=70;
 var ovFilterColor=null,ovFilterCat=null,detFilterColor=null;
 
 var I18N={
-  de:{
-    navImport:'Import',navOverview:'Overview',navDetail:'Analysis',navData:'Daten',navSettings:'Settings',navExport:'Export',
-    saveProject:'Projekt speichern',loadProject:'Projekt laden',
-    uploadTitle:'Drop Excel file here or click',uploadSub:'Supports .xlsx · Multiple suppliers · Assessment sheets auto-detected',
-    importedSup:'Suppliers',cats:'Categories',criteria:'Kriterien',
-    ovTitle:'Overview',ampel:'Ampel:',catLabel:'Category:',
-    critical:'Kritisch',medium:'Mittel',good:'Gut',reset:'Reset',
-    detTitle:'Analysis',supplier:'Supplier',allSuppliers:'All Suppliers',allCats:'All Categories',
-    dataTitle:'Datenkontrolle',selectSup:'-- Select supplier --',saveBtn:'Speichern',
-    dataInfo:'Edit scores (0-5 or N.A.) and notes directly, then click Save.',
-    settingsReport:'Berichtskopf',auditorLbl:'Assessor Name',companyLbl:'Unternehmen',projectLbl:'Projekt',dateAuto:'Datum wird automatisch auf heute gesetzt.',
-    settingsLang:'Sprache',settingsThresh:'Ampelschwellen',greenFrom:'Gruen ab',yellowFrom:'Gelb ab',redAuto:'Rot unter Gelb (automatisch)',applyBtn:'Anwenden',
-    settingsWeights:'Category Weighting',weightsInfo:'0 = deaktiviert - 1.0 = normal - 3.0 = dreifach',resetBtn:'Zuruecksetzen',afterImport:'Nach Import verfuegbar',
-    apiKeyTitle:'API-Key (KI-Analyse)',apiKeyInfo:'Anthropic API-Key. Erstellen unter anthropic.com/api',startAI:'KI-Prioritaetsanalyse starten',
-    exportTitle:'Export',themeLabel:'Corporate Design waehlen',contentLabel:'Berichtsinhalt',
-    roptCover:'Titelfolie',roptSummary:'Summary',roptMgmt:'Management OnePager',roptCat:'Category Scores',roptDetail:'Detailtabellen',roptNotes:'Nur Zeilen mit Notizen',
-    topNLabel:'Top kritische Kriterien im OnePager:',topNHint:'passt sich automatisch an',
-    suppliersLabel:'Suppliers',allBtn:'All',noneBtn:'None',
-    exportPptxBtn:'PowerPoint exportieren',exportExcelBtn:'Excel exportieren',exportPdfBtn:'PDF-Report herunterladen',
-    pdfInfo:'Erzeugt eine HTML-Datei zum Herunterladen. Im Browser oeffnen und Datei - Drucken - Als PDF speichern.',
-    ranking:'Score-Ranking',avgCat:'Average Score per Category',radar:'Radar',
-    totalScore:'Total Score',naCrit:'N.A.',
-    mgmtSummary:'Management Summary',topCritLabel:'Top kritische Kriterien',
-    catRadar:'Category Radar',catOverview:'Category Overview',detailTitle:'Detailbewertung',
-    coverSubtitle:'Supplier Assessment Report',auditorLine:'Assessor',dateLine:'Datum',
-    summaryHeading:'Summary - All Suppliers',summaryAudit:'Supplier Assessment',
-    totalCol:'Total',categoryCol:'Category',checkpointCol:'Checkpoint',scoreCol:'Score',notesCol:'Evidence / Notes',
-    noData:'Noch keine Daten importiert',noFilter:'No supplier matches the filter',selectFirst:'Select filter or supplier',
-    shown:'Angezeigt',avg:'Durchschnitt',
-    saved:'Gespeichert',projectSaved:'Project saved',projectLoaded:'Project loaded',
-    weightApplied:'Gewichtung angewendet',threshApplied:'Schwellen angewendet',editsSaved:'Changes saved',
-    pptxCreating:'PPTX wird erstellt...',pptxDone:'PowerPoint exported',pptxErr:'PPTX Fehler',
-    pdfDone:'PDF-Report heruntergeladen - im Browser oeffnen und drucken',
-    aiLoading:'Analysing all suppliers...',aiErr:'Fehler: ',aiNoKey:'Bitte API Key eingeben',aiNoData:'No suppliers loaded',
-    noCritical:'No critical criteria found.',
-    deleteConfirm:'Remove supplier?',noDataAlert:'No data',noneSelectedAlert:'No suppliers selected',
-    catScoreTitle:'Score per Category',
-    checkpointsLabel:'Checkpoints',rankingLabel:'Ranking',
-    detailAssessment:'Detailbewertung',
-    filterNoMatch:'No supplier matches the filter',
-    selectFirst:'Select filter or supplier',
-    noDataImported:'Noch keine Daten importiert',
-    shownLabel:'Angezeigt',avgLabel:'Durchschnitt',
-    criticalLabel:'Kritisch',mediumLabel:'Mittel',goodLabel:'Gut',
-    catsLabel:'Categories',criteriaLabel:'Kriterien',
-    suppliersTitle:'Suppliers',
-    filterBarAmpel:'Ampel:',filterBarCat:'Category:',filterBarSup:'Supplier:',
-    filterNoCat:'No category matches the filter',filterNoSup:'No supplier matches the filter',
-    catScoreTitle:'Score per Category',phAuditor:'Max Mustermann',phCompany:'P3 Group',phProject:'Supplier Assessment 2025',
-    dataInfoText:'Edit scores (0-5 or N.A.) and notes directly, then click Save.',
-    berichtskopf:'Berichtskopf',spracheLbl:'Sprache',ampelLbl:'Ampelschwellen',
-    gewichtLbl:'Category Weighting',gewichtInfo:'0 = deaktiviert - 1.0 = normal - 3.0 = dreifach',
-    apiKeyLbl:'API-Key (KI-Analyse)',apiKeyInfo2:'Anthropic API-Key. Erstellen unter anthropic.com/api',
-    exportThemeLbl:'Corporate Design waehlen',exportContentLbl:'Berichtsinhalt',exportSupLbl:'Suppliers',
-    selectSupFirst:'Select supplier',
-  },
   en:{
     navImport:'Import',navOverview:'Overview',navDetail:'Analysis',navData:'Data',navSettings:'Settings',navExport:'Export',
     saveProject:'Save Project',loadProject:'Load Project',
@@ -2777,7 +2871,7 @@ var I18N={
     settingsLang:'Language',settingsThresh:'Traffic Light Thresholds',greenFrom:'Green from',yellowFrom:'Yellow from',redAuto:'Red below yellow (automatic)',applyBtn:'Apply',
     settingsWeights:'Category Weighting',weightsInfo:'0 = disabled - 1.0 = normal - 3.0 = triple',resetBtn:'Reset',afterImport:'Available after import',
     apiKeyTitle:'API Key (AI Analysis)',apiKeyInfo:'Anthropic API key. Create at anthropic.com/api',startAI:'Start AI Priority Analysis',
-    exportTitle:'Export',themeLabel:'Choose Corporate Design',contentLabel:'Report Content',
+    exportTitle:'Export',themeLabel:'Choose Design',contentLabel:'Report Content',
     roptCover:'Title Slide',roptSummary:'Summary',roptMgmt:'Management One-Pager',roptCat:'Category Scores',roptDetail:'Detail Tables',roptNotes:'Only rows with notes',
     topNLabel:'Top critical criteria in one-pager:',topNHint:'adjusts automatically',
     suppliersLabel:'Suppliers',allBtn:'All',noneBtn:'None',
@@ -2811,12 +2905,12 @@ var I18N={
     suppliersTitle:'Suppliers',
     filterBarAmpel:'Traffic light:',filterBarCat:'Category:',filterBarSup:'Supplier:',
     filterNoCat:'No category matches the filter',filterNoSup:'No supplier matches the filter',
-    catScoreTitle:'Score per Category',phAuditor:'Max Mustermann',phCompany:'P3 Group',phProject:'Supplier Assessment 2025',
+    catScoreTitle:'Score per Category',phAuditor:'Jane Smith',phCompany:'P3 Group',phProject:'Supplier Assessment 2025',
     dataInfoText:'Edit scores (0-5 or N.A.) and notes directly, then click Save.',
     berichtskopf:'Report Header',spracheLbl:'Language',ampelLbl:'Traffic Light Thresholds',
     gewichtLbl:'Category Weighting',gewichtInfo:'0 = disabled - 1.0 = normal - 3.0 = triple',
     apiKeyLbl:'API Key (AI Analysis)',apiKeyInfo2:'Anthropic API key. Create at anthropic.com/api',
-    exportThemeLbl:'Choose Corporate Design',exportContentLbl:'Report Content',exportSupLbl:'Suppliers',
+    exportThemeLbl:'Choose Design',exportContentLbl:'Report Content',exportSupLbl:'Suppliers',
     selectSupFirst:'Select supplier',
   }
 };
@@ -3313,7 +3407,7 @@ var NAV={
     {id:'new',label:'Checklists',icon:'ti-list-check'}
   ]},
   // Conducting one assessment is Assessment; holding several against each other
-  // is observation over time, so Vergleich lives here rather than next to the
+  // is observation over time, so History & Comparison lives here rather than next to the
   // checklist that produced it.
   monitoring:{label:'Monitoring',areas:[
     {id:'monitoring',label:'Portfolio',icon:'ti-chart-dots'},
@@ -3335,7 +3429,34 @@ var PAGE_TO_MODULE={dashboard:'dashboard',import:'suppliers',new:'assessment',au
 // keeps "Audits" highlighted while you are inside one.
 var PAGE_TO_AREA={audit:'audits'};
 function openNav(key){var n=NAV[key];if(!n)return;showPage(n.areas?n.areas[0].id:n.page);}
-function updatePrimaryNavActive(){document.querySelectorAll('#primaryNav .nav-btn,#mobileNav .nav-btn').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-nav')===_activeModule);});}
+function updatePrimaryNavActive(){
+  document.querySelectorAll('#primaryNav .nav-btn,#mobileNav .nav-btn[data-nav],#moreSheet .more-item').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-nav')===_activeModule);});
+  // "More" in the phone bar stands in for the modules that live in its sheet
+  var mb=document.getElementById('mobileMoreBtn');if(mb)mb.classList.toggle('active',!!document.querySelector('#moreSheet .more-item.active'));
+  fitPrimaryNav();
+}
+// Top nav density — measured, not breakpoint-guessed: labels drop step by step
+// only while the buttons would otherwise overflow (narrow laptop windows, 125–150 %
+// Windows scaling, tablets). c1 = secondary modules icon-only, c2 = all icon-only
+// except the active one (+ tagline hidden), c3 = everything icon-only.
+function fitPrimaryNav(){
+  var nav=document.getElementById('primaryNav');if(!nav)return;var tb=nav.parentElement;
+  // .nav-btn animates padding/weight — measure final widths, not mid-transition ones
+  nav.classList.add('nav-fitting');
+  nav.querySelectorAll('.nav-btn').forEach(function(b){var s=b.querySelector('span');if(s)b.title=s.textContent.trim();});
+  tb.classList.remove('nav-c1','nav-c2','nav-c3');
+  if(getComputedStyle(nav).display!=='none')
+    ['nav-c1','nav-c2','nav-c3'].some(function(c){if(nav.scrollWidth<=nav.clientWidth)return true;tb.classList.add(c);return false;});
+  void nav.offsetWidth;nav.classList.remove('nav-fitting');
+}
+window.addEventListener('resize',function(){fitPrimaryNav();if(window.innerWidth>768)closeMoreSheet();});
+try{document.fonts.ready.then(fitPrimaryNav);}catch(e){}
+// Catches the moment the app becomes visible after sign-in (0 → real width)
+try{new ResizeObserver(function(){fitPrimaryNav();}).observe(document.querySelector('#appRoot .topbar'));}catch(e){}
+function toggleMoreSheet(){var s=document.getElementById('moreSheet');if(s&&s.classList.contains('open'))closeMoreSheet();else openMoreSheet();}
+function openMoreSheet(){var s=document.getElementById('moreSheet');if(!s)return;s.classList.add('open');var b=document.getElementById('mobileMoreBtn');if(b)b.setAttribute('aria-expanded','true');}
+function closeMoreSheet(){var s=document.getElementById('moreSheet');if(!s)return;s.classList.remove('open');var b=document.getElementById('mobileMoreBtn');if(b)b.setAttribute('aria-expanded','false');}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeMoreSheet();});
 function renderSubNav(modKey){
   var el=document.getElementById('subNav');if(!el)return;
   var n=NAV[modKey];
@@ -3450,15 +3571,22 @@ function showPage(id,btn,opts){
   };
   if(renders[id])renders[id]();
   renderNavBackBar();
+  if(typeof helpOnPage==='function')helpOnPage();
 }
+var _expTab='pptx';
 function switchExportTab(id,btn){
   document.querySelectorAll('.etab').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.etab-content').forEach(c=>c.classList.remove('active'));
   btn.classList.add('active');document.getElementById('etab-'+id).classList.add('active');
+  _expTab=id;
+  renderExpVariants();
 }
 function toggleChk(lbl,cbId){const cb=document.getElementById(cbId);cb.checked=!cb.checked;lbl.classList.toggle('on',cb.checked);}
 
-function getImportMode(){var r=document.querySelector('input[name="importMode"]:checked');return r?r.value:'supplier';}
+// What an import becomes — chosen in the preview dialog after the upload
+// (Standard and AI import), not up front.
+var _importMode='supplier';
+function getImportMode(){return _importMode;}
 function handleDrop(e){e.preventDefault();e.currentTarget.classList.remove('drag');if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0]);}
 function handleFile(file){
   if(!file)return;setStatus('<i class="ti ti-loader-2"></i> Reading file...');
@@ -3467,25 +3595,121 @@ function handleFile(file){
     try{
       const wb=XLSX.read(e.target.result,{type:'array'});
       const detected=wb.SheetNames.filter(s=>isAuditSheet(XLSX.utils.sheet_to_json(wb.Sheets[s],{header:1,defval:null})));
-      if(!detected.length){setStatus('No assessment sheets detected.');return;}
+      if(!detected.length){setStatus('No checklist sheets detected — the Standard Import needs a “Checkpoint” column header. Try the AI Import for other layouts.');return;}
       const sup=parseSupplier(wb,file.name,detected);
-      if(getImportMode()==='template'){
-        ensureTemplateFromImport(sup.name,sup.categories);
-        switchNewTab('builder',document.getElementById('ntab-builder'));
-        setStatus('Checklist imported as template: <strong>'+esc(sup.name)+'</strong> — editable in Template Builder');
-      } else {
-        sup.rounds=[{id:roundIdCounter++,label:'Imported — '+new Date().toISOString().slice(0,10),templateName:'',createdAt:new Date().toISOString().slice(0,10),categories:sup.categories}];
-        sup.activeRoundId=sup.rounds[0].id;
-        const idx=suppliers.findIndex(s=>s.name===sup.name);
-        if(idx>=0)suppliers[idx]=sup;else suppliers.push(sup);
-        initWeights(detected);renderSuppliersList();
-        setStatus('Supplier imported: <strong>'+esc(sup.name)+'</strong> - '+detected.length+' categories');
-      }
-    }catch(err){setStatus('Fehler: '+err.message);}
+      if(!Object.keys(sup.categories).length){setStatus('No checkpoints found in “'+esc(file.name)+'”.');return;}
+      setStatus('');
+      showStdImportModal(sup,file.name);
+    }catch(err){setStatus('Error: '+err.message);}
   };
   reader.readAsArrayBuffer(file);
 }
-function isAuditSheet(data){const f=data.slice(0,6).flat().filter(Boolean).map(v=>String(v).toLowerCase());return f.some(v=>v.includes('checkpoint'))&&f.some(v=>v.includes('score'));}
+// A sheet counts once it has a "Checkpoint" header — the score column is optional,
+// so an empty checklist can be imported as a template.
+function isAuditSheet(data){const f=data.slice(0,6).flat().filter(Boolean).map(v=>String(v).toLowerCase());return f.some(v=>v.includes('checkpoint'));}
+
+// ── Standard Import preview ──
+var _stdImport=null;
+function showStdImportModal(sup,filename){
+  var on={};Object.keys(sup.categories).forEach(function(c){on[c]=true;});
+  _stdImport={sup:sup,filename:filename,name:sup.name,on:on,date:''};
+  renderStdImportModal();
+}
+function stdImpMode(v){_importMode=v;renderStdImportModal();}
+function stdImpToggle(i,v){var c=Object.keys(_stdImport.sup.categories)[i];_stdImport.on[c]=v;renderStdImportModal();}
+function stdImpName(v){_stdImport.name=v;_impSetBadge('stdimp_b',v);}
+function _stdImpCats(){
+  var st=_stdImport,out={};
+  Object.keys(st.sup.categories).forEach(function(c){if(st.on[c])out[c]=st.sup.categories[c];});
+  return out;
+}
+function renderStdImportModal(){
+  var st=_stdImport;if(!st)return;
+  var isTpl=getImportMode()==='template';
+  var prevBody=document.querySelector('#aiModal .aiimp-body'),keepTop=prevBody?prevBody.scrollTop:0;
+  var cats=st.sup.categories,catNames=Object.keys(cats);
+  var all=[];catNames.forEach(function(c){if(st.on[c])cats[c].forEach(function(it){all.push(it);});});
+  var scored=all.filter(function(it){return it.score!==null&&it.score!==undefined;}).length;
+  var outOfScale=all.filter(function(it){return typeof it.score==='number'&&(it.score<0||it.score>5);}).length;
+  function seg(val,label,sub){
+    var on=(isTpl?'template':'supplier')===val;
+    return '<button onclick="stdImpMode(\''+val+'\')" style="flex:1;min-width:150px;text-align:left;padding:9px 12px;border:none;cursor:pointer;background:'+(on?'var(--primary)':'var(--bg)')+';color:'+(on?'var(--on-primary)':'var(--text)')+'">'
+      +'<div style="font-size:12.5px;font-weight:700">'+label+'</div><div style="font-size:10.5px;opacity:.85;margin-top:1px">'+sub+'</div></button>';
+  }
+  var th='padding:4px 6px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-weight:600;text-align:left';
+  var td='padding:3px 6px;border:1px solid var(--border);vertical-align:top';
+  var h='<div style="margin-bottom:6px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--text3)">Import as</div>'
+    +'<div style="display:flex;flex-wrap:wrap;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:12px">'
+      +seg('supplier','Supplier assessment','With scores — added as an assessment of the supplier')
+      +'<span style="width:1px;background:var(--border)"></span>'
+      +seg('template','Checklist template','Structure only — scores and notes are ignored')
+    +'</div>'
+    +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px">'
+      +'<span style="font-size:12px;font-weight:600;color:var(--text2)">'+(isTpl?'Checklist':'Supplier')+' name:</span>'
+      +'<input type="text" value="'+esc(st.name)+'" oninput="stdImpName(this.value)" style="'+_IMP_INP+';flex:1;max-width:300px;font-size:13px">'
+      +'<span id="stdimp_b">'+_impBadgeHtml(st.name,isTpl)+'</span>'
+    +'</div>'
+    +(!isTpl?'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--text2);margin-bottom:14px">Assessment date <input type="date" value="'+esc(st.date)+'" oninput="_stdImport.date=this.value" style="'+_IMP_INP+'"><span style="color:var(--text3)">empty = today</span></div>':'')
+    +'<div style="font-size:12px;color:var(--text2);margin-bottom:8px"><b>'+all.length+'</b> checkpoints in <b>'+catNames.filter(function(c){return st.on[c];}).length+'</b> categor'+(catNames.filter(function(c){return st.on[c];}).length===1?'y':'ies')
+      +(!isTpl?' · <b>'+scored+'</b> scored':'')+'</div>'
+    +(!isTpl&&outOfScale?'<div style="font-size:11.5px;color:var(--warn);margin-bottom:8px"><i class="ti ti-alert-triangle"></i> '+outOfScale+' score'+(outOfScale!==1?'s are':' is')+' outside 0–5. The Standard Import takes scores as they are — use the AI Import to convert another scale.</div>':'');
+  h+=catNames.map(function(c,i){
+    var items=cats[c],on=!!st.on[c];
+    return '<div style="border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px;overflow:hidden'+(on?'':';opacity:.55')+'">'
+      +'<label style="background:var(--bg2);padding:8px 12px;display:flex;align-items:center;gap:8px;cursor:pointer">'
+        +'<input type="checkbox"'+(on?' checked':'')+' onchange="stdImpToggle('+i+',this.checked)" style="width:15px;height:15px">'
+        +'<span style="font-size:13px;font-weight:700;flex:1"><i class="ti ti-table" style="color:var(--text3);font-size:12px;margin-right:4px"></i>'+esc(c)+'</span>'
+        +'<span style="font-size:11.5px;color:var(--text2)">'+items.length+' checkpoint'+(items.length!==1?'s':'')+'</span>'
+      +'</label>'
+      +(on?'<div style="padding:8px 12px;overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr>'
+        +'<th style="'+th+'">#</th><th style="'+th+'">Checkpoint</th>'+(isTpl?'':'<th style="'+th+'">Score</th><th style="'+th+'">Notes</th>')+'</tr></thead><tbody>'
+        +items.slice(0,4).map(function(it){
+          return '<tr><td style="'+td+'">'+esc(String(it.no))+'</td><td style="'+td+'">'+esc(it.checkpoint.slice(0,70))+'</td>'
+            +(isTpl?'':'<td style="'+td+'">'+(it.score==null?'<span style="color:var(--text3)">—</span>':esc(String(it.score)))+'</td><td style="'+td+'">'+esc((it.notes||'').slice(0,40))+'</td>')+'</tr>';
+        }).join('')
+        +(items.length>4?'<tr><td colspan="'+(isTpl?2:4)+'" style="'+td+';color:var(--text3)">… '+(items.length-4)+' more</td></tr>':'')
+        +'</tbody></table></div>':'')
+    +'</div>';
+  }).join('');
+  var n=Object.keys(_stdImpCats()).length;
+  h+=(isTpl?'':'<div style="font-size:11.5px;color:var(--text3);margin-top:4px">An existing supplier keeps all its data — the import is added as a new assessment.</div>')
+    +'<button class="btn primary" onclick="confirmStdImport()"'+(n?'':' disabled')+' style="width:100%;margin-top:10px;font-size:14px"><i class="ti ti-check"></i> '+(isTpl?'Import as checklist':'Import assessment')+'</button>';
+  var ex=document.getElementById('aiModal');if(ex)ex.remove();
+  var mo=document.createElement('div');mo.id='aiModal';
+  mo.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:3000;display:flex;align-items:flex-end;justify-content:center;padding:16px';
+  mo.innerHTML='<div style="background:var(--bg);border-radius:16px 16px 12px 12px;width:100%;max-width:780px;max-height:90vh;display:flex;flex-direction:column;box-shadow:var(--shadow-lg)">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0">'
+      +'<div style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;min-width:0"><i class="ti ti-file-spreadsheet" style="color:var(--primary-fg)"></i><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Excel Import — '+esc(st.filename)+'</span></div>'
+      +'<button onclick="document.getElementById(\'aiModal\').remove()" style="background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px"><i class="ti ti-x"></i></button>'
+    +'</div>'
+    +'<div class="aiimp-body" style="padding:20px;overflow-y:auto">'+h+'</div>'
+  +'</div>';
+  mo.onclick=function(e){if(e.target===mo)mo.remove();};
+  document.body.appendChild(mo);
+  var body=mo.querySelector('.aiimp-body');if(body)body.scrollTop=keepTop;
+}
+async function confirmStdImport(){
+  var st=_stdImport;if(!st)return;
+  var cats=_stdImpCats(),catN=Object.keys(cats).length;
+  if(!catN)return;
+  var name=(st.name||'').trim()||st.sup.name;
+  var isTpl=getImportMode()==='template';
+  var keepBoth=isTpl?await askTemplateConflict([name]):false;
+  var mo=document.getElementById('aiModal');if(mo)mo.remove();
+  _stdImport=null;
+  if(isTpl){
+    ensureTemplateFromImport(name,cats,keepBoth);
+    switchNewTab('builder',document.getElementById('ntab-builder'));
+    setStatus('Checklist imported as template: <strong>'+esc(name)+'</strong> — editable in Template Builder');
+    toast('Imported 1 checklist ('+catN+' categories)');
+  } else {
+    // Added as a new assessment — an existing supplier keeps its history.
+    var res=importAssessmentRound(name,cats,{label:'Import',date:st.date});
+    renderSuppliersList();
+    setStatus((res.isNew?'Supplier imported: ':'New assessment added to existing supplier: ')+'<strong>'+esc(name)+'</strong> - '+catN+' categories');
+    toast(res.isNew?'Supplier imported':'Assessment added to '+name);
+  }
+}
 function parseSupplier(wb,filename,detected){
   const name=filename.replace(/\.(xlsx?)$/i,'');const categories={};
   detected.forEach(sheet=>{
@@ -3500,294 +3724,585 @@ function parseSupplier(wb,filename,detected){
       const r=rows[i];const cp=r[ci];if(!cp||!String(cp).trim())continue;
       const raw=r[si];let score=null;
       if(raw!=null){const sv=String(raw).trim().toUpperCase();if(['N.A.','NA','N/A'].includes(sv))score='N.A.';else if(!isNaN(Number(raw)))score=Number(raw);}
-      items.push({no:r[noi]!=null?r[noi]:(i-hRow),checkpoint:String(cp).trim(),score,notes:ni>=0&&r[ni]!=null?String(r[ni]):''});
+      items.push({no:r[noi]!=null?r[noi]:(i-hRow),checkpoint:String(cp).trim(),score,notes:ni>=0&&r[ni]!=null?String(r[ni]):'',weight:1,rubric:null,files:[]});
     }
     if(items.length)categories[sheet]=items;
   });
   return{name,categories};
 }
+// ── Import helpers (shared by Standard and AI import) ────────────────────────
+function _todayIso(){return new Date().toISOString().slice(0,10);}
+// Add an imported assessment as a NEW round. A supplier that already exists keeps
+// everything it has (earlier rounds, profile, files, linked actions) — the import
+// used to replace the whole supplier object and silently wipe that history.
+function importAssessmentRound(name,cats,meta){
+  meta=meta||{};
+  var date=/^\d{4}-\d{2}-\d{2}$/.test(meta.date||'')?meta.date:_todayIso();
+  _assignCids(cats);
+  var s=suppliers.find(function(x){return x.name===name;});
+  var isNew=!s;
+  if(isNew){s={name:name,supplierInfo:{},files:[],rounds:[],activeRoundId:null,categories:{}};suppliers.push(s);}
+  if(!Array.isArray(s.rounds))ensureSupplierRounds(s);
+  var r={id:roundIdCounter++,label:(meta.label||'Import')+' '+date,templateName:'',
+    createdAt:date,plannedDate:date,auditor:meta.auditor||'',
+    type:s.rounds.length?'rerun':'initial',categories:cats};
+  // An imported result is a finished assessment — otherwise its scores would not
+  // count anywhere. A checklist without any scores is still to be done.
+  r.status=roundStats(r).scored>0?'completed':'planned';
+  if(r.status==='completed')r.completedAt=date;
+  s.rounds.push(r);
+  if(isNew)s.activeRoundId=r.id;
+  ensureSupplierRounds(s);   // normalises the round and repoints the categories mirror
+  initWeights(Object.keys(cats));
+  return {supplier:s,round:r,isNew:isNew};
+}
+function _tplImportName(name){return (name||'Import')+' (Checklist)';}
+// Ask once when imported checklists would replace existing ones. Closing the
+// dialog keeps both — the safe choice. Returns true for "keep both".
+async function askTemplateConflict(names){
+  var clash=names.filter(function(n){return templates.some(function(t){return t.name===_tplImportName(n);});});
+  if(!clash.length)return false;
+  var replace=await uiConfirm({title:'Checklist already exists',
+    message:(clash.length===1?'“'+_tplImportName(clash[0])+'” already exists.':clash.length+' of these checklists already exist.')
+      +' Replace '+(clash.length===1?'it':'them')+', or keep both and save the import under a new name?',
+    confirmText:'Replace',cancelText:'Keep both',icon:'ti-copy'});
+  return !replace;
+}
+
 // ── AI Import ────────────────────────────────────────────────────────────────
+// The AI only reads the STRUCTURE: which sheets are checklists, the header row,
+// which column is what, the score scale and cover-page details. The rows
+// themselves are parsed here in code from the full sheet, and every decision
+// can be corrected in the dialog before anything is saved.
+var AI_IMP_ROWS=30,AI_IMP_COLS=40;
+var _IMP_SEL='border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:11px;border-radius:4px;padding:3px 4px;max-width:100%';
+var _IMP_INP='border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;border-radius:4px;padding:3px 7px';
+// Common text ratings, matched after _normTxt. The AI's own reading of the file
+// takes precedence; the user can override every value in the dialog.
+var IMP_TEXT_DEFAULTS={
+  5:['io','ok','yes','ja','erfüllt','fulfilled','pass','passed','compliant','konform','vorhanden','done'],
+  0:['nio','nok','notok','no','nein','nichterfüllt','notfulfilled','fail','failed','noncompliant','nichtkonform','nichtvorhanden','missing','fehlt'],
+  3:['teilweise','teilw','teilweiseerfüllt','partially','partial','partly','partiallyfulfilled','bedingt'],
+  'N.A.':['na','nichtanwendbar','notapplicable','entfällt','nv','-','–']
+};
+var _aiImportState=null;
+
+function _cellText(v){
+  if(v==null)return '';
+  if(v instanceof Date)return isNaN(v)?'':v.toISOString().slice(0,10);
+  return String(v).trim();
+}
+function _aiCellPreview(v){var s=_cellText(v);return s.length>80?s.slice(0,80)+'…':s;}
+function _colIdx(v){if(v==null||v==='')return null;var n=parseInt(v,10);return isFinite(n)&&n>=0?n:null;}
+function _rubricCols(rb){
+  if(!rb||typeof rb!=='object')return null;
+  var out={},any=false;
+  for(var s=0;s<=5;s++){out[s]=_colIdx(rb[s]);if(out[s]!=null)any=true;}
+  return any?out:null;
+}
+function _isoOrEmpty(v){var s=v==null?'':String(v);return /^\d{4}-\d{2}-\d{2}/.test(s)?s.slice(0,10):'';}
+function _normTxt(s){var t=String(s).trim();var n=t.toLowerCase().replace(/[\s._\/\\-]+/g,'');return n||t;}
+function _impNum(raw){
+  if(typeof raw==='number')return raw;
+  var s=String(raw).trim();
+  return /^[-+]?\d+([.,]\d+)?\s*%?$/.test(s)?Number(s.replace('%','').replace(',','.')):NaN;
+}
+function _toFive(n,min,max){
+  var v=(min===0&&max===5)?n:(n-min)/(max-min)*5;
+  return Math.max(0,Math.min(5,Math.round(v)));
+}
+// Mapped value of a text rating: a 0-5 number, 'N.A.', '' (= leave unscored),
+// or undefined when nothing recognises it.
+function _impTextVal(k,scale){
+  if(Object.prototype.hasOwnProperty.call(scale.text,k))return scale.text[k];
+  for(var v in IMP_TEXT_DEFAULTS){if(IMP_TEXT_DEFAULTS[v].indexOf(k)>=0)return v==='N.A.'?'N.A.':Number(v);}
+  return undefined;
+}
+function _impScore(raw,scale){
+  if(raw==null||raw instanceof Date)return {v:null};
+  var s=String(raw).trim();if(!s)return {v:null};
+  var n=_impNum(raw);
+  if(isFinite(n))return {v:_toFive(n,scale.min,scale.max)};
+  var t=_impTextVal(_normTxt(s),scale);
+  if(t===undefined)return {v:null,unknown:s};
+  return {v:t===''?null:t};
+}
+
 function aiImportExcel(file){
   if(!file)return;
   if(!getApiKey()){uiAlert('Please enter your Anthropic API key in Settings first.');return;}
   setStatus(aiLoaderHtml('AI is analysing your Excel file…','aiElapsed_imp'));aiTimerStart('aiElapsed_imp');
+  function fail(msg){aiTimerStop('aiElapsed_imp');setStatus('<span style="color:var(--crit)"><i class="ti ti-alert-triangle"></i> '+msg+'</span>');}
   var reader=new FileReader();
   reader.onload=function(e){
+    var wb,rowsBySheet={},previews;
     try{
-      var wb=XLSX.read(e.target.result,{type:'array'});
-      var previews=wb.SheetNames.map(function(name){
-        var rows=XLSX.utils.sheet_to_json(wb.Sheets[name],{header:1,defval:''});
-        return {name:name,rows:rows.slice(0,14)};
+      wb=XLSX.read(e.target.result,{type:'array',cellDates:true});
+      previews=wb.SheetNames.map(function(name){
+        var rows=XLSX.utils.sheet_to_json(wb.Sheets[name],{header:1,defval:null,raw:true});
+        rowsBySheet[name]=rows;
+        return {name:name,totalRows:rows.length,rows:rows.slice(0,AI_IMP_ROWS).map(function(r){
+          var out=(r||[]).slice(0,AI_IMP_COLS).map(_aiCellPreview);
+          while(out.length&&out[out.length-1]==='')out.pop();
+          return out;
+        })};
       });
-      var prompt='I have an Excel workbook with '+previews.length+' sheet(s). For each sheet determine:\n'
-        +'1. Is this sheet audit/assessment data (checkpoints with scores)? Or is it a cover page, index, summary, chart, or non-audit tab?\n'
-        +'2. If it IS audit data: which 0-based column index contains: category, checkpoint number (no), checkpoint description, score/rating, notes/evidence? Set null if not present.\n'
-        +'3. Which row index (0-based) is the header row?\n'
-        +'4. What is the supplier name? (check sheet name and first rows)\n\n'
-        +'ALSO decide the overall workbook layout ("workbookType"):\n'
-        +'- "single": the audit sheets are CATEGORIES of ONE checklist. Typical signs: each sheet covers one topic (its name IS a category, e.g. "Office", "Incoming goods", "Quality"), the sheets have NO internal category column, and together they form one supplier audit. In this case each sheet name becomes a category of a single checklist.\n'
-        +'- "multiple": each audit sheet is a SEPARATE, complete checklist/audit — e.g. each sheet is a full audit of a different supplier, usually with its own internal category column and several categories per sheet.\n\n'
-        +'Sheet data:\n'+JSON.stringify(previews,null,1)+'\n\n'
-        +'Return ONLY a JSON object, no other text:\n'
-        +'{"workbookType":"single","sheets":['
-        +'{"sheet":"SheetName","isAudit":true,"supplierName":"Name","headerRow":0,"columns":{"category":0,"no":1,"checkpoint":2,"score":3,"notes":4}},'
-        +'{"sheet":"Cover","isAudit":false,"reason":"Cover page / no checkpoint data"}]}';
-      callClaude(prompt,
-        'You are a data import expert. Analyse Excel structures carefully. Return only a valid JSON object. Column indices are 0-based integers or null.',
-        function(text){
-          aiTimerStop('aiElapsed_imp');
-          var result;
-          try{
-            var m=text.match(/\{[\s\S]*\}/);
-            result=JSON.parse(m[0]);
-          }catch(ex){
-            // Fallback: older array-only shape
-            try{var a=text.match(/\[[\s\S]*\]/);result={workbookType:'multiple',sheets:JSON.parse(a[0])};}
-            catch(ex2){setStatus('AI could not parse the structure. Try Standard Import.');return;}
-          }
-          if(Array.isArray(result))result={workbookType:'multiple',sheets:result};
-          if(!Array.isArray(result.sheets)){setStatus('AI could not parse the structure. Try Standard Import.');return;}
-          setStatus('');
-          showAiImportModal(wb,previews,result,file.name);
+    }catch(err){fail('Error reading file: '+esc(err.message));return;}
+    var prompt='I have an Excel workbook with '+previews.length+' sheet(s). Below are the first rows of each sheet (0-based row and column indices; totalRows = full length of the sheet).\n'
+      +'Work out how to import it into a supplier assessment tool.\n\n'
+      +'PER SHEET decide:\n'
+      +'- isChecklist: true if the sheet holds a list of checkpoints / questions / requirements — WITH OR WITHOUT scores (an empty questionnaire counts). false for cover pages, instructions, indexes, summaries, charts, master data. Give a short "reason" when false.\n'
+      +'- hasScores: true if scores / ratings are filled in.\n'
+      +'- headerRow: 0-based row index of the column header row.\n'
+      +'- columns (0-based column index or null): category, no (checkpoint number), checkpoint (question / requirement text), score (rating / result), notes (comment / evidence / finding), weight (per-checkpoint weighting factor), rubric (if columns describe what each score level means: map level 0-5 to its column, e.g. {"0":5,"1":6,"2":7,"3":8,"4":9,"5":10}; else null).\n'
+      +'- sections: how category headings appear INSIDE the checkpoint column, if at all: "none" | "noNumber" (heading rows have an empty number column) | "topLevelNumber" (headings are numbered 1, 2 … while checkpoints are 1.1, 1.2 …).\n'
+      +'- supplierName, auditDate (YYYY-MM-DD), auditor: from the sheet name or the rows above the header (cover block) if present, else null.\n'
+      +'- matrixSuppliers: if the sheet is a SUPPLIER COMPARISON MATRIX — one checkpoint list with a separate score column per supplier — list them: [{"name":"Supplier A","score":3,"notes":4}] (notes = that supplier\'s comment column or null). Otherwise [].\n\n'
+      +'FOR THE WORKBOOK decide:\n'
+      +'- workbookType: "single" = the checklist sheets are CATEGORIES of ONE checklist (each sheet is one topic, sheet name = category, no category column; together one assessment). "multiple" = each checklist sheet is a separate, complete checklist / assessment (e.g. one sheet per supplier, often with its own category column). "matrix" = scores of several suppliers sit side by side in columns.\n'
+      +'- scale: {"min":0,"max":5,"text":{}} — min/max = the numeric range the score scale is designed for (e.g. 0-10, 0-100 for percent; VDA 6.3 uses 0-10). "text" maps every NON-numeric score value you see to a number on that same min-max scale, or to "N.A." for not applicable, e.g. {"i.O.":10,"n.i.O.":0,"n.a.":"N.A."}.\n\n'
+      +'Sheets:\n'+JSON.stringify(previews)+'\n\n'
+      +'Return ONLY this JSON object, no other text:\n'
+      +'{"workbookType":"multiple","scale":{"min":0,"max":5,"text":{}},"sheets":['
+      +'{"sheet":"Audit","isChecklist":true,"hasScores":true,"headerRow":3,"columns":{"category":0,"no":1,"checkpoint":2,"score":3,"notes":4,"weight":null,"rubric":null},"sections":"none","supplierName":"ACME","auditDate":"2026-03-01","auditor":null,"matrixSuppliers":[]},'
+      +'{"sheet":"Cover","isChecklist":false,"reason":"Cover page"}]}';
+    callClaude(prompt,
+      'You are a data import expert. Analyse Excel structures carefully. Return only a valid JSON object. Column and row indices are 0-based integers or null.',
+      function(text,info){
+        aiTimerStop('aiElapsed_imp');
+        var result=null;
+        try{var m=text.match(/\{[\s\S]*\}/);result=JSON.parse(m[0]);}catch(ex){}
+        if(!result||!Array.isArray(result.sheets)){
+          fail(info&&info.truncated
+            ?'The workbook is too large for one AI pass ('+previews.length+' sheets). Remove sheets you don’t need, or use Standard Import.'
+            :'AI could not read the structure. Try again, or use Standard Import.');
+          return;
         }
-      );
-    }catch(err){aiTimerStop('aiElapsed_imp');setStatus('Error reading file: '+err.message);}
+        setStatus('');
+        showAiImportModal(wb,rowsBySheet,result,file.name);
+      },null,{maxTokens:8000,onError:function(msg){fail(esc(msg));}});
   };
   reader.readAsArrayBuffer(file);
 }
 
-var _aiImportState={wb:null,previews:[],mapping:[],layout:'multiple',filename:'',combinedName:''};
-
-function showAiImportModal(wb,previews,result,filename){
-  var sheets=result.sheets||result;
-  _aiImportState={
-    wb:wb,previews:previews,mapping:sheets,
-    layout:(result.workbookType==='single')?'single':'multiple',
-    filename:filename||'',
-    combinedName:(filename||'Imported').replace(/\.[^.]+$/,'')
-  };
+function showAiImportModal(wb,rowsBySheet,result,filename){
+  var known={};(result.sheets||[]).forEach(function(m){if(m&&m.sheet)known[m.sheet]=m;});
+  // Every sheet of the workbook gets an entry — one the AI skipped (or forgot)
+  // can still be included by hand.
+  var sheets=wb.SheetNames.map(function(name){
+    var m=known[name]||{sheet:name,isChecklist:false,reason:'not analysed'};
+    var c=m.columns||{};
+    return {
+      sheet:name,isChecklist:m.isChecklist!=null?!!m.isChecklist:!!m.isAudit,reason:m.reason||'',on:true,
+      headerRow:Math.max(0,parseInt(m.headerRow,10)||0),
+      columns:{category:_colIdx(c.category),no:_colIdx(c.no),checkpoint:_colIdx(c.checkpoint),score:_colIdx(c.score),notes:_colIdx(c.notes),weight:_colIdx(c.weight)},
+      rubric:_rubricCols(c.rubric),
+      sections:(m.sections==='noNumber'||m.sections==='topLevelNumber')?m.sections:'none',
+      name:String(m.supplierName||name).trim(),catName:name,
+      date:_isoOrEmpty(m.auditDate),auditor:m.auditor?String(m.auditor).trim():'',
+      matrix:(Array.isArray(m.matrixSuppliers)?m.matrixSuppliers:[]).map(function(x){
+        return {on:true,name:String((x&&x.name)||'').trim()||'Supplier',score:_colIdx(x&&x.score),notes:_colIdx(x&&x.notes)};
+      }).filter(function(x){return x.score!=null;})
+    };
+  });
+  var layout=(result.workbookType==='single'||result.workbookType==='matrix')?result.workbookType:'multiple';
+  if(layout==='matrix'&&!sheets.some(function(m){return m.matrix.length;}))layout='multiple';
+  var sc=result.scale||{},min=Number(sc.min),max=Number(sc.max);
+  if(!isFinite(min))min=0;
+  if(!isFinite(max)||max<=min){min=0;max=5;}
+  var text={};
+  Object.keys(sc.text||{}).forEach(function(k){
+    var v=sc.text[k];
+    text[_normTxt(k)]=String(v).toUpperCase()==='N.A.'?'N.A.':(isFinite(Number(v))&&v!==''&&v!=null?_toFive(Number(v),min,max):'');
+  });
+  var first=sheets.find(function(m){return m.isChecklist&&(m.date||m.auditor);})||{};
+  _aiImportState={wb:wb,rows:rowsBySheet,sheets:sheets,layout:layout,filename:filename||'',
+    combinedName:(filename||'Imported').replace(/\.[^.]+$/,''),
+    meta:{date:first.date||'',auditor:first.auditor||''},
+    scale:{min:min,max:max,text:text},_tv:[]};
   renderAiImportModal();
 }
-// Toggle between "each sheet is its own checklist" and "all sheets are
-// categories of one checklist" — re-renders the same modal so the user can
-// flip the AI's guess without re-uploading.
-function setAiImportLayout(v){_aiImportState.layout=v;renderAiImportModal();}
-function renderAiImportModal(){
-  var st=_aiImportState, previews=st.previews, mapping=st.mapping, filename=st.filename;
-  var single=(st.layout==='single');
-  var audit=mapping.filter(function(m){return m.isAudit;});
-  var skipped=mapping.filter(function(m){return !m.isAudit;});
-  if(!audit.length){
-    showAiModal('AI Import — '+esc(filename),'<div style="color:var(--crit);padding:16px">No assessment data sheets detected in this file.<br>Try Standard Import or check that your Excel contains checkpoint and score columns.</div>');
-    return;
-  }
-  // Layout chooser
-  function segBtn(val,label,sub){
-    var on=(st.layout===val);
-    return '<button onclick="setAiImportLayout(\''+val+'\')" style="flex:1;text-align:left;padding:10px 12px;border:none;cursor:pointer;background:'+(on?'var(--primary)':'var(--bg)')+';color:'+(on?'var(--on-primary)':'var(--text)')+'">'
-      +'<div style="font-size:12.5px;font-weight:700">'+label+'</div>'
-      +'<div style="font-size:10.5px;opacity:.85;margin-top:1px">'+sub+'</div>'
-    +'</button>';
-  }
-  var h='<div style="margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap">'
-    +'<span style="background:var(--good-bg);color:var(--good);font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px"><i class="ti ti-check"></i> '+audit.length+' assessment sheet'+(audit.length!==1?'s':'')+' detected</span>'
-    +(skipped.length?'<span style="background:var(--bg2);color:var(--text2);font-size:12px;padding:4px 10px;border-radius:20px"><i class="ti ti-ban"></i> '+skipped.length+' sheet'+(skipped.length!==1?'s':'')+' skipped ('+skipped.map(function(s){return s.sheet+(s.reason?' — '+s.reason:'');}).join(', ')+')</span>':'')
-    +'</div>';
-  h+='<div style="margin-bottom:6px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--text3)">These sheets are…</div>'
-    +'<div style="display:flex;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:6px">'
-      +segBtn('single','Categories of one checklist','Each sheet name becomes a category — one checklist total')
-      +'<span style="width:1px;background:var(--border)"></span>'
-      +segBtn('multiple','Separate checklists','Each sheet becomes its own checklist / supplier')
-    +'</div>';
-  if(single){
-    h+='<div style="display:flex;align-items:center;gap:8px;margin:10px 0 16px">'
-      +'<span style="font-size:12px;font-weight:600;color:var(--text2)">Checklist name:</span>'
-      +'<input type="text" value="'+esc(st.combinedName)+'" onchange="_aiImportState.combinedName=this.value" style="flex:1;max-width:320px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;border-radius:6px;padding:5px 9px">'
-    +'</div>';
-  }
-  h+=audit.map(function(m,mi){
-    var preview=previews.find(function(p){return p.name===m.sheet;});
-    var cols=m.columns||{};
-    var colNames=preview&&preview.rows[0]?preview.rows[0].map(function(c,i){return {i:i,label:c||'Col '+i};}):[];
-    var dataRows=preview?preview.rows.slice((m.headerRow||0)+1,m.headerRow+4):[];
-    function colOpt(field){
-      return '<select onchange="_aiImportState.mapping['+mapping.indexOf(m)+'].columns.'+field+'=this.value===\'\'?null:parseInt(this.value)" style="border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:11px;border-radius:4px;padding:2px 4px">'
-        +'<option value="">— none —</option>'
-        +colNames.map(function(c){return '<option value="'+c.i+'"'+(cols[field]==c.i?' selected':'')+'>'+esc(String(c.label).slice(0,24))+'</option>';}).join('')
-        +'</select>';
+
+// ── Parsing (used for the live preview AND the final import) ──
+function _impScoreCols(st,m){
+  if(st.layout==='matrix')return m.matrix.filter(function(x){return x.on&&x.score!=null;}).map(function(x){return x.score;});
+  return m.columns.score!=null?[m.columns.score]:[];
+}
+// One sheet → checkpoint rows. The category comes from the category column, a
+// heading row inside the checkpoint column, or the sheet name (in that order).
+// With forcedCat (sheet = category) heading rows are simply dropped.
+function _impParseRows(st,m,forcedCat){
+  var rows=st.rows[m.sheet]||[],c=m.columns,out=[];
+  if(c.checkpoint==null)return out;
+  var cur=forcedCat||m.sheet,scoreCols=_impScoreCols(st,m);
+  for(var i=m.headerRow+1;i<rows.length;i++){
+    var r=rows[i]||[];
+    var cp=_cellText(r[c.checkpoint]);if(!cp)continue;
+    if(!forcedCat&&c.category!=null&&_cellText(r[c.category]))cur=_cellText(r[c.category]);
+    var noStr=c.no!=null?_cellText(r[c.no]):'';
+    var noScore=scoreCols.every(function(sc){return !_cellText(r[sc]);});
+    var heading=noScore&&((m.sections==='noNumber'&&c.no!=null&&!noStr)||(m.sections==='topLevelNumber'&&/^\d+\.?$/.test(noStr)));
+    if(heading){if(!forcedCat)cur=cp;continue;}
+    var rb=null;
+    if(m.rubric){
+      var any=false;rb={};
+      for(var s=0;s<=5;s++){var t=m.rubric[s]!=null?_cellText(r[m.rubric[s]]):'';rb[s]=t;if(t)any=true;}
+      if(!any)rb=null;
     }
-    // In single layout the sheet name IS the category, so the internal category
-    // column is meaningless — hide it and its preview column to reduce clutter.
-    var previewTable='<div style="overflow-x:auto;margin-top:8px"><table style="width:100%;border-collapse:collapse;font-size:11px">'
-      +'<thead><tr>'
-      +(single?'':'<th style="padding:4px 6px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-weight:600">Category</th>')
-      +'<th style="padding:4px 6px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-weight:600">#</th>'
-      +'<th style="padding:4px 6px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-weight:600">Checkpoint</th>'
-      +'<th style="padding:4px 6px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-weight:600">Score</th>'
-      +'<th style="padding:4px 6px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-weight:600">Notes</th>'
-      +'</tr></thead><tbody>'
-      +dataRows.map(function(r){
-        function cell(idx){return idx!=null&&idx!==''?esc(String(r[idx]||'').slice(0,30)):'<span style="color:var(--text3)">—</span>';}
-        return '<tr>'
-          +(single?'':'<td style="padding:3px 6px;border:1px solid var(--border)">'+cell(cols.category)+'</td>')
-          +'<td style="padding:3px 6px;border:1px solid var(--border)">'+cell(cols.no)+'</td>'
-          +'<td style="padding:3px 6px;border:1px solid var(--border)">'+cell(cols.checkpoint)+'</td>'
-          +'<td style="padding:3px 6px;border:1px solid var(--border)">'+cell(cols.score)+'</td>'
-          +'<td style="padding:3px 6px;border:1px solid var(--border)">'+cell(cols.notes)+'</td>'
-          +'</tr>';
+    var w=1;
+    if(c.weight!=null&&_cellText(r[c.weight])){var wn=_impNum(r[c.weight]);if(isFinite(wn))w=Math.max(0,Math.min(10,wn));}
+    out.push({cat:cur,no:noStr,checkpoint:cp,weight:w,rubric:rb,row:r});
+  }
+  return out;
+}
+function _impBuildCats(parsed,scoreCol,notesCol,scale,withScores){
+  var cats={};
+  parsed.forEach(function(p){
+    if(!cats[p.cat])cats[p.cat]=[];
+    cats[p.cat].push({no:p.no||(cats[p.cat].length+1),checkpoint:p.checkpoint,weight:p.weight,rubric:p.rubric,
+      score:withScores&&scoreCol!=null?_impScore(p.row[scoreCol],scale).v:null,
+      notes:withScores&&notesCol!=null?_cellText(p.row[notesCol]):'',files:[]});
+  });
+  return cats;
+}
+function _impCatName(m){return (m.catName||'').trim()||m.sheet;}
+// What will be created: one entry per supplier (assessment mode) or checklist
+// (template mode). Entries with the same name merge their categories.
+function _impTargets(st){
+  var isTpl=getImportMode()==='template',out=[];
+  var on=st.sheets.filter(function(m){return m.isChecklist&&m.on;});
+  function add(name,cats,meta){
+    if(!Object.keys(cats).length)return;
+    var t=out.find(function(x){return x.name===name;});
+    if(!t){t={name:name,cats:{},date:meta.date||'',auditor:meta.auditor||''};out.push(t);}
+    Object.keys(cats).forEach(function(c){t.cats[c]=(t.cats[c]||[]).concat(cats[c]);});
+  }
+  var combined=(st.combinedName||'').trim()||'Imported checklist';
+  if(st.layout==='single'){
+    var all={};
+    on.forEach(function(m){
+      var c=_impBuildCats(_impParseRows(st,m,_impCatName(m)),m.columns.score,m.columns.notes,st.scale,!isTpl);
+      Object.keys(c).forEach(function(k){all[k]=(all[k]||[]).concat(c[k]);});
+    });
+    add(combined,all,st.meta);
+  }else if(st.layout==='matrix'){
+    on.forEach(function(m){
+      var p=_impParseRows(st,m,null);
+      if(isTpl){add(combined,_impBuildCats(p,null,null,st.scale,false),{});return;}
+      m.matrix.forEach(function(x){
+        if(x.on&&x.score!=null)add(x.name.trim()||'Supplier',_impBuildCats(p,x.score,x.notes,st.scale,true),{date:m.date,auditor:m.auditor});
+      });
+    });
+  }else{
+    on.forEach(function(m){
+      add((m.name||'').trim()||m.sheet,_impBuildCats(_impParseRows(st,m,null),m.columns.score,m.columns.notes,st.scale,!isTpl),{date:m.date,auditor:m.auditor});
+    });
+  }
+  return out;
+}
+// Every distinct non-numeric score in the selected sheets, plus the numeric range.
+function _impTextValues(st){
+  var map={},lo=null,hi=null;
+  st.sheets.forEach(function(m){
+    if(!m.isChecklist||!m.on)return;
+    var cols=_impScoreCols(st,m);if(!cols.length)return;
+    _impParseRows(st,m,st.layout==='single'?_impCatName(m):null).forEach(function(p){
+      cols.forEach(function(c){
+        var raw=p.row[c];if(raw==null||raw instanceof Date)return;
+        var s=String(raw).trim();if(!s)return;
+        var n=_impNum(raw);
+        if(isFinite(n)){lo=lo==null?n:Math.min(lo,n);hi=hi==null?n:Math.max(hi,n);return;}
+        var k=_normTxt(s);
+        if(!map[k])map[k]={key:k,label:s,count:0};
+        map[k].count++;
+      });
+    });
+  });
+  return {text:Object.keys(map).map(function(k){return map[k];}).sort(function(a,b){return b.count-a.count;}),lo:lo,hi:hi};
+}
+
+// ── Dialog ──
+function _impBadgeHtml(name,isTpl){
+  name=(name||'').trim();
+  var ex=isTpl?templates.some(function(t){return t.name===_tplImportName(name);}):suppliers.some(function(s){return s.name===name;});
+  var txt=isTpl?(ex?'Checklist exists — you choose: replace or keep both':'New checklist')
+               :(ex?'Existing supplier — added as a new assessment':'New supplier');
+  return '<span style="font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap;background:'+(ex?'var(--bg2)':'var(--good-bg)')+';color:'+(ex?'var(--warn)':'var(--good)')+';border:1px solid '+(ex?'var(--warn)':'transparent')+'">'+txt+'</span>';
+}
+function _impSetBadge(id,name){var el=document.getElementById(id);if(el)el.innerHTML=_impBadgeHtml(name,getImportMode()==='template');}
+function _impRe(){renderAiImportModal();}
+function aiImpMode(v){_importMode=v;_impRe();}
+function setAiImportLayout(v){_aiImportState.layout=v;_impRe();}
+function aiImpCol(i,f,v){_aiImportState.sheets[i].columns[f]=_colIdx(v);_impRe();}
+function aiImpRubric(i,lvl,v){
+  var m=_aiImportState.sheets[i];
+  if(!m.rubric)m.rubric={0:null,1:null,2:null,3:null,4:null,5:null};
+  m.rubric[lvl]=_colIdx(v);
+  if(![0,1,2,3,4,5].some(function(s){return m.rubric[s]!=null;}))m.rubric=null;
+  _impRe();
+}
+// re=true re-renders (selects, checkboxes); text fields only update state, so a
+// click on "Import" right after typing is never swallowed by a re-render.
+function aiImpSheet(i,f,v,re){
+  var m=_aiImportState.sheets[i];m[f]=v;
+  if(re){_impRe();return;}
+  if(f==='name')_impSetBadge('aiimp_b_'+i,v);
+}
+function aiImpInclude(i){var m=_aiImportState.sheets[i];m.isChecklist=true;m.on=true;_impRe();}
+function aiImpMx(i,j,f,v,re){
+  var x=_aiImportState.sheets[i].matrix[j];
+  x[f]=(f==='score'||f==='notes')?_colIdx(v):v;
+  if(re){_impRe();return;}
+  if(f==='name')_impSetBadge('aiimp_b_'+i+'_'+j,v);
+}
+function aiImpMxAdd(i){_aiImportState.sheets[i].matrix.push({on:true,name:'Supplier '+(_aiImportState.sheets[i].matrix.length+1),score:null,notes:null});_impRe();}
+function aiImpTop(f,v){
+  var st=_aiImportState;
+  if(f==='combinedName'){st.combinedName=v;_impSetBadge('aiimp_b_top',v);}
+  else st.meta[f]=v;
+}
+function aiImpScale(v){var p=String(v).split('|');_aiImportState.scale.min=Number(p[0]);_aiImportState.scale.max=Number(p[1]);_impRe();}
+function aiImpText(idx,v){
+  var st=_aiImportState,t=st._tv[idx];if(!t)return;
+  st.scale.text[t.key]=v==='N.A.'?'N.A.':(v===''?'':Number(v));
+  _impRe();
+}
+
+function _impScaleHtml(st){
+  var tv=_impTextValues(st);st._tv=tv.text;
+  var sc=st.scale;
+  var presets=[[0,5],[1,5],[0,3],[0,4],[1,4],[0,10],[1,10],[0,100]];
+  if(!presets.some(function(p){return p[0]===sc.min&&p[1]===sc.max;}))presets.push([sc.min,sc.max]);
+  function lab(p){return p[0]+' – '+p[1]+(p[0]===0&&p[1]===5?' (same as the tool)':p[0]===0&&p[1]===10?' (e.g. VDA 6.3)':p[0]===0&&p[1]===100?' (percent)':'');}
+  var h='<div style="border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:14px">'
+    +'<div style="font-size:12.5px;font-weight:700;margin-bottom:8px"><i class="ti ti-adjustments-horizontal" style="color:var(--text3)"></i> Score scale</div>'
+    +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--text2)">Scale in the file '
+      +'<select onchange="aiImpScale(this.value)" style="'+_IMP_SEL+';font-size:12px">'
+        +presets.map(function(p){return '<option value="'+p[0]+'|'+p[1]+'"'+(p[0]===sc.min&&p[1]===sc.max?' selected':'')+'>'+lab(p)+'</option>';}).join('')
+      +'</select> → converted to the tool’s 0 – 5'
+      +(tv.lo!=null?'<span style="color:var(--text3)">· numbers found in the file: '+tv.lo+' – '+tv.hi+'</span>':'')
+    +'</div>';
+  if(tv.hi!=null&&(tv.hi>sc.max||tv.lo<sc.min))
+    h+='<div style="font-size:11.5px;color:var(--warn);margin-top:6px"><i class="ti ti-alert-triangle"></i> Some numbers lie outside '+sc.min+' – '+sc.max+'. They are capped at 0 or 5 — check the scale.</div>';
+  if(tv.text.length){
+    var unknown=0;
+    h+='<div style="font-size:11px;font-weight:600;color:var(--text2);margin:10px 0 4px">Text ratings found in the file</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px">'
+      +tv.text.map(function(t,idx){
+        var v=_impTextVal(t.key,sc);if(v===undefined)unknown++;
+        var opts=[['','not scored'],['N.A.','N.A.'],['0','0'],['1','1'],['2','2'],['3','3'],['4','4'],['5','5']];
+        var cur=v===undefined?'':String(v);
+        return '<div style="display:flex;align-items:center;gap:6px;font-size:12px;padding:4px 8px;border:1px solid '+(v===undefined?'var(--warn)':'var(--border)')+';border-radius:6px">'
+          +'<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(t.label)+'">“'+esc(t.label)+'” <span style="color:var(--text3)">×'+t.count+'</span></span>'
+          +'<select onchange="aiImpText('+idx+',this.value)" style="'+_IMP_SEL+'">'+opts.map(function(o){return '<option value="'+o[0]+'"'+(cur===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>'
+        +'</div>';
+      }).join('')+'</div>';
+    if(unknown)h+='<div style="font-size:11.5px;color:var(--warn);margin-top:6px"><i class="ti ti-alert-triangle"></i> '+unknown+' value'+(unknown!==1?'s':'')+' not recognised — '+(unknown!==1?'they stay':'it stays')+' unscored unless you assign a score.</div>';
+  }
+  return h+'</div>';
+}
+
+function _impSheetCard(st,m,i,isTpl){
+  var single=st.layout==='single',matrix=st.layout==='matrix';
+  var rows=st.rows[m.sheet]||[];
+  var width=0;rows.forEach(function(r){if(r&&r.length>width)width=r.length;});width=Math.min(width,80);
+  var hdr=rows[m.headerRow]||[];
+  function colSel(val,onch){
+    var o='<select onchange="'+onch+'" style="'+_IMP_SEL+'"><option value="">— none —</option>';
+    for(var c=0;c<width;c++){
+      var lab=_cellText(hdr[c]);
+      o+='<option value="'+c+'"'+(val===c?' selected':'')+'>'+XLSX.utils.encode_col(c)+(lab?' · '+esc(lab.slice(0,28)):'')+'</option>';
+    }
+    return o+'</select>';
+  }
+  function field(label,html){return '<div style="min-width:0"><div style="font-size:10px;color:var(--text2);margin-bottom:2px;text-transform:uppercase;letter-spacing:.03em">'+label+'</div>'+html+'</div>';}
+  var hrOpts='';
+  for(var r=0;r<Math.min(rows.length,60);r++){
+    var first=(rows[r]||[]).map(_cellText).filter(Boolean).slice(0,3).join(' · ');
+    hrOpts+='<option value="'+r+'"'+(r===m.headerRow?' selected':'')+'>Row '+(r+1)+(first?' · '+esc(first.slice(0,34)):'')+'</option>';
+  }
+  var secOpts=[['none','None'],['noNumber','Rows without a number'],['topLevelNumber','Top-level numbers (1, 2 …)']];
+  var grid='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:8px">'
+    +field('Header row','<select onchange="aiImpSheet('+i+',\'headerRow\',parseInt(this.value,10),true)" style="'+_IMP_SEL+'">'+hrOpts+'</select>')
+    +(single?'':field('Category col',colSel(m.columns.category,'aiImpCol('+i+',\'category\',this.value)')))
+    +field('No. col',colSel(m.columns.no,'aiImpCol('+i+',\'no\',this.value)'))
+    +field('Checkpoint col',colSel(m.columns.checkpoint,'aiImpCol('+i+',\'checkpoint\',this.value)'))
+    +(matrix||isTpl?'':field('Score col',colSel(m.columns.score,'aiImpCol('+i+',\'score\',this.value)')))
+    +(matrix||isTpl?'':field('Notes col',colSel(m.columns.notes,'aiImpCol('+i+',\'notes\',this.value)')))
+    +field('Weight col',colSel(m.columns.weight,'aiImpCol('+i+',\'weight\',this.value)'))
+    +field('Headings in checkpoint col','<select onchange="aiImpSheet('+i+',\'sections\',this.value,true)" style="'+_IMP_SEL+'">'+secOpts.map(function(o){return '<option value="'+o[0]+'"'+(m.sections===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>')
+  +'</div>';
+  var rbSet=m.rubric?[0,1,2,3,4,5].filter(function(s){return m.rubric[s]!=null;}).length:0;
+  var rubric='<details ontoggle="_aiImportState.sheets['+i+']._rbOpen=this.open"'+(m._rbOpen?' open':'')+' style="margin-bottom:8px">'
+    +'<summary style="font-size:11.5px;color:var(--text2);cursor:pointer">Scoring criteria columns (what each score 0–5 means)'+(rbSet?' · <b>'+rbSet+' mapped</b>':'')+'</summary>'
+    +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-top:6px">'
+      +[0,1,2,3,4,5].map(function(s){return field('Score '+s,colSel(m.rubric?m.rubric[s]:null,'aiImpRubric('+i+','+s+',this.value)'));}).join('')
+    +'</div></details>';
+  // Supplier columns of a comparison matrix
+  var mx='';
+  if(matrix&&!isTpl){
+    mx='<div style="font-size:11px;font-weight:600;color:var(--text2);margin:2px 0 4px">Supplier columns</div>'
+      +(m.matrix.length?'':'<div style="font-size:11.5px;color:var(--warn);margin-bottom:4px">No supplier columns on this sheet — add one, or switch the layout.</div>')
+      +m.matrix.map(function(x,j){
+        return '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:5px 0;border-top:1px solid var(--border-soft,var(--border))">'
+          +'<input type="checkbox"'+(x.on?' checked':'')+' onchange="aiImpMx('+i+','+j+',\'on\',this.checked,true)" style="width:15px;height:15px;cursor:pointer">'
+          +'<input type="text" value="'+esc(x.name)+'" oninput="aiImpMx('+i+','+j+',\'name\',this.value)" style="'+_IMP_INP+';width:170px" title="Supplier name">'
+          +'<span style="font-size:10.5px;color:var(--text2)">Score</span>'+colSel(x.score,'aiImpMx('+i+','+j+',\'score\',this.value,true)')
+          +'<span style="font-size:10.5px;color:var(--text2)">Notes</span>'+colSel(x.notes,'aiImpMx('+i+','+j+',\'notes\',this.value,true)')
+          +'<span id="aiimp_b_'+i+'_'+j+'">'+_impBadgeHtml(x.name,false)+'</span>'
+        +'</div>';
       }).join('')
-      +'</tbody></table></div>';
-    var nameField=single
-      ?'<div style="font-size:11px;color:var(--text2)">Category: <input type="text" value="'+esc(m.categoryName||m.sheet)+'" onchange="_aiImportState.mapping['+mapping.indexOf(m)+'].categoryName=this.value" style="border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:11px;border-radius:4px;padding:2px 6px;width:200px"></div>'
-      :'<div style="font-size:11px;color:var(--text2)">Supplier name: <input type="text" value="'+esc(m.supplierName||m.sheet)+'" onchange="_aiImportState.mapping['+mapping.indexOf(m)+'].supplierName=this.value" style="border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:11px;border-radius:4px;padding:2px 6px;width:180px"></div>';
-    return '<div style="border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden">'
-      +'<div style="background:var(--bg2);padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
-        +'<input type="checkbox" id="ais_'+mi+'" checked style="width:16px;height:16px;cursor:pointer">'
-        +'<div style="flex:1;min-width:0">'
-          +'<div style="font-size:13px;font-weight:700"><i class="ti ti-table" style="color:var(--text3);font-size:12px;margin-right:4px"></i>'+esc(m.sheet)+'</div>'
-          +nameField
-        +'</div>'
-      +'</div>'
-      +'<div style="padding:10px 14px">'
-        +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:8px">'
-          +(single?'':'<div><div style="font-size:10px;color:var(--text2);margin-bottom:2px">CATEGORY COL</div>'+colOpt('category')+'</div>')
-          +'<div><div style="font-size:10px;color:var(--text2);margin-bottom:2px">NO. COL</div>'+colOpt('no')+'</div>'
-          +'<div><div style="font-size:10px;color:var(--text2);margin-bottom:2px">CHECKPOINT COL</div>'+colOpt('checkpoint')+'</div>'
-          +'<div><div style="font-size:10px;color:var(--text2);margin-bottom:2px">SCORE COL</div>'+colOpt('score')+'</div>'
-          +'<div><div style="font-size:10px;color:var(--text2);margin-bottom:2px">NOTES COL</div>'+colOpt('notes')+'</div>'
-        +'</div>'
-        +'<div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px">Preview (first 3 data rows):</div>'
-        +previewTable
-      +'</div>'
-      +'</div>';
-  }).join('');
-  var btnLabel=single?'Confirm & Import as one checklist':'Confirm & Import';
-  h+='<button class="btn primary" onclick="confirmAiImport()" style="width:100%;margin-top:8px;font-size:14px"><i class="ti ti-check"></i> '+btnLabel+'</button>';
+      +'<button class="btn sm" onclick="aiImpMxAdd('+i+')" style="margin:4px 0 8px"><i class="ti ti-plus"></i> Add supplier column</button>';
+  }
+  // Live preview through the real parser
+  var parsed=_impParseRows(st,m,single?_impCatName(m):null);
+  var catN={};parsed.forEach(function(p){catN[p.cat]=1;});
+  var sCols=isTpl?[]:(matrix?m.matrix.filter(function(x){return x.on&&x.score!=null;}).slice(0,3)
+    :(m.columns.score!=null?[{name:'Score',score:m.columns.score}]:[]));
+  var scored=0;
+  if(!matrix&&sCols.length)parsed.forEach(function(p){if(_impScore(p.row[sCols[0].score],st.scale).v!=null)scored++;});
+  var th='padding:4px 6px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-weight:600;text-align:left';
+  var td='padding:3px 6px;border:1px solid var(--border);vertical-align:top';
+  function scoreCell(raw){
+    var r=_impScore(raw,st.scale),rt=_cellText(raw);
+    if(r.unknown)return '<span style="color:var(--warn)">'+esc(rt.slice(0,12))+' → ?</span>';
+    if(r.v==null)return '<span style="color:var(--text3)">—</span>';
+    return (rt!==String(r.v)?'<span style="color:var(--text3)">'+esc(rt.slice(0,10))+' → </span>':'')+'<b>'+r.v+'</b>';
+  }
+  var showNotes=!matrix&&!isTpl&&m.columns.notes!=null,showW=m.columns.weight!=null;
+  var preview=!parsed.length
+    ?'<div style="font-size:12px;color:var(--warn);padding:6px 0"><i class="ti ti-alert-triangle"></i> No checkpoints found — check the header row and the checkpoint column.</div>'
+    :'<div style="font-size:11.5px;color:var(--text2);margin-bottom:4px"><b>'+parsed.length+'</b> checkpoints · <b>'+Object.keys(catN).length+'</b> categor'+(Object.keys(catN).length===1?'y':'ies')
+      +(!matrix&&sCols.length?' · <b>'+scored+'</b> scored':'')+(rbSet?' · with scoring criteria':'')+'</div>'
+     +'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr>'
+      +'<th style="'+th+'">Category</th><th style="'+th+'">#</th><th style="'+th+'">Checkpoint</th>'
+      +sCols.map(function(x){return '<th style="'+th+'">'+esc((x.name||'Score').slice(0,16))+'</th>';}).join('')
+      +(showNotes?'<th style="'+th+'">Notes</th>':'')+(showW?'<th style="'+th+'">Weight</th>':'')
+     +'</tr></thead><tbody>'
+     +parsed.slice(0,5).map(function(p){
+        return '<tr><td style="'+td+'">'+esc(p.cat.slice(0,24))+'</td><td style="'+td+'">'+esc(p.no)+'</td><td style="'+td+'">'+esc(p.checkpoint.slice(0,60))+'</td>'
+          +sCols.map(function(x){return '<td style="'+td+';white-space:nowrap">'+scoreCell(p.row[x.score])+'</td>';}).join('')
+          +(showNotes?'<td style="'+td+'">'+esc(_cellText(p.row[m.columns.notes]).slice(0,30))+'</td>':'')
+          +(showW?'<td style="'+td+'">'+p.weight+'</td>':'')+'</tr>';
+      }).join('')+'</tbody></table></div>';
+  // Name / date / auditor of this sheet
+  var head;
+  if(single)head='<div style="font-size:11px;color:var(--text2)">Category: <input type="text" value="'+esc(m.catName)+'" oninput="aiImpSheet('+i+',\'catName\',this.value)" style="'+_IMP_INP+';width:200px"></div>';
+  else if(matrix)head='';
+  else head='<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--text2)">'+(isTpl?'Checklist':'Supplier')+': <input type="text" value="'+esc(m.name)+'" oninput="aiImpSheet('+i+',\'name\',this.value)" style="'+_IMP_INP+';width:190px"> <span id="aiimp_b_'+i+'">'+_impBadgeHtml(m.name,isTpl)+'</span></div>';
+  var meta=(!single&&!isTpl)
+    ?'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--text2);margin-bottom:8px">Assessment date <input type="date" value="'+esc(m.date)+'" oninput="aiImpSheet('+i+',\'date\',this.value)" style="'+_IMP_INP+'">'
+      +' Auditor <input type="text" value="'+esc(m.auditor)+'" oninput="aiImpSheet('+i+',\'auditor\',this.value)" placeholder="optional" style="'+_IMP_INP+';width:150px"></div>'
+    :'';
+  return '<div style="border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden'+(m.on?'':';opacity:.55')+'">'
+    +'<div style="background:var(--bg2);padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
+      +'<input type="checkbox"'+(m.on?' checked':'')+' onchange="aiImpSheet('+i+',\'on\',this.checked,true)" style="width:16px;height:16px;cursor:pointer" title="Import this sheet">'
+      +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;margin-bottom:3px"><i class="ti ti-table" style="color:var(--text3);font-size:12px;margin-right:4px"></i>'+esc(m.sheet)+'</div>'+head+'</div>'
+    +'</div>'
+    +(m.on?'<div style="padding:10px 14px">'+meta+grid+rubric+mx+preview+'</div>':'')
+  +'</div>';
+}
+
+function renderAiImportModal(){
+  var st=_aiImportState;if(!st)return;
+  var isTpl=getImportMode()==='template',single=st.layout==='single',matrix=st.layout==='matrix';
+  var prevBody=document.querySelector('#aiModal .aiimp-body'),keepTop=prevBody?prevBody.scrollTop:0;
+  var audit=[],skipped=[];
+  st.sheets.forEach(function(m,i){(m.isChecklist?audit:skipped).push(i);});
+  function seg(cur,val,label,sub,fn){
+    var on=cur===val;
+    return '<button onclick="'+fn+'(\''+val+'\')" style="flex:1;min-width:150px;text-align:left;padding:9px 12px;border:none;cursor:pointer;background:'+(on?'var(--primary)':'var(--bg)')+';color:'+(on?'var(--on-primary)':'var(--text)')+'">'
+      +'<div style="font-size:12.5px;font-weight:700">'+label+'</div>'+(sub?'<div style="font-size:10.5px;opacity:.85;margin-top:1px">'+sub+'</div>':'')+'</button>';
+  }
+  function segWrap(inner){return '<div style="display:flex;flex-wrap:wrap;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:12px">'+inner+'</div>';}
+  function kicker(t){return '<div style="margin-bottom:6px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--text3)">'+t+'</div>';}
+  var h='<div style="margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">'
+    +'<span style="background:var(--good-bg);color:var(--good);font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px"><i class="ti ti-check"></i> '+audit.length+' checklist sheet'+(audit.length!==1?'s':'')+' detected</span>'
+    +skipped.map(function(i){var m=st.sheets[i];
+      return '<span style="background:var(--bg2);color:var(--text2);font-size:11.5px;padding:3px 4px 3px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:6px" title="'+esc(m.reason||'')+'"><i class="ti ti-ban"></i> '+esc(m.sheet)+(m.reason?' <span style="color:var(--text3)">— '+esc(m.reason.slice(0,40))+'</span>':'')
+        +'<button onclick="aiImpInclude('+i+')" style="border:1px solid var(--border);background:var(--bg);color:var(--text);border-radius:20px;font-size:11px;padding:1px 8px;cursor:pointer">Include</button></span>';
+    }).join('')
+  +'</div>';
+  h+=kicker('Import as')+segWrap(
+      seg(isTpl?'template':'supplier','supplier','Supplier assessment','With scores — one assessment per supplier','aiImpMode')
+     +'<span style="width:1px;background:var(--border)"></span>'
+     +seg(isTpl?'template':'supplier','template','Checklist template','Structure only — scores are ignored','aiImpMode'));
+  h+=kicker('These sheets are…')+segWrap(
+      seg(st.layout,'single','Categories of one checklist','Each sheet name becomes a category','setAiImportLayout')
+     +'<span style="width:1px;background:var(--border)"></span>'
+     +seg(st.layout,'multiple','Separate checklists','Each sheet is its own '+(isTpl?'checklist':'supplier'),'setAiImportLayout')
+     +'<span style="width:1px;background:var(--border)"></span>'
+     +seg(st.layout,'matrix','Supplier comparison','One list, a score column per supplier','setAiImportLayout'));
+  if(single||(matrix&&isTpl)){
+    h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 10px">'
+      +'<span style="font-size:12px;font-weight:600;color:var(--text2)">'+(isTpl?'Checklist':'Supplier')+' name:</span>'
+      +'<input type="text" value="'+esc(st.combinedName)+'" oninput="aiImpTop(\'combinedName\',this.value)" style="'+_IMP_INP+';flex:1;max-width:300px;font-size:13px">'
+      +'<span id="aiimp_b_top">'+_impBadgeHtml(st.combinedName,isTpl)+'</span></div>';
+    if(single&&!isTpl)h+='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--text2);margin-bottom:14px">Assessment date <input type="date" value="'+esc(st.meta.date)+'" oninput="aiImpTop(\'date\',this.value)" style="'+_IMP_INP+'">'
+      +' Auditor <input type="text" value="'+esc(st.meta.auditor)+'" oninput="aiImpTop(\'auditor\',this.value)" placeholder="optional" style="'+_IMP_INP+';width:160px"></div>';
+  }
+  var anyScore=!isTpl&&audit.some(function(i){var m=st.sheets[i];return m.on&&_impScoreCols(st,m).length;});
+  if(anyScore)h+=_impScaleHtml(st);
+  if(!audit.length)h+='<div style="color:var(--text2);font-size:13px;padding:12px 0">No checklist sheets detected. Use <b>Include</b> on a sheet above if the AI missed it.</div>';
+  h+=audit.map(function(i){return _impSheetCard(st,st.sheets[i],i,isTpl);}).join('');
+  var n=_impTargets(st).length;
+  var btnLabel=isTpl?'Import '+n+' checklist'+(n!==1?'s':''):'Import '+n+' assessment'+(n!==1?'s':'');
+  h+='<div style="font-size:11.5px;color:var(--text3);margin-top:4px">'+(isTpl?'':'Existing suppliers keep all their data — the import is added as a new assessment. ')+'Assessment dates default to today when none is set.</div>'
+    +'<button class="btn primary" onclick="confirmAiImport()"'+(n?'':' disabled')+' style="width:100%;margin-top:10px;font-size:14px"><i class="ti ti-check"></i> '+btnLabel+'</button>';
   var ex=document.getElementById('aiModal');if(ex)ex.remove();
   var mo=document.createElement('div');mo.id='aiModal';
   mo.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:3000;display:flex;align-items:flex-end;justify-content:center;padding:16px';
-  mo.innerHTML='<div style="background:var(--bg);border-radius:16px 16px 12px 12px;width:100%;max-width:780px;max-height:90vh;display:flex;flex-direction:column;box-shadow:var(--shadow-lg)">'
+  mo.innerHTML='<div style="background:var(--bg);border-radius:16px 16px 12px 12px;width:100%;max-width:860px;max-height:90vh;display:flex;flex-direction:column;box-shadow:var(--shadow-lg)">'
     +'<div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0">'
-      +'<div style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700"><i class="ti ti-sparkles" style="color:var(--primary-fg)"></i>AI Import — '+esc(filename)+'</div>'
+      +'<div style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;min-width:0"><i class="ti ti-sparkles" style="color:var(--primary-fg)"></i><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">AI Import — '+esc(st.filename)+'</span></div>'
       +'<button onclick="document.getElementById(\'aiModal\').remove()" style="background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px"><i class="ti ti-x"></i></button>'
     +'</div>'
-    +'<div style="padding:20px;overflow-y:auto">'+h+'</div>'
+    +'<div class="aiimp-body" style="padding:20px;overflow-y:auto">'+h+'</div>'
   +'</div>';
   mo.onclick=function(e){if(e.target===mo)mo.remove();};
   document.body.appendChild(mo);
+  var body=mo.querySelector('.aiimp-body');if(body)body.scrollTop=keepTop;
 }
 
-// Parse one sheet's rows into checkpoint objects grouped by category. In
-// "single" layout every checkpoint on the sheet goes under one fixed category
-// (the sheet's category name); otherwise categories are tracked from the
-// category column, falling back to the sheet name.
-function _aiSheetToCats(wb,m,forcedCat){
-  var cols=m.columns||{};
-  if(cols.checkpoint==null)return {};
-  var allRows=XLSX.utils.sheet_to_json(wb.Sheets[m.sheet],{header:1,defval:null});
-  var hRow=m.headerRow||0;
-  var cats={};
-  var currentCat=forcedCat||m.sheet;
-  for(var i=hRow+1;i<allRows.length;i++){
-    var r=allRows[i];
-    var cp=r[cols.checkpoint];
-    if(!cp||!String(cp).trim())continue;
-    if(!forcedCat&&cols.category!=null&&r[cols.category]!=null&&String(r[cols.category]).trim())
-      currentCat=String(r[cols.category]).trim();
-    var raw=cols.score!=null?r[cols.score]:null;
-    var score=null;
-    if(raw!=null){var sv=String(raw).trim().toUpperCase();if(['N.A.','NA','N/A'].includes(sv))score='N.A.';else if(!isNaN(Number(raw)))score=Number(raw);}
-    var no=cols.no!=null&&r[cols.no]!=null?r[cols.no]:(i-hRow);
-    var notes=cols.notes!=null&&r[cols.notes]!=null?String(r[cols.notes]):'';
-    if(!cats[currentCat])cats[currentCat]=[];
-    cats[currentCat].push({no:no,checkpoint:String(cp).trim(),score:score,notes:notes,rubric:null});
-  }
-  return cats;
-}
-function confirmAiImport(){
-  var st=_aiImportState;
-  var wb=st.wb, mapping=st.mapping;
-  var auditSheets=mapping.filter(function(m){return m.isAudit;});
-  var isTemplate=(getImportMode()==='template');
-  var mo=document.getElementById('aiModal');
-
-  if(st.layout==='single'){
-    // All selected sheets combine into ONE checklist; each sheet = one category.
-    var combined={};
-    auditSheets.forEach(function(m,mi){
-      var cb=document.getElementById('ais_'+mi);
-      if(cb&&!cb.checked)return;
-      var catName=((m.categoryName||m.sheet)||'').trim()||m.sheet;
-      var one=_aiSheetToCats(wb,m,catName);
-      Object.keys(one).forEach(function(c){
-        combined[c]=(combined[c]||[]).concat(one[c]);
-      });
-    });
-    if(!Object.keys(combined).length){if(mo)mo.remove();setStatus('Nothing imported — check the checkpoint column mapping.');return;}
-    var name=(st.combinedName||'Imported checklist').trim()||'Imported checklist';
-    if(isTemplate){
-      ensureTemplateFromImport(name,combined);
-    } else {
-      var sup={name:name,categories:combined,rounds:[{id:roundIdCounter++,label:'AI Import — '+new Date().toISOString().slice(0,10),templateName:'',createdAt:new Date().toISOString().slice(0,10),categories:combined}]};
-      sup.activeRoundId=sup.rounds[0].id;
-      var exIdx=suppliers.findIndex(function(s){return s.name===name;});
-      if(exIdx>=0)suppliers[exIdx]=sup;else suppliers.push(sup);
-    }
-    initWeights(Object.keys(combined));
-    if(mo)mo.remove();
-    renderSuppliersList();
-    var catCount=Object.keys(combined).length;
-    if(isTemplate){
-      switchNewTab('builder',document.getElementById('ntab-builder'));
-      setStatus('AI Import: <strong>1 checklist</strong> ('+catCount+' categories) as template — editable in Template Builder');
-      toast('Imported 1 checklist ('+catCount+' categories)');
-    } else {
-      setStatus('AI Import complete: <strong>1 supplier</strong> ('+catCount+' categories) imported');
-      toast('Imported 1 supplier ('+catCount+' categories)');
-    }
-    return;
-  }
-
-  // Multiple layout — each sheet becomes its own checklist / supplier.
-  var imported=0;
-  auditSheets.forEach(function(m,mi){
-    var cb=document.getElementById('ais_'+mi);
-    if(cb&&!cb.checked)return;
-    var cats=_aiSheetToCats(wb,m,null);
-    if(!Object.keys(cats).length)return;
-    var supName=m.supplierName||m.sheet;
-    if(isTemplate){
-      ensureTemplateFromImport(supName,cats);
-    } else {
-      var sup={name:supName,categories:cats,rounds:[{id:roundIdCounter++,label:'AI Import — '+new Date().toISOString().slice(0,10),templateName:'',createdAt:new Date().toISOString().slice(0,10),categories:cats}]};
-      sup.activeRoundId=sup.rounds[0].id;
-      var idx=suppliers.findIndex(function(s){return s.name===supName;});
-      if(idx>=0)suppliers[idx]=sup;else suppliers.push(sup);
-    }
-    initWeights(Object.keys(cats));
-    imported++;
+async function confirmAiImport(){
+  var st=_aiImportState;if(!st)return;
+  var isTpl=getImportMode()==='template';
+  var targets=_impTargets(st);
+  if(!targets.length){uiAlert('Nothing to import — check that a checkpoint column is selected.');return;}
+  var keepBoth=isTpl?await askTemplateConflict(targets.map(function(t){return t.name;})):false;
+  var mo=document.getElementById('aiModal');if(mo)mo.remove();
+  var created=0,added=0,cats=0;
+  targets.forEach(function(t){
+    cats+=Object.keys(t.cats).length;
+    if(isTpl){ensureTemplateFromImport(t.name,t.cats,keepBoth);created++;}
+    else{var r=importAssessmentRound(t.name,t.cats,{date:t.date,auditor:t.auditor,label:'AI Import'});if(r.isNew)created++;else added++;}
   });
-  if(mo)mo.remove();
+  _aiImportState=null;
   renderSuppliersList();
-  if(isTemplate){
+  if(isTpl){
     switchNewTab('builder',document.getElementById('ntab-builder'));
-    setStatus('AI Import: <strong>'+imported+' checklist(s) as template</strong> — editable in Template Builder');
-    toast('Imported '+imported+' checklist'+(imported!==1?'s':'')+' as template(s)');
-  } else {
-    setStatus('AI Import complete: <strong>'+imported+' supplier'+(imported!==1?'s':'')+' imported</strong>');
-    toast('Imported '+imported+' supplier'+(imported!==1?'s':''));
+    setStatus('AI Import: <strong>'+created+' checklist'+(created!==1?'s':'')+'</strong> ('+cats+' categories) — editable in Template Builder');
+    toast('Imported '+created+' checklist'+(created!==1?'s':''));
+  }else{
+    var parts=[];
+    if(created)parts.push(created+' new supplier'+(created!==1?'s':''));
+    if(added)parts.push(added+' assessment'+(added!==1?'s':'')+' added to existing supplier'+(added!==1?'s':''));
+    setStatus('AI Import complete: <strong>'+parts.join(', ')+'</strong>');
+    toast('Imported: '+parts.join(', '));
   }
 }
 // ── End AI Import ────────────────────────────────────────────────────────────
 
 // Derive an editable checklist template from an imported supplier structure (scores/notes stripped)
-function ensureTemplateFromImport(name, cats){
+function ensureTemplateFromImport(name,cats,keepBoth){
   if(!cats||!Object.keys(cats).length)return;
   var tplCats={};
   Object.keys(cats).forEach(function(c){
     tplCats[c]=(cats[c]||[]).map(function(it,i){return {no:it.no||(i+1),cid:it.cid,checkpoint:it.checkpoint||'',weight:(it.weight!==undefined?it.weight:1),rubric:it.rubric||null};});
   });
-  var tplName=(name||'Import')+' (Checklist)';
+  _assignCids(tplCats);
+  var tplName=_tplImportName(name);
+  if(keepBoth){var base=tplName,n=2;while(templates.some(function(t){return t.name===tplName;}))tplName=base+' '+(n++);}
   var tpl={name:tplName,categories:tplCats};
   var ti=templates.findIndex(function(t){return t.name===tplName;});
   if(ti>=0)templates[ti]=tpl;else templates.push(tpl);
@@ -4037,7 +4552,7 @@ function renderActions(){
       var pc=a.priority==='High'?'var(--crit)':a.priority==='Medium'?'var(--warn)':'var(--text3)';
       var due=a.dueDate?new Date(a.dueDate):null;
       var isOverdue=due&&a.status!=='Done'&&due<today;
-      var dueStr=due?due.toLocaleDateString('de-DE'):'—';
+      var dueStr=due?due.toLocaleDateString('en-GB'):'—';
       if(isOverdue)dueStr='<span style="color:var(--crit);font-weight:600">'+dueStr+' ⚠</span>';
       var chk=_selActions.has(a.id);
       var cmpl=a.status==='Done'?actCompletion(a):null;
@@ -4373,7 +4888,7 @@ function renderActComments(){
   el.innerHTML=items.map(function(it){
     var c=it.c;
     var d=c.ts?new Date(c.ts):null;
-    var when=d?d.toLocaleDateString(lang==='de'?'de-DE':'en-GB')+' '+d.toLocaleTimeString(lang==='de'?'de-DE':'en-GB',{hour:'2-digit',minute:'2-digit'}):'';
+    var when=d?d.toLocaleDateString('en-GB')+' '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}):'';
     // Completion proof — highlighted, with its evidence files, and locked.
     if(c.kind==='completion'){
       var files=c.files||[];
@@ -5471,6 +5986,13 @@ function auRound(){
   if(!s)return null;
   return (s.rounds||[]).find(function(r){return r.id===_auState.roundId;})||null;
 }
+// A completed assessment is the official result — read-only until it is reopened.
+function auLocked(){var r=auRound();return !!(r&&r.status==='completed');}
+function roundIsLocked(sup,roundId){
+  var s=suppliers.find(function(x){return x.name===sup;});
+  var r=s&&roundId!=null?(s.rounds||[]).find(function(x){return x.id===roundId;}):null;
+  return !!(r&&r.status==='completed');
+}
 function auCats(){var r=auRound();return (r&&r.categories)||{};}
 
 function auFlat(source){
@@ -5553,7 +6075,7 @@ function auRender(){
       var col=AUDIT_STATUS_COLOR[round.status]||'var(--text2)';
       stTools.innerHTML='<span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:color-mix(in srgb,'+col+' 15%,transparent);color:'+col+'">'+AUDIT_STATUS[round.status]+'</span>'
         +(round.status==='completed'
-          ?'<button class="btn sm" onclick="reopenAudit(\''+esc(s.name).replace(/'/g,"\\'")+'\','+round.id+')"><i class="ti ti-lock-open"></i> Reopen</button>'
+          ?'<button class="btn sm primary" onclick="reopenAudit(\''+esc(s.name).replace(/'/g,"\\'")+'\','+round.id+')"><i class="ti ti-lock-open"></i> Reopen</button>'
           :(hasChecklist(round)?'<button class="btn sm primary" onclick="completeAudit(\''+esc(s.name).replace(/'/g,"\\'")+'\','+round.id+')"><i class="ti ti-check"></i> Complete assessment</button>':''))
         +(cmpEligibleRounds(s).length>=2
           ?'<button class="btn sm" onclick="goToComparePage(\''+esc(s.name).replace(/'/g,"\\'")+'\')" title="Compare with an earlier assessment"><i class="ti ti-git-compare"></i> Compare</button>'
@@ -5600,6 +6122,7 @@ function auRender(){
         +'</div></div>';
     }
     document.getElementById('auContent').innerHTML=_auState.view==='details'?supplierDetailsHtml(s.name,true):body;
+    document.getElementById('auContent').classList.remove('au-locked');
     return;
   }
   auRenderCoverage(s,flat,round);
@@ -5607,7 +6130,13 @@ function auRender(){
       _auState.view==='ledger'?auLedgerHtml(s,round)
     : _auState.view==='details'?supplierDetailsHtml(s.name,true)
     : auConsoleHtml(s,flat,round);
+  // Completed = read-only: edit controls go quiet, fields become read-only.
+  // Navigation, files (view/download) and tasks keep working.
+  var locked=auLocked(),auC=document.getElementById('auContent');
+  auC.classList.toggle('au-locked',locked);
+  if(locked)auC.querySelectorAll('.au-notes,.au-ni,#auGnNote').forEach(function(el){el.readOnly=true;});
   if(_auState.view==='console'){
+    auFitConsole();
     var active=document.querySelector('.au-cprow.on');
     if(active&&active.scrollIntoView)active.scrollIntoView({block:'nearest'});
   }
@@ -5679,7 +6208,9 @@ function auConsoleHtml(s,flat,round){
     var esSn=esc(s.name).replace(/'/g,"\\'");
     var rubricRows=[0,1,2,3,4,5].filter(function(v){return item.rubric&&item.rubric[v]&&String(item.rubric[v]).trim();});
     var files=item.files||[];
-    focus='<div class="au-focus">'
+    // Three parts: head (checkpoint + score buttons) and foot (Prev/Next) stay
+    // in view; only the body (criteria, notes, files, tasks) scrolls.
+    focus='<div class="au-focus"><div class="au-fhead">'
       +'<div class="au-kicker">'+esc(cur.cat)+' · Checkpoint '+posInCat+' of '+catLen+(item.weight!==undefined&&item.weight!==1?' · Weight '+item.weight:'')+'</div>'
       +'<h3>'+esc(item.checkpoint)+'</h3>'
       +'<div class="au-scorepick">'
@@ -5688,6 +6219,7 @@ function auConsoleHtml(s,flat,round){
         }).join('')
         +'<button class="au-sbtn na'+(item.score==='N.A.'?' sel':'')+'" onclick="auSetScore(\''+esCat+'\','+cur.idx+',\'N.A.\')">N.A.</button>'
       +'</div>'
+      +'</div><div class="au-fbody">'
       +(rubricRows.length
         ?'<div class="au-rubric">'+rubricRows.map(function(v){
             return '<div class="au-rr'+(String(item.score)===String(v)?' hot':'')+'" onclick="auSetScore(\''+esCat+'\','+cur.idx+','+v+')">'
@@ -5729,6 +6261,7 @@ function auConsoleHtml(s,flat,round){
           +'</div>')
       +'</div>'
       +cpTasksHtml(s.name,cur.cat,cur.idx,tasksForCheckpoint(s.name,cur.cat,item.checkpoint),{from:'assessment',roundId:round.id})
+      +'</div>'
       +'<div class="au-foot">'
         +'<span style="flex:1"></span>'
         +'<button class="btn" onclick="auNav(-1)"><i class="ti ti-arrow-left"></i> Prev</button>'
@@ -5742,6 +6275,21 @@ function auConsoleHtml(s,flat,round){
   +'</div>';
   return '<div class="au-console"><div class="au-rail">'+railHead+rail+'</div>'+focus+'</div>';
 }
+// Score view: give the console exactly the height left below its top edge, so
+// the page itself doesn't scroll and score buttons / Prev-Next stay visible.
+// Phones and narrow windows keep the stacked, page-scrolling layout.
+function auFitConsole(){
+  var c=document.querySelector('#page-audit .au-console');
+  if(!c)return;
+  if(window.innerWidth<=900){c.style.height='';return;}
+  var top=c.getBoundingClientRect().top+window.scrollY;
+  var h=Math.max(380,window.innerHeight-top-16);
+  c.style.height=h+'px';
+  // whatever still overflows (page padding below the console) comes off too
+  var extra=document.documentElement.scrollHeight-window.innerHeight;
+  if(extra>0&&extra<200)c.style.height=Math.max(380,h-extra)+'px';
+}
+window.addEventListener('resize',function(){if(_currentPage==='audit'&&_auState.view==='console')auFitConsole();});
 // Collapse or expand every category in the Score rail at once.
 function auCollapseAll(collapse){
   var cats=auCats()||{};
@@ -5871,7 +6419,7 @@ function auToggleCrit(key){
 }
 // Row-scoped "Improve note with AI" for Table view — same wording/behavior as the
 // Console's auImproveNote, but keyed per-row since many rows can be open at once.
-function auImproveNoteLedger(cat,idx){
+function auImproveNoteLedger(cat,idx){if(auLocked())return;
   var item=auCats()[cat]&&auCats()[cat][idx];
   if(!item)return;
   var key=auLedgerKey(cat,idx);
@@ -5893,7 +6441,7 @@ function auImproveNoteLedger(cat,idx){
     function(loading){if(btn){var ic=btn.querySelector('.nt-ic');if(ic){ic.className=loading?'ti ti-loader nt-ic':'ti ti-wand nt-ic';ic.style.animation=loading?'spin 1s linear infinite':'';}var lbl=btn.querySelector('.nt-label');if(lbl)lbl.textContent=loading?'Improving…':'Improve';btn.disabled=loading;btn.title=loading?'Generating...':'Improve note with AI';}}
   );
 }
-function auAcceptAiNoteLedger(cat,idx){
+function auAcceptAiNoteLedger(cat,idx){if(auLocked())return;
   var key=auLedgerKey(cat,idx);
   var tEl=document.getElementById('auLAiText_'+key);
   if(!tEl)return;
@@ -5913,8 +6461,8 @@ function auRejectAiNoteLedger(cat,idx){
 }
 
 // ── General notes for the current assessment (Details view) ──────────────────
-function auSaveGeneralNotes(val){var r=auRound();if(r)r.generalNotes=val;}
-function auImproveGeneralNotes(){
+function auSaveGeneralNotes(val){if(auLocked())return;var r=auRound();if(r)r.generalNotes=val;}
+function auImproveGeneralNotes(){if(auLocked())return;
   var r=auRound();if(!r)return;
   var noteEl=document.getElementById('auGnNote');
   var current=noteEl?noteEl.value.trim():(r.generalNotes||'');
@@ -5932,7 +6480,7 @@ function auImproveGeneralNotes(){
     function(loading){if(btn){var ic=btn.querySelector('.nt-ic');if(ic){ic.className=loading?'ti ti-loader nt-ic':'ti ti-wand nt-ic';ic.style.animation=loading?'spin 1s linear infinite':'';}var lbl=btn.querySelector('.nt-label');if(lbl)lbl.textContent=loading?'Improving…':'Improve';btn.disabled=loading;}}
   );
 }
-function auAcceptGeneralNotes(){
+function auAcceptGeneralNotes(){if(auLocked())return;
   var tEl=document.getElementById('auGnAiText');if(!tEl)return;
   var improved=tEl.textContent;
   var noteEl=document.getElementById('auGnNote');
@@ -5953,7 +6501,7 @@ function auToggleCat(cat,ci){
   if(hd&&gp){hd.classList.toggle('collapsed',now);gp.classList.toggle('collapsed',now);}
   else auRender();
 }
-function auSetScore(cat,idx,val){
+function auSetScore(cat,idx,val){if(auLocked())return;
   var s=auSupplier(),r=auRound(),cats=auCats();
   if(!s||!r||!cats[cat]||!cats[cat][idx])return;
   cats[cat][idx].score=val;
@@ -5982,7 +6530,7 @@ function cssAttrEscape(v){return String(v).replace(/["\\]/g,'\\$&');}
 // in the console (auCats()), never into supplier.categories (the reporting
 // mirror), so a suggestion accepted while working an old audit can't leak into
 // a different one.
-function auImproveNote(cat,idx){
+function auImproveNote(cat,idx){if(auLocked())return;
   var item=auCats()[cat]&&auCats()[cat][idx];
   if(!item)return;
   var noteEl=document.querySelector('.au-notes');
@@ -6003,7 +6551,7 @@ function auImproveNote(cat,idx){
     function(loading){if(btn){var ic=btn.querySelector('.nt-ic');if(ic){ic.className=loading?'ti ti-loader nt-ic':'ti ti-wand nt-ic';ic.style.animation=loading?'spin 1s linear infinite':'';}var lbl=btn.querySelector('.nt-label');if(lbl)lbl.textContent=loading?'Improving…':'Improve';btn.disabled=loading;btn.title=loading?'Generating...':'Improve note with AI';}}
   );
 }
-function auAcceptAiNote(cat,idx){
+function auAcceptAiNote(cat,idx){if(auLocked())return;
   var tEl=document.getElementById('auAiPrevText');
   if(!tEl)return;
   var improved=tEl.textContent;
@@ -6023,12 +6571,12 @@ function auRejectAiNote(){
 // ── Voice dictation for checkpoint notes (Web Speech API) ─────────────
 var _voiceState={active:false,recognition:null,cat:null,idx:null,target:null,mode:null};
 function voiceSupported(){return !!(window.SpeechRecognition||window.webkitSpeechRecognition);}
-function voiceToggle(cat,idx,mode){
+function voiceToggle(cat,idx,mode){if(auLocked()&&!_voiceState.active)return;
   if(_voiceState.active){voiceStop();return;}
   if(!voiceSupported()){uiAlert('Speech recognition is not supported in this browser. Please use Chrome, Edge, or Safari.');return;}
   var SpeechRec=window.SpeechRecognition||window.webkitSpeechRecognition;
   var rec=new SpeechRec();
-  rec.lang=lang==='de'?'de-DE':'en-US';
+  rec.lang='en-US';
   rec.continuous=true;
   rec.interimResults=true;
   var noteEl;
@@ -6082,12 +6630,12 @@ function voiceUpdateBtns(cat,idx,mode,recording){
     btn.classList.remove('voice-rec');
   }
 }
-function auSetNote(cat,idx,val){
+function auSetNote(cat,idx,val){if(auLocked())return;
   var cats=auCats();
   if(!cats[cat]||!cats[cat][idx])return;
   cats[cat][idx].notes=val; // no re-render: keeps the caret in the field
 }
-function auSetWeight(cat,idx,val){
+function auSetWeight(cat,idx,val){if(auLocked())return;
   var s=auSupplier(),r=auRound(),cats=auCats();
   if(!s||!r||!cats[cat]||!cats[cat][idx])return;
   var w=parseFloat(val);
@@ -6637,8 +7185,8 @@ function renderDashboard(){
       +'<div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px">No data to display</div>'
       +'<div style="font-size:13px;color:var(--text2);margin-bottom:20px">Import suppliers or load a project to see your dashboard.</div>'
       +'<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'
-        +'<button class="btn primary" onclick="showPage(\'new\',document.querySelectorAll(\'.nav-btn\')[1]);setTimeout(function(){var b=document.getElementById(\'ntab-import\');if(b)b.click();},80)"><i class="ti ti-file-spreadsheet"></i> Import Excel</button>'
-        +'<button class="btn" onclick="showPage(\'new\',document.querySelectorAll(\'.nav-btn\')[1])"><i class="ti ti-user-plus"></i> Add Supplier</button>'
+        +'<button class="btn primary" onclick="navTo(\'new\');setTimeout(function(){var b=document.getElementById(\'ntab-import\');if(b)b.click();},80)"><i class="ti ti-file-spreadsheet"></i> Import Excel</button>'
+        +'<button class="btn" onclick="navTo(\'new\')"><i class="ti ti-user-plus"></i> Add Supplier</button>'
       +'</div></div>';
     return;
   }
@@ -6662,9 +7210,10 @@ function renderDashboard(){
   var covColor=coveragePct===100?'var(--text)':'var(--warn)';
 
   // ── 1. KPI Row ──────────────────────────────────────────────────────────────
-  var actNavBtn='document.querySelectorAll(\'.nav-btn\')[4]';
+  // Every jump out of the dashboard goes through navTo(), so the target page
+  // shows "Back to Dashboard" — the dashboard is a hub people return to.
   var h='<div class="db-kpi-row">'
-    +'<div class="db-kpi" onclick="showPage(\'import\',document.querySelector(\'.nav-btn\'))" style="cursor:pointer">'
+    +'<div class="db-kpi" onclick="navTo(\'import\')" style="cursor:pointer">'
       +'<div class="db-kpi-icon" style="background:color-mix(in srgb,var(--primary) 13%,transparent)"><i class="ti ti-users" style="color:var(--primary-fg)"></i></div>'
       +'<div><div class="db-kpi-val">'+suppliers.length+'</div><div class="db-kpi-lbl">Suppliers</div></div>'
     +'</div>'
@@ -6676,7 +7225,7 @@ function renderDashboard(){
       +'<div class="db-kpi-icon" style="background:'+covColor+'22"><i class="ti ti-clipboard-list" style="color:'+covColor+'"></i></div>'
       +'<div><div class="db-kpi-val" style="color:'+covColor+'">'+coveragePct+'%</div><div class="db-kpi-lbl">Assessment Coverage<br><span style="font-weight:400">'+filledItems.length+'/'+allItems.length+' checkpoints</span></div></div>'
     +'</div>'
-    +'<div class="db-kpi" onclick="showPage(\'actions\','+actNavBtn+')" style="cursor:pointer">'
+    +'<div class="db-kpi" onclick="navTo(\'actions\')" style="cursor:pointer">'
       +'<div class="db-kpi-icon" style="background:'+(overdueActs.length?'var(--crit)':'var(--warn)')+'22"><i class="ti ti-clipboard-check" style="color:'+(overdueActs.length?'var(--crit)':'var(--warn)')+'"></i></div>'
       +'<div><div class="db-kpi-val" style="color:'+(overdueActs.length?'var(--crit)':'var(--text)')+'">'+openActs.length+'</div><div class="db-kpi-lbl">Open Actions'+(overdueActs.length?'<br><span style="color:var(--crit);font-weight:600">'+overdueActs.length+' overdue</span>':'')+'</div></div>'
     +'</div>'
@@ -6732,7 +7281,7 @@ function renderDashboard(){
     +'<div class="card" style="padding:16px 18px">'
       +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
         +'<span style="font-size:13px;font-weight:700"><i class="ti ti-list-check" style="color:var(--primary-fg);margin-right:6px"></i>Actions</span>'
-        +'<button onclick="showPage(\'actions\','+actNavBtn+')" style="font-size:11px;color:var(--primary-fg);background:none;border:none;cursor:pointer;font-weight:700">View all →</button>'
+        +'<button onclick="navTo(\'actions\')" style="font-size:11px;color:var(--primary-fg);background:none;border:none;cursor:pointer;font-weight:700">View all →</button>'
       +'</div>'
       // Neutral counters: Open / In Progress / Done are workflow STATES, not
       // pass/fail statuses — tinting them red/amber/green implied an open action
@@ -6750,7 +7299,7 @@ function renderDashboard(){
         ?'<div>'
           +'<div style="font-size:11px;font-weight:700;color:var(--crit);margin-bottom:6px;display:flex;align-items:center;gap:4px"><i class="ti ti-alert-triangle"></i> Overdue ('+overdueActs.length+')</div>'
           +overdueActs.slice(0,4).map(function(a){
-            return '<div onclick="showPage(\'actions\','+actNavBtn+')" style="padding:5px 8px;border-left:3px solid var(--crit);background:color-mix(in srgb,var(--crit) 4%,transparent);border-radius:0 6px 6px 0;margin-bottom:4px;cursor:pointer">'
+            return '<div onclick="navTo(\'actions\')" style="padding:5px 8px;border-left:3px solid var(--crit);background:color-mix(in srgb,var(--crit) 4%,transparent);border-radius:0 6px 6px 0;margin-bottom:4px;cursor:pointer">'
               +'<div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(a.title)+'</div>'
               +'<div style="font-size:10px;color:var(--text2)">'+esc(a.supplier||'—')+(a.dueDate?' · Due '+new Date(a.dueDate).toLocaleDateString('en-GB'):'')+'</div>'
             +'</div>';
@@ -6790,7 +7339,7 @@ function renderDashboard(){
       });
       out+='</div>';
       if(covList.length>COV_CAP){
-        out+='<button onclick="showPage(\'import\',document.querySelector(\'.nav-btn\'))" style="width:100%;margin-top:10px;font-size:11px;font-weight:600;padding:6px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--primary-fg);cursor:pointer">View all '+covList.length+' on Project page →</button>';
+        out+='<button onclick="navTo(\'import\')" style="width:100%;margin-top:10px;font-size:11px;font-weight:600;padding:6px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--primary-fg);cursor:pointer">View all '+covList.length+' on Project page →</button>';
       }
       return out+'</div>';
     })()
@@ -6968,8 +7517,8 @@ function renderOverview(){
         +'<div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px">No suppliers yet</div>'
         +'<div style="font-size:13px;color:var(--text2);margin-bottom:20px;max-width:380px;margin-left:auto;margin-right:auto">Start by defining an assessment template and adding a supplier — or import an existing Excel file.</div>'
         +'<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'
-          +'<button class="btn primary" onclick="showPage(\'new\',document.querySelectorAll(\'.nav-btn\')[1]);setTimeout(function(){var b=document.getElementById(\'ntab-builder\');if(b)b.click();},80)"><i class="ti ti-template"></i> Create template</button>'
-          +'<button class="btn" onclick="showPage(\'new\',document.querySelectorAll(\'.nav-btn\')[1]);setTimeout(function(){var b=document.getElementById(\'ntab-import\');if(b)b.click();},80)"><i class="ti ti-file-spreadsheet"></i> Import data</button>'
+          +'<button class="btn primary" onclick="navTo(\'new\');setTimeout(function(){var b=document.getElementById(\'ntab-builder\');if(b)b.click();},80)"><i class="ti ti-template"></i> Create template</button>'
+          +'<button class="btn" onclick="navTo(\'new\');setTimeout(function(){var b=document.getElementById(\'ntab-import\');if(b)b.click();},80)"><i class="ti ti-file-spreadsheet"></i> Import data</button>'
         +'</div>'
       +'</div>';
     return;
@@ -7336,7 +7885,7 @@ function cpTasksHtml(sup,cat,idx,tasks,opts){
       +'<span style="font-size:11px;font-weight:600;color:var(--text3);font-variant-numeric:tabular-nums;white-space:nowrap">'+esc(a.ref||'—')+'</span>'
       +'<span style="flex:1;min-width:0;font-size:12.5px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(a.title||'')+'</span>'
       +'<span style="font-size:11px;font-weight:600;color:'+stc+';white-space:nowrap">'+esc(a.status||'')+'</span>'
-      +'<span style="font-size:11px;white-space:nowrap;color:'+(od?'var(--crit)':'var(--text2)')+'">'+(due?due.toLocaleDateString('de-DE')+(od?' ⚠':''):'—')+'</span>'
+      +'<span style="font-size:11px;white-space:nowrap;color:'+(od?'var(--crit)':'var(--text2)')+'">'+(due?due.toLocaleDateString('en-GB')+(od?' ⚠':''):'—')+'</span>'
       +'<i class="ti ti-arrow-right" style="color:var(--text3)"></i>'
     +'</div>';
   }).join('')+'</div>';
@@ -7388,7 +7937,7 @@ var _fileTarget=null; // {kind:'checkpoint',sup,cat,idx} | {kind:'supplier',sup}
 
 // roundId pins the attachment to a specific audit. Callers inside the scoring
 // console pass it; legacy callers omit it and fall back to the reporting mirror.
-function triggerFileUpload(sup,cat,idx,roundId){
+function triggerFileUpload(sup,cat,idx,roundId){if(roundIsLocked(sup,roundId))return;
   _fileTarget={kind:'checkpoint',sup:sup,cat:cat,idx:idx,roundId:roundId!=null?roundId:null};
   var inp=document.getElementById('imgFileInput');
   inp.value='';
@@ -7457,7 +8006,7 @@ function handleFileUpload(input){
 // Drag & drop — attach to any drop-zone element via ondragover/ondrop calling these with the target
 function fileDragOver(ev){ev.preventDefault();ev.currentTarget.classList.add('drag');}
 function fileDragLeave(ev){ev.currentTarget.classList.remove('drag');}
-function fileDropCheckpoint(ev,sup,cat,idx,roundId){
+function fileDropCheckpoint(ev,sup,cat,idx,roundId){if(roundIsLocked(sup,roundId)){ev.preventDefault();ev.currentTarget.classList.remove('drag');return;}
   ev.preventDefault();ev.currentTarget.classList.remove('drag');
   if(!ev.dataTransfer||!ev.dataTransfer.files.length)return;
   _fileTarget={kind:'checkpoint',sup:sup,cat:cat,idx:idx,roundId:roundId!=null?roundId:null};
@@ -7536,7 +8085,7 @@ function openFileViewer(kind,sup,cat,idx,fileIdx,roundId){
     overlay.innerHTML=
       '<div style="position:absolute;top:16px;right:16px;display:flex;gap:10px">'
         +'<a href="'+f.data+'" download="'+esc(f.name||'file')+'" style="color:#fff;font-size:22px;text-decoration:none" title="Download"><i class="ti ti-download"></i></a>'
-        +(kind==='completion'?'':'<button onclick="deleteFile(\''+kind+'\',\''+esc(sup)+'\',\''+esc(cat||'')+'\','+(idx!=null?idx:'null')+','+current+')" style="background:none;border:none;cursor:pointer;color:#ff6b6b;font-size:22px" title="Delete"><i class="ti ti-trash"></i></button>')
+        +(kind==='completion'||(kind==='checkpoint'&&roundIsLocked(sup,roundId))?'':'<button onclick="deleteFile(\''+kind+'\',\''+esc(sup)+'\',\''+esc(cat||'')+'\','+(idx!=null?idx:'null')+','+current+','+(roundId!=null?roundId:'null')+')" style="background:none;border:none;cursor:pointer;color:#ff6b6b;font-size:22px" title="Delete"><i class="ti ti-trash"></i></button>')
         +'<button onclick="document.getElementById(\'imgViewerOverlay\').remove()" style="background:none;border:none;cursor:pointer;color:#fff;font-size:26px"><i class="ti ti-x"></i></button>'
       +'</div>'
       +'<div style="color:#ccc;font-size:13px">'+(current+1)+' / '+files.length+(f.name?' — '+esc(f.name):'')+(f.size?' ('+humanFileSize(f.size)+')':'')+'</div>'
@@ -7613,7 +8162,7 @@ async function deleteActionImg(actionId,imgIdx){
   toast('Photo removed from task');
 }
 
-async function deleteFile(kind,sup,cat,idx,fileIdx,roundId){
+async function deleteFile(kind,sup,cat,idx,fileIdx,roundId){if(kind!=='supplier'&&roundIsLocked(sup,roundId))return;
   var target=kind==='supplier'?{kind:'supplier',sup:sup}:{kind:'checkpoint',sup:sup,cat:cat,idx:idx,roundId:roundId!=null?roundId:null};
   var files=getFileArray(target,false);
   if(!files)return;
@@ -7707,7 +8256,7 @@ function closeSupplierProfile(){var m=document.getElementById('supplierProfileMo
 // Suppliers is pure master data (name, custom fields, files) — the popup used to
 // also embed a score report, radar and the compare-over-time card, which made it
 // unclear whether you were looking at "who is this supplier" or "how did they
-// score". Assessment questions now live only in Analysis / the Vergleich tab;
+// score". Assessment questions now live only in Analysis / the History & Comparison tab;
 // this popup just links out to them when applicable.
 function supplierQuickLinksHtml(sn){
   var s=suppliers.find(function(x){return x.name===sn;});
@@ -7718,7 +8267,7 @@ function supplierQuickLinksHtml(sn){
     links.push('<button class="btn sm" onclick="closeSupplierProfile();showPage(\'detail\');var sel=document.getElementById(\'detailSupSelect\');if(sel){sel.value=\''+esSn+'\';renderDetail();}"><i class="ti ti-chart-arcs"></i> Open Analysis</button>');
   }
   if(cmpEligibleRounds(s).length>=2){
-    links.push('<button class="btn sm" onclick="closeSupplierProfile();goToComparePage(\''+esSn+'\')"><i class="ti ti-git-compare"></i> Assessments vergleichen</button>');
+    links.push('<button class="btn sm" onclick="closeSupplierProfile();goToComparePage(\''+esSn+'\')"><i class="ti ti-git-compare"></i> Compare assessments</button>');
   }
   if(!links.length)return '';
   return '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">'+links.join('')+'</div>';
@@ -9690,6 +10239,12 @@ function axisLabel(which){
 }
 // Factors feed the X axis (criticality) only.
 function critFactors(){ return riskModel.factors.filter(function(f){return f.axis==='crit';}); }
+// The footnote every export prints under the criticality axis, so a reader sees
+// what "High" was judged on. Names only — the weighting stays in the tool.
+function critCriteriaNote(){
+  var n=critFactors().map(function(f){return (f.name||'').trim();}).filter(Boolean);
+  return n.length?'* '+axisLabel('x')+' criteria: '+n.join(' · '):'';
+}
 // Criticality as a weighted aggregate of ITS factors' 1–3 ratings — not a single
 // field. Returns the raw weighted mean on the 1..3 scale, or null if none rated.
 function critValue(s){
@@ -9967,7 +10522,7 @@ function renderKpiSparklines(s){
   });
 }
 
-// ── KPI-Erfassung: the bulk, period-based data-entry ritual ────────────────
+// ── KPI entry: the bulk, period-based data-entry ritual ────────────────
 // Monitoring has no API feed — someone has to type these numbers in on a
 // rhythm (monthly/quarterly). Doing that one supplier-dropdown-click at a time
 // doesn't scale past 2 suppliers, so this is one table: all suppliers × all
@@ -10952,34 +11507,44 @@ function kpiAllSuppliersHtml(view){
 }
 
 function saveProject(){
-  var auditor=document.getElementById('auditorName');
-  var company=document.getElementById('companyName');
-  var project=document.getElementById('projectName');
-  var apiKeyEl=document.getElementById('apiKey');
-  var aiModelEl=document.querySelector('input[name="aiModel"]:checked');
-  var data={
-    v:'9',suppliers,weights,threshGreen,threshYellow,tiers:TIERS,tierColorMode,
-    templates,actions,actionIdCounter,
-    selectedTheme,calColors,kpiCatalog,riskModel,reportBuilder,
-    themeMode,brandColors,supplierInfoCatalog,maps,
-    auditor:auditor?auditor.value:'',
-    company:company?company.value:'',
-    project:project?project.value:'',
-    apiKey:apiKeyEl?apiKeyEl.value:'',
-    aiModel:aiModelEl?aiModelEl.value:'claude-haiku-4-5-20251001'
-  };
+  // Same payload as the cloud save, so the two can never drift apart. The API key
+  // stays out of the file — a backup is easily passed on; loading keeps the key
+  // already entered (applyProjectData only sets it when the file carries one).
+  var data=collectProjectData();
+  delete data.apiKey;
+  var d=new Date(),pad=function(n){return (n<10?'0':'')+n;};
+  var base=(_currentProjectName||'').replace(/[\\\/:*?"<>|\s]+/g,'_').replace(/^_+|_+$/g,'')||'supplier_project';
   var url=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));
-  var a=document.createElement('a');a.href=url;a.download='supplier_assessment.json';a.click();
+  var a=document.createElement('a');a.href=url;a.download=base+'_'+d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'.json';a.click();
   URL.revokeObjectURL(url);
   toast('Project saved');
+}
+// Anything worth asking about before a file replaces it?
+function projectHasData(){
+  return suppliers.length>0||templates.length>0||actions.length>0||maps.length>0;
 }
 function loadProject(file){
   if(!file)return;
   const reader=new FileReader();
-  reader.onload=function(e){
+  reader.onload=async function(e){
+    var d;
+    try{d=JSON.parse(e.target.result);}
+    catch(err){toast('“'+file.name+'” is not a valid project file','var(--crit)');return;}
+    // Any other JSON (e.g. a KPI export) would otherwise wipe the project.
+    if(!d||typeof d!=='object'||Array.isArray(d)||!Array.isArray(d.suppliers)){
+      toast('“'+file.name+'” is not a Supplier Loop project file','var(--crit)');return;
+    }
+    if(projectHasData()&&!(await uiConfirm({title:'Replace project data?',
+        message:'All data in “'+(_currentProjectName||'this project')+'” will be replaced by “'+file.name+'”. The change is synced to the cloud. Save a backup first if you may need the current state.',
+        confirmText:'Replace data',icon:'ti-file-import'})))return;
     try{
-      var d=JSON.parse(e.target.result);
+      var keepLog=activityLog;
+      var keyEl=document.getElementById('apiKey'),keepKey=keyEl?keyEl.value:'';
       applyProjectData(d); // shared with cloud-load; restores all state incl. KPI catalog & risk model
+      renderThemeGrid();
+      if(!Array.isArray(d.activityLog))activityLog=keepLog;
+      if(!d.apiKey&&keyEl)keyEl.value=keepKey; // older backups carry apiKey:'' — don't let them blank the key
+      if(typeof actLogEvent==='function')actLogEvent({a:'Settings',v:'file_load',s:file.name});
       toast('Project loaded: '+suppliers.length+' supplier'+(suppliers.length===1?'':'s'));
     }catch(err){
       console.error('loadProject error:',err);
@@ -12033,9 +12598,18 @@ function _rptSupplier(){return _currentPage==='exp'?expSupplier():auSupplier();}
 function _rptRound(){return _currentPage==='exp'?expRound():auRound();}
 function _rptRerender(){if(_currentPage==='exp')renderExpReportContent();else if(typeof auRender==='function')auRender();}
 
+// The dark style of every format pins the accent to lime (the design colours
+// vanish on navy), so the Design card follows the open export tab: dark there
+// -> swatches greyed out with a hint. The choice itself is kept and applies
+// again as soon as that format is switched back to light.
+function _expTabIsDark(){
+  var st=_expTab==='excel'?reportBuilder.xlStyle:_expTab==='pdf'?reportBuilder.docStyle:reportBuilder.slideStyle;
+  return st==='dark';
+}
 function renderExpVariants(){
   var el=document.getElementById('expVariants');if(!el)return;
-  var h='';
+  var dark=_expTabIsDark();
+  var h='<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center'+(dark?';opacity:0.35;pointer-events:none;filter:grayscale(0.6)':'')+'">';
   Object.keys(RB_VARIANTS).forEach(function(k){
     var v=RB_VARIANTS[k];
     var sel=reportBuilder.variant===k;
@@ -12049,14 +12623,25 @@ function renderExpVariants(){
   h+='<input type="color" id="expCustomColor" value="#'+(reportBuilder.customColor||'888888')+'" '
     +'onchange="expSetCustomColor(this.value)" '
     +'style="width:36px;height:36px;border:1px solid var(--border);border-radius:var(--r);padding:2px;cursor:pointer'
-    +(reportBuilder.variant==='custom'?'':';opacity:0.4')+'" title="Pick a custom accent color">';
+    +(reportBuilder.variant==='custom'?'':';opacity:0.4')+'" title="Pick a custom accent color"'+(dark?' disabled':'')+'>';
+  h+='</div>';
+  if(dark){
+    var fmt=_expTab==='excel'?'Excel workbook':_expTab==='pdf'?'Word document':'PowerPoint deck';
+    h+='<div style="flex-basis:100%;display:flex;align-items:flex-start;gap:6px;font-size:12px;color:var(--text2);'
+      +'padding:8px 10px;border:1px dashed var(--border);border-radius:var(--r)">'
+      +'<i class="ti ti-moon" style="margin-top:1px"></i><span>The '+fmt+' is set to <b>Dark</b>, which always uses a fixed '
+      +'<span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#a2f233;vertical-align:-1px"></span> lime accent for readability. '
+      +'The design colour only applies to <b>Light</b> — your choice is kept for when you switch back.</span></div>';
+  }
   el.innerHTML=h;
 }
 function expSetVariant(k){
+  if(_expTabIsDark())return;
   reportBuilder.variant=k;
   renderExpVariants();
 }
 function expSetCustomColor(hex){
+  if(_expTabIsDark())return;
   reportBuilder.customColor=hex.replace('#','').toUpperCase();
   reportBuilder.variant='custom';
   renderExpVariants();
@@ -12146,6 +12731,7 @@ function renderReportScope(){
 function setReportSlideStyle(style){
   reportBuilder.slideStyle=(style==='dark')?'dark':'light';
   renderReportSlideStyle();
+  renderExpVariants();
 }
 function renderReportSlideStyle(){
   var st=reportBuilder.slideStyle==='dark'?'dark':'light';
@@ -12155,6 +12741,7 @@ function renderReportSlideStyle(){
 function setReportDocStyle(style){
   reportBuilder.docStyle=(style==='dark')?'dark':'light';
   renderReportDocStyle();
+  renderExpVariants();
 }
 function renderReportDocStyle(){
   var st=reportBuilder.docStyle==='dark'?'dark':'light';
@@ -12164,6 +12751,7 @@ function renderReportDocStyle(){
 function setReportXlStyle(style){
   reportBuilder.xlStyle=(style==='dark')?'dark':'light';
   renderReportXlStyle();
+  renderExpVariants();
 }
 function renderReportXlStyle(){
   var st=reportBuilder.xlStyle==='dark'?'dark':'light';
@@ -12222,7 +12810,7 @@ async function exportExcel(){
   const th=THEMES[selectedTheme];
   const project=document.getElementById('projectName').value||'Supplier Assessment';
   const auditor=document.getElementById('auditorName').value||'';
-  const today=new Date().toLocaleDateString(lang==='de'?'de-DE':'en-GB');
+  const today=new Date().toLocaleDateString('en-GB');
   const exOpts={
     dashboard:document.getElementById('xopt_dashboard')?.checked!==false,
     ranking:document.getElementById('xopt_ranking')?.checked!==false,
@@ -12452,10 +13040,11 @@ async function exportExcel(){
     const ws=wb.addWorksheet('Register',{tabColor:{argb:'FF'+P3BLUE}});
     ws.views=[{state:'frozen',xSplit:1,ySplit:4}];
     const infoFields=(typeof supplierInfoCatalog!=='undefined'&&Array.isArray(supplierInfoCatalog))?supplierInfoCatalog:[];
+    const critNote=(typeof critCriteriaNote==='function')?critCriteriaNote():'';
     const headers=['Supplier',...infoFields.map(function(f){return f.label;}),
-      'Overall %','Tier','Criticality','Risk Tier','Last Assessment','Next Assessment','Assessor'];
+      'Overall %','Tier','Criticality'+(critNote?'*':''),'Risk Tier','Last Assessment','Next Assessment','Assessor'];
     const nCol=headers.length;
-    titleBlock(ws,'Supplier Register — '+project,'Stand '+today+'   |   '+sel.length+(sel.length===1?' supplier':' suppliers'),nCol);
+    titleBlock(ws,'Supplier Register — '+project,'As of '+today+'   |   '+sel.length+(sel.length===1?' supplier':' suppliers'),nCol);
     ws.getRow(3).height=8;
 
     const hRow=ws.getRow(4);
@@ -12472,7 +13061,7 @@ async function exportExcel(){
       let c=2;
       infoFields.forEach(function(f){
         const v=(s.supplierInfo&&s.supplierInfo[f.id]!=null)?s.supplierInfo[f.id]:'';
-        dataCell(row.getCell(c++),v,bg,{font:{size:9,color:{argb:'FF444444'}},align:{vertical:'middle',horizontal:f.type==='number'?'center':'left',indent:1}});
+        dataCell(row.getCell(c++),v,bg,{font:{size:9,color:{argb:'FF444444'}},align:{vertical:'middle',horizontal:f.type==='number'?'center':'left',indent:1,wrapText:f.type!=='number'}});
       });
       const tot=calcScore(s);const totHex=scoreHex(tot);
       const scCell=row.getCell(c++);
@@ -12491,6 +13080,12 @@ async function exportExcel(){
       row.height=24;
     });
 
+    // Below the table, one blank row clear of the autofilter range.
+    if(critNote){
+      const nc=ws.getRow(6+sorted.length).getCell(1);
+      nc.value=critNote;
+      nc.font={italic:true,size:8,color:{argb:'FF888888'}};
+    }
     ws.autoFilter={from:{row:4,column:1},to:{row:4+sorted.length,column:nCol}};
     ws.getColumn(1).width=30;
     infoFields.forEach(function(f,i){ws.getColumn(2+i).width=16;});
@@ -12610,7 +13205,7 @@ async function exportExcel(){
     const ws=wb.addWorksheet('KPI Overview',{tabColor:{argb:'FF'+P3BLUE}});
     ws.views=[{state:'frozen',xSplit:1,ySplit:6}];
     const nCol=1+kpiCatalog.length;
-    titleBlock(ws,'KPI Overview — '+project,'Latest recorded value per KPI   |   Stand '+today,nCol);
+    titleBlock(ws,'KPI Overview — '+project,'Latest recorded value per KPI   |   As of '+today,nCol);
     ws.getRow(3).height=8;
 
     // Header: KPI name + unit
@@ -12666,7 +13261,7 @@ async function exportExcel(){
     const PCOL={'High':'C0392B','Medium':'E07B00','Low':'1A8A5A'};
     const ws=wb.addWorksheet('Action List',{tabColor:{argb:'FFE07B00'}});
     ws.views=[{state:'frozen',ySplit:4}];
-    titleBlock(ws,'Action List — '+project,'Stand '+today+'   |   '+actions.length+' actions',10);
+    titleBlock(ws,'Action List — '+project,'As of '+today+'   |   '+actions.length+' actions',10);
     ws.getRow(3).height=8;
 
     ['#','Title','Supplier','Category','Responsible','Start','Due Date','Priority','Status','Completion proof'].forEach(function(h,i){
@@ -12678,7 +13273,7 @@ async function exportExcel(){
       const row=ws.getRow(5+i);const bg=i%2===0?'FFFFFF':LGRAY;
       const sc4=SCOL[a.status]||'888888';const pc=PCOL[a.priority]||'888888';
       const cp=a.status==='Done'?actCompletion(a):null;
-      const cpTxt=cp?new Date(cp.ts).toLocaleDateString('de-DE')+(cp.author?' · '+cp.author:'')+' — '+cp.text+(cp.files&&cp.files.length?' ['+cp.files.length+' file'+(cp.files.length===1?'':'s')+']':''):'';
+      const cpTxt=cp?new Date(cp.ts).toLocaleDateString('en-GB')+(cp.author?' · '+cp.author:'')+' — '+cp.text+(cp.files&&cp.files.length?' ['+cp.files.length+' file'+(cp.files.length===1?'':'s')+']':''):'';
       [i+1,a.title,a.supplier,a.category,a.responsible,a.startDate||'—',a.dueDate||'—',a.priority,a.status,cpTxt].forEach(function(v,ci){
         const cell=row.getCell(ci+1);
         if(ci===9){// Completion proof — free text, wrapped
@@ -12719,7 +13314,7 @@ async function exportExcel(){
     const ws=wb.addWorksheet('Raw Data',{tabColor:{argb:'FF17806E'}});
     ws.views=[{state:'frozen',ySplit:4}];
     const cols=['Supplier','Category','#','Checkpoint','Score (0-5)','Score %','Weight','Tier','Notes / Evidence','Assessment','Date'];
-    titleBlock(ws,'Raw Data — '+project,'One row per checkpoint   |   Stand '+today,cols.length);
+    titleBlock(ws,'Raw Data — '+project,'One row per checkpoint   |   As of '+today,cols.length);
     ws.getRow(3).height=8;
     cols.forEach(function(h,i){
       hdrCell(ws.getRow(4).getCell(i+1),h,HDR,{align:{vertical:'middle',horizontal:(i===2||i>=4&&i<=7)?'center':'left',indent:(i===2||i>=4&&i<=7)?0:1,wrapText:true}});
@@ -12766,7 +13361,7 @@ async function exportExcel(){
   // data itself is maintained in the tool, these sheets are working copies.
   if(exOpts.legend){
     const ws=wb.addWorksheet('Legend',{tabColor:{argb:'FF'+PRIMARY}});
-    titleBlock(ws,'Legend & notes — '+project,(auditor?'Assessor: '+auditor+'   |   ':'')+'Stand '+today,4);
+    titleBlock(ws,'Legend & notes — '+project,(auditor?'Assessor: '+auditor+'   |   ':'')+'As of '+today,4);
     ws.getRow(3).height=10;
 
     function sectionHdr(r,txt){
@@ -12830,6 +13425,7 @@ async function exportExcel(){
     ws.getColumn(1).width=16;ws.getColumn(2).width=18;ws.getColumn(3).width=16;ws.getColumn(4).width=34;
   }
 
+  _xlFitRows(wb);
   _xlFixContrast(wb);
   if(XDARK)_xlDarken(wb,PRIMARY);
 
@@ -12841,6 +13437,45 @@ async function exportExcel(){
   a.href=url;a.download='Supplier_WorkingFiles_'+project.replace(/[^a-zA-Z0-9]/g,'_')+'_'+new Date().toISOString().slice(0,10)+(XDARK?'_dark':'')+'.xlsx';
   a.click();URL.revokeObjectURL(url);
   toast('Excel working file exported — '+wb.worksheets.length+' sheets');
+}
+
+// Rows are written at a fixed height, which clips any wrapped text that needs
+// more than one line (evidence notes, checkpoints, completion proof). Excel does
+// not re-fit rows of a generated file on open, so the height is estimated here:
+// greedy word wrap against the column width, then lines × line height. It only
+// ever GROWS a row — headers and short rows keep their designed height — and
+// skips merged cells, whose width spans several columns and are sized by hand.
+// The estimate leans generous: a little air beats a cut-off last line.
+function _xlFitRows(wb){
+  wb.worksheets.forEach(function(ws){
+    ws.eachRow(function(row){
+      var need=0;
+      row.eachCell(function(cell,col){
+        if(cell.isMerged||!cell.alignment||!cell.alignment.wrapText)return;
+        var txt=cell.value==null?'':String(cell.value);
+        if(!txt)return;
+        var size=(cell.font&&cell.font.size)||11;
+        var w=ws.getColumn(col).width||10;
+        // Column width is counted in '0' characters of 11pt Calibri; running
+        // text is a bit narrower than '0', smaller fonts fit proportionally more.
+        var cpl=Math.max(4,Math.floor((w-1-(cell.alignment.indent||0)*1.5)*1.05*11/size));
+        var lines=0;
+        txt.split(/\r?\n/).forEach(function(par){
+          var n=1,len=0;
+          par.split(/\s+/).forEach(function(word){
+            if(!word)return;
+            var wl=word.length;
+            if(len&&len+1+wl>cpl){n++;len=0;}
+            if(wl>cpl){n+=Math.floor(wl/cpl);wl=wl%cpl;}
+            len+=(len?1:0)+wl;
+          });
+          lines+=n;
+        });
+        need=Math.max(need,lines*size*1.35+6);
+      });
+      if(need>(row.height||15))row.height=Math.min(409,Math.ceil(need));   // 409pt = Excel's row limit
+    });
+  });
 }
 
 // Score/tier/status cells are written with WHITE text on their tier colour. With
@@ -12928,7 +13563,7 @@ function _xlDarken(wb,bandHex){
 //   · module order mirrors RPT_MODULES: cover -> agenda -> portfolio ->
 //     per supplier (summary -> narrative -> findings -> action plan)
 //   · one fixed content grid + fixed table layouts, so every column, rule and
-//     panel edge lines up down the whole document ("bündig").
+//     panel edge lines up down the whole document ("flush").
 // Vector text, selectable, exact alignment — no rasterising.
 // ══════════════════════════════════════════════════════════════════════════
 async function exportWord(){
@@ -12955,7 +13590,7 @@ async function exportWord(){
   var company =(document.getElementById('companyName').value)||'P3 Group';
   var project =(document.getElementById('projectName').value)||'Supplier Assessment Report';
   var assessor=(document.getElementById('auditorName').value)||'';
-  var today=new Date().toLocaleDateString(lang==='de'?'de-DE':'en-GB');
+  var today=new Date().toLocaleDateString('en-GB');
 
   // Word opens HTML documents, but its layout engine has no flexbox/grid and no
   // absolute positioning — so everything here is built from TABLES and solid
@@ -13136,7 +13771,9 @@ async function exportWord(){
       });
       rm+='</tr>';
     });
-    rm+='</table>'+(showCrit?'<p class=rmaxis>'+esc(axisLabel('x'))+' &#8594;</p>':'');
+    var critNote=showCrit?critCriteriaNote():'';
+    rm+='</table>'+(showCrit?'<p class=rmaxis>'+esc(axisLabel('x'))+(critNote?'*':'')+' &#8594;</p>':'')
+      +(critNote?'<p class=rmnote>'+esc(critNote)+'</p>':'');
 
     P.push(PB+chrome('Section 01','Portfolio Overview')+stats+gap(22)+matrix+gap(26)+rm);
   }
@@ -13333,6 +13970,7 @@ async function exportWord(){
     +'table.chip td.chipn{font-size:8.5pt;color:'+C.textDark+';line-height:1.3}'
     +'table.chip td.chips{font-size:8.5pt;font-weight:bold;text-align:right}'
     +'p.rmaxis{font-size:8.5pt;font-weight:bold;letter-spacing:.6pt;color:'+C.foot+';text-align:center;margin:9pt 0 0}'
+    +'p.rmnote{font-size:7.5pt;color:'+C.foot+';text-align:right;margin:6pt 0 0}'
     // management summary — the block that read as cramped
     +'p.big{font-size:32pt;font-weight:bold;text-align:center;margin:10pt 0 12pt;line-height:1}'
     +'div.msbar{margin:0 0 2pt}'
@@ -13381,7 +14019,7 @@ async function exportWord(){
   a.href=url;a.download='Supplier_Report_'+new Date().toISOString().slice(0,10)+(dark?'_dark':'')+'.doc';
   document.body.appendChild(a);a.click();a.remove();
   setTimeout(function(){URL.revokeObjectURL(url);},1500);
-  toast(lang==='de'?'Word-Report heruntergeladen':'Word report downloaded');
+  toast('Word report downloaded');
 }
 
 // Radar as a PNG for the Word report. Rendered at 2.5x (1500px) with every font
@@ -14899,8 +15537,12 @@ async function rptRiskMatrix(pres,ctx){
   sl.background={color:RB_C.bg};
   rptChrome(sl,ctx,ctx.project||'',showCrit?'Risk Matrix · class vs. criticality':'Risk Matrix');
 
+  // The criteria footnote gets its own line under the axis title — sharing the
+  // title's row would collide with it once a project defines a few factors.
+  var critNote=showCrit?critCriteriaNote():'';
+  var footH=showCrit?M.footH+(critNote?0.16:0):0;
   var gx=C.x+M.axisW+M.headW, gy=C.y+(showCrit?0.20:0);
-  var gw=C.x+C.w-gx, gh=C.y+C.h-gy-(showCrit?M.footH:0);
+  var gw=C.x+C.w-gx, gh=C.y+C.h-gy-footH;
   var colW=gw/cols.length, rowH=gh/tiers.length;
   // Chips shrink to the fullest cell, not to a fixed size. A portfolio that
   // lands entirely in one cell — ten poor suppliers in one commodity is not
@@ -14976,10 +15618,13 @@ async function rptRiskMatrix(pres,ctx){
   sl.addText(axisLabel('y'),
     {x:C.x-1.0,y:gy+gh/2-0.09,w:2.2,h:0.18,fontSize:6.5,bold:true,margin:0,rotate:270,
      charSpacing:1.1,color:RB_C.foot,fontFace:'Montserrat',align:'center',valign:'middle'});
-  if(showCrit)
-    sl.addText(axisLabel('x'),{x:gx,y:C.y+C.h-M.footH+0.04,w:gw,h:0.16,fontSize:6.5,bold:true,
+  if(showCrit){
+    sl.addText(axisLabel('x')+(critNote?'*':''),{x:gx,y:C.y+C.h-footH+0.04,w:gw,h:0.16,fontSize:6.5,bold:true,
       margin:0,charSpacing:1.1,color:RB_C.foot,fontFace:'Montserrat',align:'center',valign:'middle'});
-  else
+    if(critNote)
+      sl.addText(critNote,{x:gx,y:C.y+C.h-0.15,w:gw,h:0.14,fontSize:5.5,margin:0,
+        color:RB_C.foot,fontFace:'Montserrat',align:'right',valign:'middle'});
+  } else
     sl.addText('Rate the criticality factors on the suppliers to add the second axis.',
       {x:gx,y:C.y+C.h-0.18,w:gw,h:0.16,fontSize:6,italic:true,margin:0,
        color:RB_C.foot,fontFace:'Montserrat',align:'right',valign:'middle'});
@@ -15320,7 +15965,7 @@ async function exportStandardReport(){
     company:(el('companyName')&&el('companyName').value)||'P3 Group',
     project:(el('projectName')&&el('projectName').value)||'Supplier Assessment Report',
     assessor:(el('auditorName')&&el('auditorName').value)||'',
-    today:new Date().toLocaleDateString(lang==='de'?'de-DE':'en-GB'),
+    today:new Date().toLocaleDateString('en-GB'),
     suppliers:sel, pageNo:1
   };
   toast('Creating report…','var(--primary)');
@@ -15602,6 +16247,528 @@ body.satsplit #subNav,body.satsplit #navBackBar{display:none!important}
     addToggle();
   }catch(err){console.error('[split-view] init failed',err);}
 })();
+</script>
+
+<!-- Help panel — "This page" explains the screen you're on, "Handbook" lists
+     every topic. Content is plain data below; one entry per page id.
+     KEEP IN SYNC: any change to a page, button label or workflow must update
+     its HELP entry in the same change. -->
+<aside id="helpPanel" class="help-panel" aria-label="Help" aria-hidden="true">
+  <div class="help-head"><i class="ti ti-book-2" style="color:var(--primary-fg)"></i> Help
+    <button onclick="closeHelp()" title="Close" aria-label="Close help"><i class="ti ti-x"></i></button></div>
+  <div class="help-tabs">
+    <button id="helpTabPage" onclick="helpShow('page')">This page</button>
+    <button id="helpTabBook" onclick="helpShow('book')">Handbook</button>
+  </div>
+  <div class="help-body" id="helpBody"></div>
+</aside>
+<script>
+var HELP={
+  quickstart:{title:'Quick start',icon:'ti-rocket',group:'Getting started',
+    intro:'From an empty project to a finished report in six steps.',
+    steps:['<b>Add your suppliers</b> under Suppliers.',
+      '<b>Pick or build a checklist</b> under Assessment › Checklists.',
+      '<b>Plan an assessment</b> under Assessment › Assessments — choose the supplier(s), date and checklist.',
+      '<b>Score the checkpoints</b> in the assessment and press <b>Complete assessment</b>.',
+      '<b>Create actions</b> for weak points under Steering › Actions.',
+      '<b>Export the report</b> under Import / Export › Export.'],
+    tips:['Everything saves to the cloud automatically — there is no Save button.',
+      'Use the project switcher next to the logo to keep separate projects apart.']},
+  terms:{title:'Key terms',icon:'ti-vocabulary',group:'Getting started',terms:[
+    ['Project','A separate workspace with its own suppliers, checklists and actions. Switch it next to the logo.'],
+    ['Supplier','A company you assess and follow over time.'],
+    ['Checklist (template)','The list of questions — checkpoints, grouped in categories — that an assessment uses.'],
+    ['Assessment','One evaluation of one supplier with one checklist. Every new assessment adds to the supplier’s history.'],
+    ['Checkpoint','A single question in the checklist, scored from 0 (not met) to 5 (fully met).'],
+    ['Score','The weighted result of all checkpoints in percent.'],
+    ['Tier','The rating a score falls into: Very Good (85 %+), Good (70 %+), Moderate (55 %+), High Risk (below). Adjustable in Settings.'],
+    ['Action','A task to fix a weak point — with owner, due date and status. Each gets a reference such as A-01.'],
+    ['KPI','A measured value tracked per period, e.g. delivery reliability or ppm.'],
+    ['Criticality','How important a supplier is to your business — the second axis of the Portfolio matrix.']]},
+  activity:{title:'Activity',icon:'ti-history',group:'Getting started',
+    intro:'A history of every change in this project — what changed, when, and by whom.',
+    steps:['Click the clock icon at the top right.',
+      'Filter by area or search, e.g. for a supplier name.',
+      'Click <b>Show details</b> to see the single changes, e.g. old and new scores.'],
+    tips:['Small changes to the same item within 10 minutes are combined into one entry.',
+      'The history is saved with the project. It starts from the moment this feature was added.']},
+
+  dashboard:{title:'Dashboard',icon:'ti-layout-dashboard',group:'Modules',crumb:'Dashboard',
+    intro:'Your starting point: how all suppliers are doing at a glance.',
+    steps:['Check the key figures at the top — suppliers, average score and assessment coverage.',
+      'Look at <b>Supplier Scores</b> to see who needs attention — click a supplier to drill down.',
+      'Check <b>Actions</b> for open and overdue tasks.'],
+    tips:['Switch the project next to the logo to see another project’s dashboard.',
+      'Anything you open from here shows <b>Back to Dashboard</b> at the top, so you return in one click.']},
+  import:{title:'Suppliers',icon:'ti-building-factory-2',group:'Modules',crumb:'Suppliers',
+    intro:'The list of all suppliers in this project, each with its own profile.',
+    steps:['Press <b>Add Supplier</b> and enter at least a name.',
+      'Click a supplier to open its profile — details, files and assessment history.',
+      'Use <b>Manage custom fields</b> to add your own profile fields (e.g. employee count).'],
+    tips:['Custom fields apply to every supplier in the project.',
+      'Adding a supplier does not start an assessment — plan one under Assessment.']},
+  audits:{title:'Assessments',icon:'ti-checkup-list',group:'Modules',crumb:'Assessment › Assessments',
+    intro:'All planned, running and completed assessments across your suppliers.',
+    steps:['Press <b>Plan assessment</b>.',
+      'Enter a name and date, choose the type (initial, re-assessment, follow-up) and a checklist.',
+      'Select one or more suppliers and confirm.',
+      'Click an assessment in the list to start scoring.'],
+    tips:['You can choose “Decide later” for the checklist and attach it once the scope is agreed.',
+      'Earlier assessments stay untouched — they become the supplier’s history.']},
+  audit:{title:'Scoring an assessment',icon:'ti-clipboard-check',group:'Modules',crumb:'Assessment › Assessments › Assessment',
+    intro:'Here you score one supplier, checkpoint by checkpoint.',
+    steps:['Pick the supplier and assessment at the top if needed.',
+      'In <b>Score</b> view, give each checkpoint a value from 0 to 5 and add notes or files.',
+      'Switch to <b>Table</b> for a compact overview, or <b>Details</b> for date, assessor and type.',
+      'When everything is scored, press <b>Complete assessment</b>.'],
+    tips:['Keyboard in Score view: <b>0–5</b> to score, <b>N</b> for N.A., <b>↑ / ↓</b> for the previous / next checkpoint.',
+      'The bar at the top shows how many checkpoints are still open.',
+      'A completed assessment is read-only. Press <b>Reopen</b> to change it, then complete it again.',
+      'With two or more completed assessments, <b>Compare</b> shows what changed.']},
+  detail:{title:'Analysis',icon:'ti-chart-arcs',group:'Modules',crumb:'Assessment › Analysis',
+    intro:'Find the strengths and weak points of a supplier, down to single checkpoints.',
+    steps:['Choose a supplier — or keep “All Suppliers”.',
+      'Narrow the view by category or by traffic-light colour.',
+      'Read the checkpoints with low scores — they are the candidates for actions.'],
+    tips:['Press Reset to clear all filters.']},
+  new:{title:'Checklists',icon:'ti-list-check',group:'Modules',crumb:'Assessment › Checklists',
+    intro:'The library of checklists your assessments are built on.',
+    steps:['Press <b>New Template</b> and add categories and checkpoints.',
+      'Or use <b>AI Generate Checklist</b> to get a first draft from a short description.',
+      'Already have an Excel checklist? Upload it in the <b>Excel Import</b> tab. A preview opens, where you choose whether it becomes a <b>checklist template</b> or a <b>supplier assessment</b> with scores.'],
+    tips:['<b>AI Import</b> reads almost any Excel layout: one sheet per category, one sheet per supplier, or a <b>supplier comparison</b> with a score column per supplier. Check the mapping and the live preview before importing.',
+      'The AI Import converts other score scales (0–10, VDA, percent) and text ratings such as i.O. / n.i.O. or OK / NOK to the tool’s 0–5. Every value can be adjusted in the dialog.',
+      'Heading rows inside the checkpoint list become categories. Weight and scoring-criteria columns are taken over.',
+      'Importing a supplier that already exists adds a <b>new assessment</b> — earlier assessments and the profile are kept. The date and auditor are read from the file when present.',
+      'If a checklist with the same name exists, you choose whether to replace it or keep both.',
+      'Weights decide how much a category or checkpoint counts in the score (default 1, 0 = excluded).',
+      'Changing a checklist does not change assessments that already use it.']},
+  monitoring:{title:'Portfolio',icon:'ti-chart-dots',group:'Modules',crumb:'Monitoring › Portfolio',
+    intro:'All suppliers in one matrix: score tier against criticality.',
+    steps:['Find suppliers in the top rows — they have the lowest scores.',
+      'Click a supplier to see its details and rate its criticality.',
+      'Use <b>Configure risk model</b> to define the criticality factors.'],
+    tips:['The criticality columns appear once at least one supplier is rated on a factor.',
+      'Exports name the criticality factors in a small footnote (*), so readers see what the axis is based on.']},
+  kpis:{title:'KPIs',icon:'ti-activity-heartbeat',group:'Modules',crumb:'Monitoring › KPIs',
+    intro:'Measured performance per supplier over time, e.g. delivery reliability.',
+    steps:['Set up your indicators once with <b>Configure KPIs</b>.',
+      'Press <b>Enter KPIs</b> — one period, all suppliers in one table.',
+      'Type the values, paste a block from Excel, or import a file.',
+      'Switch between <b>Status</b>, <b>Trend</b> and <b>Table</b> to read the results.'],
+    tips:['Download the <b>Template</b> in the entry dialog for a ready-made Excel layout.',
+      '<b>AI Import</b> reads any sheet layout and lets you check the mapping before saving.']},
+  compare:{title:'History & Comparison',icon:'ti-git-compare',group:'Modules',crumb:'Monitoring › History & Comparison',
+    intro:'See how a supplier developed from one assessment to the next.',
+    steps:['Choose a supplier.',
+      'Compare its completed assessments by category and checkpoint.'],
+    tips:['A supplier needs at least two completed assessments to be compared.']},
+  actions:{title:'Actions',icon:'ti-clipboard-check',group:'Modules',crumb:'Steering › Actions',
+    intro:'Every task that should improve a supplier — who does what by when.',
+    steps:['Press <b>New Action</b>, enter a title and choose the supplier.',
+      'Link the checkpoints the action fixes, set owner, due date and priority.',
+      'Update the status as work progresses: Open → In Progress → Done.',
+      'Or press <b>AI Suggestions</b> to get proposals for low-scoring checkpoints.'],
+    tips:['<b>List</b> to work through tasks, <b>Gantt</b> for the timeline, <b>Coverage</b> to see which checkpoints have an action.',
+      'Review AI suggestions before adding — you can edit everything afterwards.']},
+  calendar:{title:'Calendar',icon:'ti-calendar',group:'Modules',crumb:'Calendar',
+    intro:'All assessment dates and action deadlines on one calendar.',
+    steps:['Browse months with the arrows, or press <b>Today</b>.',
+      'Check the upcoming and planned assessments below the calendar.'],
+    tips:['Click a colour dot in the legend to change that colour.',
+      'To get the dates into Outlook, export an .ics file under Import / Export › Export.']},
+  exp:{title:'Export',icon:'ti-file-export',group:'Modules',crumb:'Import / Export › Export',
+    intro:'Turn your results into a PowerPoint, Excel or Word report.',
+    steps:['Fill in the report header (assessor, company, project).',
+      'Choose the format tab: PowerPoint, Excel or Word.',
+      'Select one supplier or several, and the content you want.',
+      'Press the export button — the file downloads.'],
+    tips:['<b>Generate for all suppliers</b> writes the summaries and findings for every supplier at once.',
+      'The calendar export (.ics) is at the bottom of this page.',
+      'Wherever criticality appears (risk matrix slide, Word risk matrix, Excel register), a footnote (*) lists the criticality factors.',
+      'In Excel, rows with longer text (notes, checkpoints, completion proof) grow to fit, so nothing is cut off.']},
+  imp:{title:'Import',icon:'ti-file-import',group:'Modules',crumb:'Import / Export › Import',
+    intro:'Save the whole project to a file, or load one back in.',
+    steps:['<b>Save Project</b> downloads everything as one .json file named after the project and today’s date — a good backup. It includes suppliers with all assessment rounds, attached files and photos, checklists, actions, KPIs, maps, settings and the activity log.',
+      '<b>Load Project</b> opens such a file again. It <b>replaces all data</b> in the project that is open right now, and the change is synced to the cloud — you are asked to confirm first. Files that are not Supplier Loop projects are rejected.'],
+    tips:['Photos and attachments are stored inside the .json file itself (no separate ZIP). Photos are already reduced when they are added (max. 1200 px, JPEG), so saving and loading never lowers their quality further.',
+      'The AI API key is not written to the file; after loading, the key you already entered stays in place.',
+      'Checklists and supplier scores from Excel are imported under Assessment › Checklists › Excel Import.']},
+  settings:{title:'Settings',icon:'ti-adjustments-horizontal',group:'Modules',crumb:'Settings',
+    intro:'Look and feel, score tiers, AI and cloud sync.',
+    steps:['<b>Appearance</b>: switch light / dark mode and the brand colours.',
+      '<b>Score Thresholds</b>: change tier limits, colours and labels, then press Apply.',
+      '<b>AI Settings</b>: enter your API key to use the AI features.',
+      '<b>Cloud Account</b>: press Sync Now to save immediately, or sign out.'],
+    tips:['“Save as my default” keeps your colours and tiers for new projects.']}
+};
+var HELP_ORDER=['quickstart','terms','activity','dashboard','import','audits','audit','detail','new','monitoring','kpis','compare','actions','calendar','exp','imp','settings'];
+var _helpTab='page',_helpTopic=null;
+
+function openHelp(){
+  openHelpExclusive();
+  var p=document.getElementById('helpPanel');p.classList.add('open');p.setAttribute('aria-hidden','false');
+  document.getElementById('helpBtn').classList.add('on');
+  helpShow('page');
+}
+function closeHelp(){
+  var p=document.getElementById('helpPanel');p.classList.remove('open');p.setAttribute('aria-hidden','true');
+  document.getElementById('helpBtn').classList.remove('on');
+}
+function toggleHelp(){if(document.getElementById('helpPanel').classList.contains('open'))closeHelp();else openHelp();}
+// Called from showPage: "This page" follows the user around while the panel is open
+function helpOnPage(){if(_helpTab==='page'&&document.getElementById('helpPanel').classList.contains('open'))helpShow('page');}
+function helpShow(tab,topic){
+  _helpTab=tab;_helpTopic=topic||null;
+  document.getElementById('helpTabPage').classList.toggle('on',tab==='page');
+  document.getElementById('helpTabBook').classList.toggle('on',tab==='book');
+  var body=document.getElementById('helpBody');
+  if(tab==='page')body.innerHTML=helpArticle(HELP[_currentPage]?_currentPage:'quickstart',false);
+  else body.innerHTML=topic?helpArticle(topic,true):helpToc();
+  body.scrollTop=0;
+}
+function helpToc(){
+  var h='',last='';
+  HELP_ORDER.forEach(function(k){
+    var t=HELP[k];
+    if(t.group!==last){h+=(last?'</div>':'')+'<div class="help-toc-group">'+t.group+'</div><div class="help-toc">';last=t.group;}
+    h+='<button onclick="helpShow(\'book\',\''+k+'\')"><i class="ti '+t.icon+'"></i>'+t.title+'</button>';
+  });
+  return h+'</div>';
+}
+function helpArticle(k,inBook){
+  var t=HELP[k],h='';
+  if(inBook)h+='<button class="help-link" onclick="helpShow(\'book\')" style="margin-bottom:12px"><i class="ti ti-arrow-left"></i> All topics</button>';
+  if(t.crumb)h+='<div class="help-crumb">'+t.crumb+'</div>';
+  h+='<h3>'+t.title+'</h3>';
+  if(t.intro)h+='<p>'+t.intro+'</p>';
+  if(t.steps)h+='<h4>How it works</h4><ol>'+t.steps.map(function(s){return '<li>'+s+'</li>';}).join('')+'</ol>';
+  if(t.terms)h+='<dl class="help-terms">'+t.terms.map(function(x){return '<dt>'+x[0]+'</dt><dd>'+x[1]+'</dd>';}).join('')+'</dl>';
+  if(t.tips)h+='<h4>Good to know</h4><ul>'+t.tips.map(function(s){return '<li>'+s+'</li>';}).join('')+'</ul>';
+  if(!inBook)h+='<div style="margin-top:14px"><button class="help-link" onclick="helpShow(\'book\')"><i class="ti ti-book-2"></i> Open the handbook</button></div>';
+  return h;
+}
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'&&document.getElementById('helpPanel').classList.contains('open'))closeHelp();
+});
+// Date fields: the native picker icon is replaced by a CSS background icon (see
+// "Date fields" in the stylesheet), so a click on that icon area opens the picker
+// here — with an English tooltip instead of the browser's OS-language one.
+(function(){
+  var SEL='input[type=date],input[type=month],input[type=week],input[type=datetime-local]';
+  function onIcon(el,e){var r=el.getBoundingClientRect();return e.clientX>=r.right-30;}
+  document.addEventListener('click',function(e){
+    var el=e.target;if(!el.matches||!el.matches(SEL)||el.disabled||el.readOnly||!onIcon(el,e))return;
+    try{el.showPicker();}catch(err){}
+  });
+  document.addEventListener('mousemove',function(e){
+    var el=e.target;if(!el.matches||!el.matches(SEL))return;
+    if(el.dataset.tip==null)el.dataset.tip=el.title||'';
+    var on=onIcon(el,e);el.style.cursor=on?'pointer':'';el.title=on?'Show date picker':el.dataset.tip;
+  });
+})();
+function openHelpExclusive(){if(typeof closeActivity==='function')closeActivity();}
+// Split View appends its toggle to the nav at init — keep Activity and "?" in the far corner
+(function(){['actBtn','helpBtn'].forEach(function(id){var b=document.getElementById(id);if(b)b.parentNode.appendChild(b);});})();
+</script>
+
+<!-- Activity — the project's change history. Every few seconds (and right before
+     each save) the data is reduced to a compact snapshot and compared with the
+     previous one; the differences become readable entries. Small changes to the
+     same item within 10 minutes merge into one entry with expandable details.
+     Data changes only — exports, navigation etc. are not logged. -->
+<aside id="actPanel" class="help-panel" aria-label="Activity" aria-hidden="true">
+  <div class="help-head"><i class="ti ti-history" style="color:var(--primary-fg)"></i> Activity
+    <button onclick="closeActivity()" title="Close" aria-label="Close activity"><i class="ti ti-x"></i></button></div>
+  <div style="padding:0 16px 10px;border-bottom:1px solid var(--border)">
+    <input id="actSearch" type="search" placeholder="Search, e.g. a supplier" oninput="_actShown=200;renderActivity()"
+      style="width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:13px">
+    <div class="help-tabs" id="actFilters" style="padding:8px 0 0;border:none;flex-wrap:wrap"></div>
+  </div>
+  <div class="help-body" id="actBody"></div>
+</aside>
+<script>
+var ACT_AREAS=['All','Suppliers','Assessments','Actions','Checklists','KPIs','Settings'];
+var ACT_ICON={Suppliers:'ti-building-factory-2',Assessments:'ti-clipboard-check',Actions:'ti-subtask',Checklists:'ti-list-check',KPIs:'ti-activity-heartbeat',Settings:'ti-adjustments-horizontal'};
+var ACT_MAX=2000,ACT_MERGE_MS=10*60*1000;
+var _actSnap=null,_actFilter='All',_actOpen={},_actShown=200;
+function _actPl(n,w){return n+' '+w+(n===1?'':'s');}
+var ACT_VERB={
+  sup_add:function(){return 'Supplier created';},
+  sup_del:function(){return 'Supplier deleted';},
+  sup_edit:function(){return 'Supplier details changed';},
+  sup_files:function(){return 'Supplier files changed';},
+  au_add:function(){return 'Assessment planned';},
+  au_del:function(){return 'Assessment deleted';},
+  au_done:function(){return 'Assessment completed';},
+  au_reopen:function(){return 'Assessment reopened';},
+  au_tpl:function(){return 'Checklist attached';},
+  au_edit:function(){return 'Assessment details changed';},
+  au_score:function(n){return _actPl(n,'checkpoint')+' scored';},
+  au_note:function(n){return 'Notes edited on '+_actPl(n,'checkpoint');},
+  au_weight:function(n){return 'Weight changed on '+_actPl(n,'checkpoint');},
+  au_files:function(n){return 'Evidence files changed on '+_actPl(n,'checkpoint');},
+  au_gn:function(){return 'General notes edited';},
+  act_add:function(){return 'Action created';},
+  act_del:function(){return 'Action deleted';},
+  act_status:function(n,e){var d=e.d&&e.d[0];return 'Action status '+(d?d[2]+' → '+d[3]:'changed');},
+  act_edit:function(){return 'Action changed';},
+  act_note:function(){return 'Progress note added';},
+  tpl_add:function(){return 'Checklist created';},
+  tpl_del:function(){return 'Checklist deleted';},
+  tpl_edit:function(){return 'Checklist edited';},
+  kpi_val:function(n){return _actPl(n,'KPI value')+' entered or changed';},
+  kpi_add:function(){return 'KPI added';},
+  kpi_del:function(){return 'KPI removed';},
+  kpi_edit:function(){return 'KPI renamed';},
+  set:function(){return 'Settings changed';},
+  file_load:function(){return 'Project data loaded from file';}
+};
+
+// ── Snapshot: only what a person would call "data", in comparable form ──
+function actSnap(){
+  var S={sup:{},act:{},tpl:{},kcat:{},set:{}};
+  suppliers.forEach(function(s){
+    var o={info:{auditor:s.auditor||'',code:s.refCode||''},files:(s.files||[]).map(function(f){return f.name||'file';}),
+      risk:JSON.stringify(s.risk||{}),rounds:{},kpi:{}};
+    Object.keys(s.supplierInfo||{}).forEach(function(k){var v=s.supplierInfo[k];o.info['f:'+k]=v==null?'':String(v);});
+    (s.rounds||[]).forEach(function(r){
+      var ro={label:r.label||'',status:r.status||'',date:r.plannedDate||'',type:r.type||'',auditor:r.auditor||'',
+        tpl:r.templateName||'',has:hasChecklist(r),gn:r.generalNotes||'',cps:{}};
+      Object.keys(r.categories||{}).forEach(function(cat){(r.categories[cat]||[]).forEach(function(it,i){
+        ro.cps[cat+'\u0001'+i]={c:it.checkpoint||'',sc:(it.score===null||it.score===undefined)?'':String(it.score),
+          n:it.notes||'',w:String(it.weight==null?1:it.weight),f:(it.files||[]).length,ref:cpRef(it,i)};
+      });});
+      o.rounds[r.id]=ro;
+    });
+    Object.keys(s.kpiData||{}).forEach(function(id){(s.kpiData[id]||[]).forEach(function(p){o.kpi[id+'\u0001'+p.period]=p.value==null?'':String(p.value);});});
+    S.sup[s.name]=o;
+  });
+  actions.forEach(function(a){
+    S.act[a.id]={title:a.title||'',supplier:a.supplier||'',status:a.status||'',dueDate:a.dueDate||'',startDate:a.startDate||'',
+      responsible:a.responsible||'',priority:a.priority||'',desc:a.desc||'',cps:JSON.stringify(a.checkpointLinks||[]),
+      nc:(a.comments||[]).filter(function(c){return !c.system;}).length};
+  });
+  templates.forEach(function(t){S.tpl[t.name]=JSON.stringify(t.categories||{});});
+  (kpiCatalog||[]).forEach(function(k){S.kcat[k.id]=k.name||'';});
+  S.set={
+    'Score thresholds':JSON.stringify(TIERS.map(function(t){return [t.min,t.label];})),
+    'Category weighting':JSON.stringify(weights||{}),
+    'Appearance':JSON.stringify([themeMode,brandColors,tierColorMode]),
+    'Risk model':JSON.stringify(riskModel||{}),
+    'Custom supplier fields':JSON.stringify(supplierInfoCatalog||[]),
+    'KPI configuration':JSON.stringify((kpiCatalog||[]).map(function(k){var c=Object.assign({},k);delete c.name;return c;}))
+  };
+  return S;
+}
+
+// ── Diff: two snapshots → readable events ──
+function actInfoLabel(k){
+  if(k==='auditor')return 'Assessor';
+  if(k==='code')return 'Short code';
+  var f=(supplierInfoCatalog||[]).find(function(x){return 'f:'+x.id===k;});
+  return f?f.label:k.replace(/^f:/,'');
+}
+function actRoundScore(sn,id){
+  var s=suppliers.find(function(x){return x.name===sn;});
+  var r=s&&(s.rounds||[]).find(function(x){return String(x.id)===String(id);});
+  var p=r?calcScore({categories:r.categories}):null;
+  return p!=null?p+' %':'';
+}
+function actDiff(A,B){
+  var ev=[];
+  function addRound(n,r){ev.push({a:'Assessments',v:'au_add',s:n+' · '+r.label,
+    d:[['date','Planned date','',r.date],['tpl','Checklist','',r.tpl]].filter(function(x){return x[3];})});}
+  var kd=[];
+  Object.keys(B.sup).forEach(function(n){
+    var b=B.sup[n],a=A.sup[n];
+    if(!a){ev.push({a:'Suppliers',v:'sup_add',s:n});Object.keys(b.rounds).forEach(function(id){addRound(n,b.rounds[id]);});return;}
+    var fd=[];
+    Object.keys(Object.assign({},a.info,b.info)).forEach(function(k){var x=a.info[k]||'',y=b.info[k]||'';if(x!==y)fd.push([k,actInfoLabel(k),x,y]);});
+    if(a.risk!==b.risk)fd.push(['risk','Criticality rating','','']);
+    if(fd.length)ev.push({a:'Suppliers',v:'sup_edit',g:'supedit|'+n,s:n,d:fd});
+    var fa=b.files.filter(function(f){return a.files.indexOf(f)<0;}),fr=a.files.filter(function(f){return b.files.indexOf(f)<0;});
+    if(fa.length||fr.length)ev.push({a:'Suppliers',v:'sup_files',g:'supfiles|'+n,s:n,
+      d:fa.map(function(f){return ['+'+f,f,'','added'];}).concat(fr.map(function(f){return ['-'+f,f,'','removed'];}))});
+    Object.keys(b.rounds).forEach(function(id){
+      var rb=b.rounds[id],ra=a.rounds[id],subj=n+' · '+rb.label,g=n+'|'+id;
+      if(!ra){addRound(n,rb);return;}
+      if(ra.status!==rb.status){
+        if(rb.status==='completed')ev.push({a:'Assessments',v:'au_done',s:subj,x:actRoundScore(n,id)});
+        else if(ra.status==='completed')ev.push({a:'Assessments',v:'au_reopen',s:subj});
+      }
+      var ed=[];
+      [['label','Name'],['date','Planned date'],['type','Type'],['auditor','Assessor']].forEach(function(f){
+        if(ra[f[0]]!==rb[f[0]])ed.push([f[0],f[1],ra[f[0]],rb[f[0]]]);});
+      if(ed.length)ev.push({a:'Assessments',v:'au_edit',g:'auedit|'+g,s:subj,d:ed});
+      if(!ra.has&&rb.has){ev.push({a:'Assessments',v:'au_tpl',s:subj,x:rb.tpl});return;}
+      if(ra.gn!==rb.gn)ev.push({a:'Assessments',v:'au_gn',g:'augn|'+g,s:subj});
+      var sd=[],nd=[],wd=[],xd=[];
+      Object.keys(rb.cps).forEach(function(k){
+        var x=ra.cps[k],y=rb.cps[k];if(!x||x.c!==y.c)return;  // structure changed — not a scoring change
+        var lbl=(y.ref?y.ref+' ':'')+y.c;if(lbl.length>110)lbl=lbl.slice(0,107)+'…';
+        if(x.sc!==y.sc)sd.push([k,lbl,x.sc||'—',y.sc||'—']);
+        if(x.n!==y.n)nd.push([k,lbl,'','']);
+        if(x.w!==y.w)wd.push([k,lbl,x.w,y.w]);
+        if(x.f!==y.f)xd.push([k,lbl,String(x.f),String(y.f)]);
+      });
+      if(sd.length)ev.push({a:'Assessments',v:'au_score',g:'auscore|'+g,s:subj,d:sd});
+      if(nd.length)ev.push({a:'Assessments',v:'au_note',g:'aunote|'+g,s:subj,d:nd});
+      if(wd.length)ev.push({a:'Assessments',v:'au_weight',g:'auweight|'+g,s:subj,d:wd});
+      if(xd.length)ev.push({a:'Assessments',v:'au_files',g:'aufiles|'+g,s:subj,d:xd});
+    });
+    Object.keys(a.rounds).forEach(function(id){if(!b.rounds[id])ev.push({a:'Assessments',v:'au_del',s:n+' · '+a.rounds[id].label});});
+    Object.keys(Object.assign({},a.kpi,b.kpi)).forEach(function(k){
+      var x=a.kpi[k]==null?'':a.kpi[k],y=b.kpi[k]==null?'':b.kpi[k];if(x===y)return;
+      var p=k.split('\u0001');
+      kd.push([n+'|'+k,n+' · '+(B.kcat[p[0]]||A.kcat[p[0]]||p[0])+' · '+p[1],x||'—',y||'—']);
+    });
+  });
+  Object.keys(A.sup).forEach(function(n){if(!B.sup[n])ev.push({a:'Suppliers',v:'sup_del',s:n});});
+  if(kd.length)ev.push({a:'KPIs',v:'kpi_val',g:'kpival',d:kd});
+
+  Object.keys(B.act).forEach(function(id){
+    var b=B.act[id],a=A.act[id],subj=b.title+(b.supplier?' — '+b.supplier:'');
+    if(!a){ev.push({a:'Actions',v:'act_add',s:subj});return;}
+    if(a.status!==b.status)ev.push({a:'Actions',v:'act_status',g:'actst|'+id,s:subj,d:[['status','Status',a.status,b.status]]});
+    var ed=[];
+    [['title','Title'],['supplier','Supplier'],['dueDate','Due date'],['startDate','Start date'],['responsible','Responsible'],
+     ['priority','Priority'],['desc','Description'],['cps','Linked checkpoints']].forEach(function(f){
+      if(a[f[0]]===b[f[0]])return;
+      var quiet=f[0]==='desc'||f[0]==='cps';
+      ed.push([f[0],f[1],quiet?'':a[f[0]],quiet?'':b[f[0]]]);
+    });
+    if(ed.length)ev.push({a:'Actions',v:'act_edit',g:'actedit|'+id,s:subj,d:ed});
+    if(b.nc>a.nc)ev.push({a:'Actions',v:'act_note',g:'actnote|'+id,s:subj});
+  });
+  Object.keys(A.act).forEach(function(id){if(!B.act[id]){var a=A.act[id];ev.push({a:'Actions',v:'act_del',s:a.title+(a.supplier?' — '+a.supplier:'')});}});
+
+  Object.keys(B.tpl).forEach(function(n){
+    if(!(n in A.tpl))ev.push({a:'Checklists',v:'tpl_add',s:n});
+    else if(A.tpl[n]!==B.tpl[n])ev.push({a:'Checklists',v:'tpl_edit',g:'tpledit|'+n,s:n});
+  });
+  Object.keys(A.tpl).forEach(function(n){if(!(n in B.tpl))ev.push({a:'Checklists',v:'tpl_del',s:n});});
+
+  var kcatChanged=false;
+  Object.keys(B.kcat).forEach(function(id){
+    if(!(id in A.kcat)){kcatChanged=true;ev.push({a:'KPIs',v:'kpi_add',s:B.kcat[id]});}
+    else if(A.kcat[id]!==B.kcat[id])ev.push({a:'KPIs',v:'kpi_edit',g:'kpiedit|'+id,s:B.kcat[id],d:[['name','Name',A.kcat[id],B.kcat[id]]]});
+  });
+  Object.keys(A.kcat).forEach(function(id){if(!(id in B.kcat)){kcatChanged=true;ev.push({a:'KPIs',v:'kpi_del',s:A.kcat[id]});}});
+
+  Object.keys(B.set).forEach(function(k){
+    if(A.set[k]===B.set[k])return;
+    if(k==='KPI configuration'&&kcatChanged)return;  // already logged as KPI added / removed
+    ev.push({a:k==='KPI configuration'?'KPIs':'Settings',v:'set',g:'set|'+k,s:k});
+  });
+  return ev;
+}
+
+// ── Recording: merge into a recent entry of the same item, else append ──
+function actUser(){return (typeof _cloudUser!=='undefined'&&_cloudUser&&_cloudUser.email)||'';}
+function actLogEvent(e){
+  var now=Date.now(),u=actUser();
+  if(e.g){
+    for(var i=activityLog.length-1;i>=0&&i>=activityLog.length-40;i--){
+      var L=activityLog[i];
+      if(L.g!==e.g||L.u!==u||now-Date.parse(L.t)>ACT_MERGE_MS)continue;
+      L.d=L.d||[];
+      (e.d||[]).forEach(function(nd){
+        var od=L.d.find(function(x){return x[0]===nd[0];});
+        if(od)od[3]=nd[3];else L.d.push(nd.slice());
+      });
+      // A value changed and then changed back is no change at all
+      L.d=L.d.filter(function(x){return !(x[2]===x[3]&&x[2]!=='');});
+      L.t=new Date(now).toISOString();
+      activityLog.splice(i,1);
+      if(L.d.length||!(e.d&&e.d.length))activityLog.push(L);
+      return;
+    }
+  }
+  activityLog.push({i:now.toString(36)+Math.random().toString(36).slice(2,6),t:new Date(now).toISOString(),u:u,
+    a:e.a,v:e.v,g:e.g||'',s:e.s||'',x:e.x||'',d:e.d||[]});
+  if(activityLog.length>ACT_MAX)activityLog.splice(0,activityLog.length-ACT_MAX);
+}
+function actTick(){
+  var cur;try{cur=actSnap();}catch(err){return;}
+  if(!_actSnap){_actSnap=cur;return;}
+  var ev=actDiff(_actSnap,cur);_actSnap=cur;
+  if(!ev.length)return;
+  ev.forEach(actLogEvent);
+  if(document.getElementById('actPanel').classList.contains('open'))renderActivity();
+}
+// A freshly loaded project is the new baseline — loading is not a change
+function actResetBaseline(){_actSnap=null;setTimeout(function(){if(!_actSnap)try{_actSnap=actSnap();}catch(err){}},0);}
+setInterval(actTick,4000);
+
+// ── Panel ──
+function openActivity(){
+  if(typeof closeHelp==='function')closeHelp();
+  actTick();
+  var p=document.getElementById('actPanel');p.classList.add('open');p.setAttribute('aria-hidden','false');
+  document.getElementById('actBtn').classList.add('on');
+  _actShown=200;renderActivity();
+}
+function closeActivity(){
+  var p=document.getElementById('actPanel');if(!p)return;p.classList.remove('open');p.setAttribute('aria-hidden','true');
+  document.getElementById('actBtn').classList.remove('on');
+}
+function toggleActivity(){if(document.getElementById('actPanel').classList.contains('open'))closeActivity();else openActivity();}
+function actToggle(id){_actOpen[id]=!_actOpen[id];renderActivity();}
+function actText(e){
+  var n=(e.d||[]).length||1,f=ACT_VERB[e.v];
+  return (f?f(n,e):e.v)+(e.x?' ('+e.x+')':'');
+}
+function actDetail(d){
+  var lbl=esc(String(d[1]));
+  if(d[2]===''&&d[3]==='')return lbl;
+  if(d[2]==='')return lbl+': '+esc(String(d[3]));
+  return lbl+': '+esc(String(d[2]))+' → '+esc(String(d[3]));
+}
+function actDay(t){
+  var d=new Date(t),today=new Date();today.setHours(0,0,0,0);
+  var day=new Date(d);day.setHours(0,0,0,0);
+  var diff=Math.round((today-day)/864e5);
+  if(diff===0)return 'Today';if(diff===1)return 'Yesterday';
+  return d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+}
+function renderActivity(){
+  document.getElementById('actFilters').innerHTML=ACT_AREAS.map(function(a){
+    return '<button class="'+(a===_actFilter?'on':'')+'" onclick="_actFilter=\''+a+'\';_actShown=200;renderActivity()">'+a+'</button>';
+  }).join('');
+  var body=document.getElementById('actBody');
+  var q=(document.getElementById('actSearch').value||'').toLowerCase().trim();
+  var list=activityLog.slice().reverse().filter(function(e){
+    if(_actFilter!=='All'&&e.a!==_actFilter)return false;
+    if(!q)return true;
+    return (actText(e)+' '+e.s).toLowerCase().indexOf(q)>=0||(e.d||[]).some(function(d){return String(d[1]).toLowerCase().indexOf(q)>=0;});
+  });
+  if(!list.length){
+    body.innerHTML='<div style="text-align:center;color:var(--text3);padding:30px 10px">'
+      +(activityLog.length?'No entries match.':'No changes recorded yet — they appear here as you work.')+'</div>';
+    return;
+  }
+  var h='',last='';
+  list.slice(0,_actShown).forEach(function(e){
+    var day=actDay(e.t);
+    if(day!==last){h+='<div class="help-toc-group"'+(last?'':' style="margin-top:0"')+'>'+day+'</div>';last=day;}
+    var d=e.d||[],open=!!_actOpen[e.i],showDet=d.length&&e.v!=='act_status';
+    h+='<div class="act-row">'
+      +'<span class="act-time">'+new Date(e.t).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})+'</span>'
+      +'<i class="ti '+(ACT_ICON[e.a]||'ti-point')+' act-ic"></i>'
+      +'<div class="act-main"><div>'+esc(actText(e))+(e.s?' — <b>'+esc(e.s)+'</b>':'')+'</div>'
+      +'<div class="act-meta">'+(e.u?esc(e.u.split('@')[0]):'')
+        +(showDet?(e.u?' · ':'')+'<button class="help-link" style="font-size:11.5px" onclick="actToggle(\''+e.i+'\')">'+(open?'Hide details':'Show details')+'</button>':'')
+      +'</div>'
+      +(showDet&&open?'<ul class="act-det">'+d.map(function(x){return '<li>'+actDetail(x)+'</li>';}).join('')+'</ul>':'')
+      +'</div></div>';
+  });
+  if(list.length>_actShown)h+='<div style="text-align:center;margin-top:12px"><button class="btn sm" onclick="_actShown+=200;renderActivity()">Show more</button></div>';
+  body.innerHTML=h;
+}
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'&&document.getElementById('actPanel').classList.contains('open'))closeActivity();
+});
 </script>
 </body>
 </html>
