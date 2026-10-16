@@ -64,8 +64,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-u
 .main{padding:24px;max-width:1300px;margin:0 auto}
 .page{display:none}.page.active{display:block}
 .section-title{font-family:Georgia,"Iowan Old Style","Times New Roman",serif;font-size:20px;font-weight:400;margin-bottom:16px;display:flex;align-items:center;gap:9px;color:var(--text)}
-.section-title i{color:var(--primary-fg);font-size:17px}
-.card{background:var(--bg);border:1px solid var(--border-soft);border-radius:var(--rl);padding:18px;margin-bottom:var(--sp4);box-shadow:var(--shadow-sm)}
+.section-title i{color:var(--primary-fg);font-size:17px}.card{background:var(--bg);border:1px solid var(--border-soft);border-radius:var(--rl);padding:18px;margin-bottom:var(--sp4);box-shadow:var(--shadow-sm)}
 .btn{padding:8px 16px;border:1px solid var(--border2);border-radius:var(--r);background:transparent;color:var(--text);cursor:pointer;font-size:13px;display:inline-flex;align-items:center;gap:6px;transition:all .15s;font-family:inherit}
 .btn:hover{background:var(--bg2)}.btn.primary{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}.btn.primary:hover{background:var(--primary-dark)}
 .btn.success{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}.btn.success:hover{background:var(--primary-dark)}
@@ -1593,7 +1592,11 @@ input:is([type=date],[type=month],[type=week],[type=datetime-local]){color-schem
   </div>
       <div class="section-title"><i class="ti ti-palette"></i> Appearance</div>
       <div class="card">
-        <p style="font-size:13px;color:var(--text2);margin-bottom:14px">Choose light or dark mode and set the app's brand colors. Applies immediately and is saved with the project.</p>
+        <div onclick="toggleSetCard(this)" style="display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer">
+          <p style="font-size:13px;color:var(--text2);margin:0">Choose light or dark mode and set the app's brand colors. Applies immediately and is saved with the project.</p>
+          <button class="btn sm" onclick="event.stopPropagation();toggleSetCard(this.parentNode)" title="Collapse / expand"><i class="ti ti-chevron-down"></i></button>
+        </div>
+        <div class="set-body" style="margin-top:14px;display:none">
         <div style="margin-bottom:16px">
           <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px">Mode</label>
           <div style="display:flex;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;width:fit-content" id="themeModeSwitch">
@@ -1613,11 +1616,16 @@ input:is([type=date],[type=month],[type=week],[type=datetime-local]){color-schem
           <button class="btn" onclick="saveUserBrandDefault()" title="Remember the current colours as your default"><i class="ti ti-bookmark"></i> Save as my default</button>
           <span id="brandMyDefaultBtns" style="display:inline-flex;gap:8px"></span>
         </div>
+        </div>
       </div>
 
       <div class="section-title"><i class="ti ti-traffic-lights"></i> Score Thresholds</div>
       <div class="card">
-        <p style="font-size:13px;color:var(--text2);margin-bottom:14px">Configure score tiers with custom thresholds, colors and labels. Changes apply immediately across the entire app.</p>
+        <div onclick="toggleSetCard(this)" style="display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer">
+          <p style="font-size:13px;color:var(--text2);margin:0">Configure score tiers with custom thresholds, colors and labels. Changes apply immediately across the entire app.</p>
+          <button class="btn sm" onclick="event.stopPropagation();toggleSetCard(this.parentNode)" title="Collapse / expand"><i class="ti ti-chevron-down"></i></button>
+        </div>
+        <div class="set-body" style="margin-top:14px;display:none">
         <div id="tiersEditor"></div>
         <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
           <button class="btn primary" onclick="applyTiers()"><i class="ti ti-check"></i> Apply</button>
@@ -1625,17 +1633,18 @@ input:is([type=date],[type=month],[type=week],[type=datetime-local]){color-schem
           <button class="btn" onclick="saveUserTierDefault()" title="Remember the current tiers as your default"><i class="ti ti-bookmark"></i> Save as my default</button>
           <span id="tierMyDefaultBtns" style="display:inline-flex;gap:8px"></span>
         </div>
+        </div>
       </div>
 
       <!-- Report Map (location slide background) — project setup, so it lives
-           here rather than on the Export page; collapsed because the previews are large. -->
+           here rather than on the Export page. -->
       <div class="section-title"><i class="ti ti-map-2"></i> Report Map</div>
       <div class="card">
-        <div onclick="toggleExpMap()" style="display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer">
+        <div onclick="toggleSetCard(this)" style="display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer">
           <p style="font-size:13px;color:var(--text2);margin:0">Map sheets for the supplier location slide. All continent maps are set up for new projects.</p>
-          <button class="btn sm" onclick="event.stopPropagation();toggleExpMap()" title="Collapse / expand"><i class="ti ti-chevron-down" id="expMapChevron"></i></button>
+          <button class="btn sm" onclick="event.stopPropagation();toggleSetCard(this.parentNode)" title="Collapse / expand"><i class="ti ti-chevron-down"></i></button>
         </div>
-        <div id="expMapBody" style="margin-top:12px;display:none">
+        <div class="set-body" style="margin-top:12px;display:none">
           <p style="font-size:12px;color:var(--text3);margin-bottom:10px">
             The pin, the leader line and the info box are drawn on top as editable PowerPoint objects — only the map itself is a picture.
           </p>
@@ -1645,7 +1654,12 @@ input:is([type=date],[type=month],[type=week],[type=datetime-local]){color-schem
 
       <div class="section-title"><i class="ti ti-key"></i> AI Settings</div>
       <div class="card">
-        <p style="font-size:13px;color:var(--text2);margin-bottom:10px">Anthropic API key — create at <b>console.anthropic.com</b></p>
+        <div onclick="toggleSetCard(this)" style="display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer">
+          <p style="font-size:13px;color:var(--text2);margin:0">Anthropic API key and AI model for the AI features.</p>
+          <button class="btn sm" onclick="event.stopPropagation();toggleSetCard(this.parentNode)" title="Collapse / expand"><i class="ti ti-chevron-down"></i></button>
+        </div>
+        <div class="set-body" style="margin-top:14px;display:none">
+        <p style="font-size:12px;color:var(--text2);margin-bottom:8px">API key — create at <b>console.anthropic.com</b></p>
         <input type="text" id="apiKey" placeholder="sk-ant-..." style="width:100%;font-family:monospace;font-size:11px;margin-bottom:12px">
         <div style="margin-bottom:14px">
           <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px">Model</label>
@@ -1664,10 +1678,16 @@ input:is([type=date],[type=month],[type=week],[type=datetime-local]){color-schem
             </label>
           </div>
         </div>
+        </div>
       </div>
 
       <div class="section-title"><i class="ti ti-cloud"></i> Cloud Account</div>
       <div class="card">
+        <div onclick="toggleSetCard(this)" style="display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer">
+          <p style="font-size:13px;color:var(--text2);margin:0">Your login and the cloud sync of this project.</p>
+          <button class="btn sm" onclick="event.stopPropagation();toggleSetCard(this.parentNode)" title="Collapse / expand"><i class="ti ti-chevron-down"></i></button>
+        </div>
+        <div class="set-body" style="margin-top:14px;display:none">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
           <div>
             <div style="font-size:13px;font-weight:600"><i class="ti ti-user-circle"></i> <span id="cloudUserEmail">—</span></div>
@@ -1677,6 +1697,7 @@ input:is([type=date],[type=month],[type=week],[type=datetime-local]){color-schem
             <button class="btn" onclick="cloudSyncNow()"><i class="ti ti-cloud-upload"></i> Sync Now</button>
             <button class="btn" onclick="authSignOut()"><i class="ti ti-logout"></i> Sign Out</button>
           </div>
+        </div>
         </div>
       </div>
 </div>
@@ -3665,7 +3686,7 @@ function showPage(id,btn,opts){
     overview:function(){buildTlChips('ov_tl_chips','toggleOvFilter',ovFilterColor);buildOvCatChips();renderOverview();},
     detail:function(){buildTlChips('det_tl_chips','toggleDetFilter',detFilterColor);populateSelects('detailSupSelect','detailCatFilter');renderDetail();},
     compare:function(){renderComparePage();},
-    settings:function(){renderWeightControls();renderTiersEditor();renderBrandDefaultButtons();renderMapSettings();},
+    settings:function(){closeSetCards();renderWeightControls();renderTiersEditor();renderBrandDefaultButtons();renderMapSettings();},
     exp:function(){renderExpVariants();renderExpSelectors();renderAllExportLists();renderReportScope();renderReportSlideStyle();renderReportDocStyle();renderReportXlStyle();},
     imp:function(){},
     calendar:function(){renderCalendar();},
@@ -13109,13 +13130,21 @@ function toggleExpContent(){
   if(body)body.style.display=_expContentCollapsed?'none':'';
   if(chev)chev.className='ti '+(_expContentCollapsed?'ti-chevron-down':'ti-chevron-up');
 }
-var _expMapCollapsed=true;   // Report Map card in Settings, collapsed by default
-function toggleExpMap(){
-  _expMapCollapsed=!_expMapCollapsed;
-  var body=document.getElementById('expMapBody');
-  var chev=document.getElementById('expMapChevron');
-  if(body)body.style.display=_expMapCollapsed?'none':'';
-  if(chev)chev.className='ti '+(_expMapCollapsed?'ti-chevron-down':'ti-chevron-up');
+// Settings cards: closed whenever the page opens, the chevron button (or the
+// card's header line) opens / closes one — same pattern as the Export cards.
+function toggleSetCard(head){
+  var body=head.parentNode.querySelector('.set-body'),chev=head.querySelector('.btn i');
+  if(!body)return;
+  var open=body.style.display==='none';
+  body.style.display=open?'':'none';
+  if(chev)chev.className='ti '+(open?'ti-chevron-up':'ti-chevron-down');
+}
+function closeSetCards(){
+  document.querySelectorAll('#page-settings .set-body').forEach(function(b){
+    b.style.display='none';
+    var chev=b.parentNode.querySelector('.btn.sm i');
+    if(chev)chev.className='ti ti-chevron-down';
+  });
 }
 
 function renderAllExportLists(){['pptx','excel','pdf'].forEach(type=>{const set=type==='pptx'?exportSelectedPptx:type==='excel'?exportSelectedExcel:exportSelectedPdf;if(!set.size)suppliers.forEach(s=>set.add(s.name));renderExportList(type);});}
@@ -17278,7 +17307,8 @@ var HELP={
       '<b>Score Thresholds</b>: change tier limits, colours and labels, then press Apply.',
       '<b>AI Settings</b>: enter your API key to use the AI features.',
       '<b>Cloud Account</b>: press Sync Now to save immediately, or sign out.'],
-    tips:['New projects colour the score tiers in the system colours.',
+    tips:['Sections start closed — the arrow button opens one.',
+      'New projects colour the score tiers in the system colours.',
       '<b>Report Map</b> comes with all continent maps — adjust crop or pins only if needed.',
       '“Save as my default” keeps your colours and tiers for new projects.']}
 };
